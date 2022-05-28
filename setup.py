@@ -1,3 +1,4 @@
+# python setup.py bdist_msi
 from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but it might need
@@ -67,7 +68,7 @@ bdist_msi_options = {
 
 setup(
     name='Csv Heatmapper',
-    version = '1.0',
+    version = '1.1',
     author="yoririn",
     description = 'convert 2-dimention csv to Heatmap',
     options = {

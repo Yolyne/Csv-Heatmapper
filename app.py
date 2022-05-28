@@ -83,6 +83,7 @@ class ColormapsWindow(tk.Toplevel):
 class FigureFrame(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)  # Generate canvas instance, Embedding fig in root
+        # self.df
 
 class InputFrame(ttk.Frame):
     def __init__(self, container):
@@ -102,14 +103,14 @@ class InputFrame(ttk.Frame):
         self.browse_frame.columnconfigure( [0,],weight=1,)
         ## filepath entry
         self.filepath = tk.StringVar()
-        self.filepath_entry = ttk.Entry(self.browse_frame, textvariable=self.filepath)
-        self.filepath_entry.grid(column=0, row=0, sticky=tk.EW, padx=5, )
-        self.filepath_entry.focus()
+        self.filepath_label = ttk.Label(self.browse_frame, textvariable=self.filepath, wraplength=155)
+        self.filepath_label.grid(column=0, row=0, sticky=tk.EW, padx=5, )
+        self.filepath_label.focus()
         # self.filepath_delta_entry = ttk.Entry(self.browse_frame, textvariable=self.filepath_delta)
         # self.filepath_delta_entry.grid(column=1, row=1, sticky=tk.EW)
         ## browse button
         self.img_mglass = tk.PhotoImage(file=resource_path("mglass.png"))
-        self.load_button = ttk.Button(self.browse_frame, image=self.img_mglass, command=self.browse_inputfile)
+        self.load_button = ttk.Button(self.browse_frame, image=self.img_mglass, command=self.master.browse_inputfile)
         self.load_button.grid(column=1, row=0, sticky=tk.E, padx=(0, 5), )
 
         ## setting frame
@@ -234,22 +235,6 @@ class InputFrame(ttk.Frame):
         # ダイアログが閉じられるまで待つ
         app.wait_window(dlg_modal)
 
-    def browse_inputfile(self):
-        """
-        Handle button click event
-        """
-        csvpath = filedialog.askopenfilename(
-            filetypes=[
-                ("CSV-like files", "*.csv"),
-                ('CSV-like files', '*.xlsx'),
-            ],
-            title="load",
-            initialdir=os.path.expanduser("~/Documents")
-        )
-        if(len(csvpath) != 0):
-            self.filepath.set(csvpath)
-            app.is_first = True #regard when csv is read as the first time
-        
     def save_image(self):
         savepath = filedialog.asksaveasfilename(
             filetypes = [
@@ -303,13 +288,42 @@ class App(tk.Tk):
         # layout on the root window
         self.columnconfigure(0, weight=1)
         # create the input frame
-        self.input_frame = InputFrame(self)
-        self.input_frame.grid(column=0, row=0, sticky=tk.NSEW, padx=10, pady=10)
         self.figure_frame = tk.Frame(self, width=900, height=600, background="#E6E6FA")
         self.figure_frame.grid(column=1, row=0, sticky=tk.NSEW, padx=(0, 10), pady=10)
+        self.input_frame = InputFrame(self)
+        self.input_frame.grid(column=0, row=0, sticky=tk.NSEW, padx=10, pady=10)
+        self.analyzedvalues = tk.StringVar(value="Load a csv-like file.")
+        self.statusbar = tk.Label(self, textvariable=self.analyzedvalues,bd=1, relief=tk.SUNKEN, anchor=tk.W)
+        self.statusbar.grid(column=0, row=1, columnspan=2, sticky=tk.EW)
 
         self.is_first = True
-
+    def browse_inputfile(self):
+        """
+        Handle button click event
+        """
+        csvpath = filedialog.askopenfilename(
+            filetypes=[
+                ("CSV-like files", "*.csv"),
+                ('CSV-like files', '*.xlsx'),
+            ],
+            title="load",
+            initialdir=os.path.expanduser("~/Documents")
+        )
+        if(len(csvpath) != 0):
+            if(os.path.splitext(csvpath)[-1].lower() == ".csv"):
+                self.figure_frame.df = pd.read_csv(csvpath,header=None).dropna(axis=1)
+            else:
+                df_file = pd.ExcelFile(csvpath)
+                self.figure_frame.df = df_file.parse(sheet_name=0,header=None).dropna(axis=1)
+            # self.input_frame.df = df = df
+            self.figure_frame.df_mean = self.figure_frame.df.mean().mean()
+            self.figure_frame.df_max = self.figure_frame.df.max().max()
+            self.figure_frame.df_min = self.figure_frame.df.min().min()
+            self.analyzedvalues.set(f"Max: {self.figure_frame.df_max}, Min: {self.figure_frame.df_min}, Mean: {self.figure_frame.df_mean}")
+            self.input_frame.filepath.set(csvpath)
+            app.is_first = True #regard when csv is read as the first time
+            self.screen()
+        
     def screen(self):
         if((fig := self.plot()) == None):
             return
@@ -317,7 +331,7 @@ class App(tk.Tk):
             figure_canvas = FigureCanvasTkAgg(fig, master=self.figure_frame)
             figure_canvas.draw()
             figure_canvas.get_tk_widget().grid(column=1, row=0, sticky=tk.NSEW)
-        except ValueError as e:
+        except ValueError as e: # Error(Latex) in drawing figure
             pass
             # print(traceback.format_exception(*sys.exc_info()))
             # figure_canvas = FigureCanvasTkAgg(fig, master=self.figure_frame)
@@ -325,16 +339,8 @@ class App(tk.Tk):
         # path = self.input_frame.filepath.get()
         if((path := self.input_frame.filepath.get()) == ""):
             return None
-        if(os.path.splitext(path)[-1].lower() == ".csv"):
-            df=pd.read_csv(path,header=None)
-        else:
-            df_file=pd.ExcelFile(path)
-            df=df_file.parse(sheet_name=0,header=None)
-        self.input_frame.df = df = df.dropna(axis=1)
         plt.close("all")
 
-        fig = plt.figure(figsize=(9,6), dpi=100)
-        ax = fig.add_subplot(111)
         # ax_ = ax_.ravel()
         # norm = mpl.colors.Normalize(df_min, 138)
         # cmax = df.max().max()
@@ -346,9 +352,9 @@ class App(tk.Tk):
             return None
         if(self.is_first): # set initial values
             self.is_first = False
-            cmax = math.ceil(df.max().max())
-            cmin = math.floor(df.min().min())
-            cinterval = cmax-cmin
+            cmax = math.ceil(self.figure_frame.df_max)
+            cmin = math.floor(self.figure_frame.df_min)
+            cinterval = (cmax-cmin)/10
             self.input_frame.scalemax.set(cmax)
             self.input_frame.scalemin.set(cmin)
             self.input_frame.scaleinterval.set(cinterval)
@@ -359,6 +365,7 @@ class App(tk.Tk):
         elif(cs_max <= cs_min):
             return None
         else:
+            self.input_frame.change_intervalslist()
             if(self.input_frame.scaleinterval.get() not in self.input_frame.scaleintervals_cbox["values"]):
                 #
                 return None
@@ -370,6 +377,11 @@ class App(tk.Tk):
             cmax = cs_max
             cmin = cs_min
             cinterval = float(self.input_frame.scaleinterval.get())
+
+        df = self.figure_frame.df
+        fig = plt.figure(figsize=(9,6), dpi=100)
+        ax = fig.add_subplot(111)
+
         cstep_num = int((cmax-cmin)/cinterval)
         cbar_norm = mpl.colors.Normalize(cmin, cmax)
 
@@ -385,11 +397,13 @@ class App(tk.Tk):
         cbar.ax.set_yticklabels([fr"$\leq {cmin}$"]+[f"${round(cmin+(i+1)*cinterval, 3)}$" for i in range(cstep_num-1)]+[fr"$\geq {cmax}$"])
         ax.xaxis.set_label_position('top')
         ax.yaxis.set_ticks_position('both')
-        if('' in ((x_interval := self.input_frame.xaxis_cbox.get()), (y_interval := self.input_frame.yaxis_cbox.get()))):
+        if((x_interval := self.input_frame.xaxis_cbox.get()) == ""):
             ax.set_xticks([1]+[len(df.columns)//5*(i+1) for i in range(5)])
-            ax.set_yticks([1]+[len(df)//3*(i+1) for i in range(3)])
         else:
             ax.set_xticks([1]+[i for i in range(2, len(df.columns)+1) if i%int(x_interval) == 0])
+        if((y_interval := self.input_frame.yaxis_cbox.get()) == ""):
+            ax.set_yticks([1]+[len(df)//3*(i+1) for i in range(3)])
+        else:
             ax.set_yticks([1]+[i for i in range(2, len(df)+1) if i%int(y_interval) == 0])
         labelsize = self.input_frame.labelsize.get()
         tickslabelsize = self.input_frame.tickslabelsize.get()
@@ -439,6 +453,7 @@ def on_closing():
     app.destroy()
 
 if __name__ == "__main__":
+    df = pd.DataFrame()
     app = App()
     center(app)
     
