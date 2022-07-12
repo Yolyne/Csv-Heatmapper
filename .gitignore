@@ -2,3 +2,5 @@
 .tmp.driveupload
 /Lib
 /build
+/dist
+desktop.ini

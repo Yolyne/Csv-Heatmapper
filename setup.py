@@ -1,6 +1,7 @@
 # python setup.py bdist_msi
 from cx_Freeze import setup, Executable
-
+app_name = "CsvHeatmapper"
+version = "1.2"
 # Dependencies are automatically detected, but it might need
 # fine tuning.
 # # importして使っているライブラリを記載（こちらの方が軽くなるという噂）
@@ -33,9 +34,10 @@ executables = [
         'app.py',
         base=base,
         icon="images/icon.ico",
-        target_name = 'Csv Heatmapper',
-        shortcut_name="Csv Heatmapper",
+        target_name = app_name,
+        shortcut_name=f"{app_name} {version}",
         shortcut_dir="ProgramMenuFolder",
+        copyright="Copyright (c) yoririn 2022"
     )
 ]
 
@@ -43,9 +45,9 @@ shortcut_table = [
     (
         "DesktopShortcut",  # Shortcut
         "DesktopFolder",  # Directory_
-        "Csv Heatmapper",  # Name
+        app_name,  # Name
         "TARGETDIR",  # Component_
-        "[TARGETDIR]Csv Heatmapper",  # Target
+        f"[TARGETDIR]{app_name}",  # Target
         None,  # Arguments
         None,  # Description
         None,  # Hotkey
@@ -63,12 +65,12 @@ upgrade_code = "{59745BEA-C550-4066-A77D-88B494F22C82}"
 bdist_msi_options = {
     "upgrade_code": upgrade_code,
     "data": msi_data,
-    "initial_target_dir": f"[ProgramFiles64Folder]Csv Heatmapper",
+    "initial_target_dir": f"[ProgramFiles64Folder]{app_name}",
 }
 
 setup(
-    name='Csv Heatmapper',
-    version = '1.1',
+    name=app_name,
+    version = version,
     author="yoririn",
     description = 'convert 2-dimention csv to Heatmap',
     options = {

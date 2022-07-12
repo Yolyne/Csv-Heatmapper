@@ -121,13 +121,15 @@ class InputFrame(ttk.Frame):
         self.axes_frame = ttk.LabelFrame(self.setting_frame, text="Axis Scale")
         self.axes_frame.grid(column=0, row=0, padx=5, ipadx=5, ipady=3, sticky=tk.EW)
         self.axes_frame.columnconfigure([1,], weight=1,)
+        self.xaxis_interval = tk.DoubleVar()
+        self.yaxis_interval = tk.DoubleVar()
         self.xaxis_label = ttk.Label(self.axes_frame, text="x-Interval")
         self.xaxis_label.grid(column=0, row=0, sticky=tk.W)
         self.yaxis_label = ttk.Label(self.axes_frame, text="y-Interval")
         self.yaxis_label.grid(column=0, row=1, sticky=tk.W)
-        self.xaxis_cbox = ttk.Combobox(self.axes_frame, state="readonly")
+        self.xaxis_cbox = ttk.Combobox(self.axes_frame, state="readonly", textvariable=self.xaxis_interval)
         self.xaxis_cbox.grid(column=1, row=0, sticky=tk.E)
-        self.yaxis_cbox = ttk.Combobox(self.axes_frame, state="readonly")
+        self.yaxis_cbox = ttk.Combobox(self.axes_frame, state="readonly", textvariable=self.yaxis_interval)
         self.yaxis_cbox.grid(column=1, row=1, sticky=tk.E)
         ## colorscale_frame
         self.colorscale_frame = ttk.LabelFrame(self.setting_frame, text="Color Scale")
@@ -259,7 +261,7 @@ class InputFrame(ttk.Frame):
     def change_intervalslist(self):
         if("" in (self.scalemax.get(), self.scalemin.get())):
             return
-        mm_range = float(self.scalemax.get())-float(self.scalemin.get())
+        mm_range = self.scalemax.get()-self.scalemin.get()
         _ = make_divisors(mm_range)
         self.scaleintervals_cbox["values"] = [i for i in _ if mm_range/i < 21]
 
@@ -309,7 +311,7 @@ class App(tk.Tk):
             title="load",
             initialdir=os.path.expanduser("~/Documents")
         )
-        if(len(csvpath) != 0):
+        if(csvpath):
             if(os.path.splitext(csvpath)[-1].lower() == ".csv"):
                 self.figure_frame.df = pd.read_csv(csvpath,header=None).dropna(axis=1)
             else:
@@ -341,13 +343,21 @@ class App(tk.Tk):
             return None
         plt.close("all")
 
+        df = self.figure_frame.df
+        fig = plt.figure(figsize=(9,6), dpi=100)
+        ax = fig.add_subplot(111)
+
+        df_width = len(df.columns)
+        df_height = len(df)
         # ax_ = ax_.ravel()
         # norm = mpl.colors.Normalize(df_min, 138)
         # cmax = df.max().max()
         # cmin = df.min().min()
         try:
-            cs_max = self.input_frame.scalemax.get()
-            cs_min = self.input_frame.scalemin.get()
+            # cs_max = self.input_frame.scalemax.get()
+            # cs_min = self.input_frame.scalemin.get()
+            cmax = self.input_frame.scalemax.get()
+            cmin = self.input_frame.scalemin.get()
         except:
             return None
         if(self.is_first): # set initial values
@@ -355,56 +365,52 @@ class App(tk.Tk):
             cmax = math.ceil(self.figure_frame.df_max)
             cmin = math.floor(self.figure_frame.df_min)
             cinterval = (cmax-cmin)/10
+            x_interval = 1 if df_width < 5 else df_width//5
+            y_interval = 1 if df_height < 4 else df_height//4
             self.input_frame.scalemax.set(cmax)
             self.input_frame.scalemin.set(cmin)
             self.input_frame.scaleinterval.set(cinterval)
+            self.input_frame.xaxis_cbox.set(x_interval)
+            self.input_frame.yaxis_cbox.set(y_interval)
             self.input_frame.change_intervalslist()
-        elif('' in (cs_max, cs_min, self.input_frame.scaleinterval.get())):
+        elif('' in (cmax, cmin)):
             # When colorbar scale max or min have no value.
             return None
-        elif(cs_max <= cs_min):
+        elif(cmax <= cmin):
             return None
         else:
             self.input_frame.change_intervalslist()
-            if(self.input_frame.scaleinterval.get() not in self.input_frame.scaleintervals_cbox["values"]):
-                #
-                return None
-            # try:
-            #     float(cs_max)
-            #     float(cs_min)
-            # except ValueError:
-            #     return None
-            cmax = cs_max
-            cmin = cs_min
-            cinterval = float(self.input_frame.scaleinterval.get())
+            if((cinterval := self.input_frame.scaleinterval.get()) not in self.input_frame.scaleintervals_cbox["values"]):
+                # cmax = self.input_frame.scalemax.get()
+                # cmin = self.input_frame.scalemin.get()
+                cinterval = (cmax-cmin)/10
+                self.input_frame.scaleinterval.set(cinterval)
+            # cmax = cs_max
+            # cmin = cs_min
+            # cinterval = self.input_frame.scaleinterval.get()
+            x_interval = self.input_frame.xaxis_interval.get()
+            y_interval = self.input_frame.yaxis_interval.get()
 
-        df = self.figure_frame.df
-        fig = plt.figure(figsize=(9,6), dpi=100)
-        ax = fig.add_subplot(111)
 
-        cstep_num = int((cmax-cmin)/cinterval)
+        cbar_step = int((cmax-cmin)/cinterval)
         cbar_norm = mpl.colors.Normalize(cmin, cmax)
-
-        extent = 0.5, len(df.columns)+0.5, len(df)+0.5, 0.5
+        extent = 0.5, df_width+0.5, df_height+0.5, 0.5
+        print(df.columns)
+        print(extent)
 
         cmap = self.input_frame.which_cm.get()
         if(self.input_frame.cm_reversed.get()):
             cmap =cmap+"_r"
         ax.matshow(df, norm=cbar_norm, cmap=cmap, extent=extent)
+        # ax.matshow(df, norm=cbar_norm, cmap=cmap,)
         cbar = fig.colorbar(mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
                     ax=ax,)
-        cbar.ax.set_yticks([cmin+i*cinterval for i in range(cstep_num+1)])
-        cbar.ax.set_yticklabels([fr"$\leq {cmin}$"]+[f"${round(cmin+(i+1)*cinterval, 3)}$" for i in range(cstep_num-1)]+[fr"$\geq {cmax}$"])
+        cbar.ax.set_yticks([cmin+i*cinterval for i in range(cbar_step+1)])
+        cbar.ax.set_yticklabels([fr"$\leq {float(cmin)}$"]+[f"${round(cmin+(i+1)*cinterval, 3)}$" for i in range(cbar_step-1)]+[fr"$\geq {float(cmax)}$"])
         ax.xaxis.set_label_position('top')
         ax.yaxis.set_ticks_position('both')
-        if((x_interval := self.input_frame.xaxis_cbox.get()) == ""):
-            ax.set_xticks([1]+[len(df.columns)//5*(i+1) for i in range(5)])
-        else:
-            ax.set_xticks([1]+[i for i in range(2, len(df.columns)+1) if i%int(x_interval) == 0])
-        if((y_interval := self.input_frame.yaxis_cbox.get()) == ""):
-            ax.set_yticks([1]+[len(df)//3*(i+1) for i in range(3)])
-        else:
-            ax.set_yticks([1]+[i for i in range(2, len(df)+1) if i%int(y_interval) == 0])
+        ax.set_xticks([1]+[i for i in range(int(x_interval), df_width+1, int(x_interval))])
+        ax.set_yticks([1]+[i for i in range(int(y_interval), df_height+1, int(y_interval))])
         labelsize = self.input_frame.labelsize.get()
         tickslabelsize = self.input_frame.tickslabelsize.get()
         # ax.set_yticklabels(xvalues, fontsize=tickslabelsize)
@@ -433,10 +439,10 @@ class App(tk.Tk):
         # print(fig_width, fig_height)
 
 
-        _ = list(range(1,10))+[i for i in range(10, len(df.columns)+1) if i%5 == 0]
-        self.input_frame.xaxis_cbox["values"] = [i for i in _ if len(df.columns)/i < 21]
-        _ = list(range(1,10))+[i for i in range(10, len(df)+1) if i%5 == 0]
-        self.input_frame.yaxis_cbox["values"] = [i for i in _ if len(df)/i < 21]
+        _ = list(range(1,10))+[i for i in range(10, df_width, 5)]+[df_width] if df_width > 10 else list(range(1, df_width+1))
+        self.input_frame.xaxis_cbox["values"] = [i for i in _ if df_width/i < 21]
+        _ = list(range(1,10))+[i for i in range(10, df_height, 5)]+[df_height] if df_height > 10 else list(range(1, df_height+1))
+        self.input_frame.yaxis_cbox["values"] = [i for i in _ if df_height/i < 21]
 
         return fig
 
