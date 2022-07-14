@@ -1,7 +1,7 @@
 # python setup.py bdist_msi
 from cx_Freeze import setup, Executable
 app_name = "CsvHeatmapper"
-version = "1.2"
+version = "2.0"
 # Dependencies are automatically detected, but it might need
 # fine tuning.
 # # importして使っているライブラリを記載（こちらの方が軽くなるという噂）

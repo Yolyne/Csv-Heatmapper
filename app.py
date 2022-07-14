@@ -5,9 +5,12 @@ import pandas as pd
 import sys
 import os
 import math
+import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+# from matplotlib.backend_bases import key_press_handler
+
 # plt.switch_backend("tkagg")
 
 # IMAGES_PATH = pathlib.Path(__file__).parent / "images"
@@ -39,6 +42,8 @@ def make_divisors(n):
 # }
 # plt.rcParams.update(config)
 
+class MyNavigationToolbar(NavigationToolbar2Tk):
+    toolitems = [t for t in NavigationToolbar2Tk.toolitems[:-2]]
 
 class ColormapsWindow(tk.Toplevel):
     def __init__(self, container):
@@ -80,10 +85,10 @@ class ColormapsWindow(tk.Toplevel):
         
         return fig
 
-class FigureFrame(ttk.Frame):
-    def __init__(self, container):
-        super().__init__(container)  # Generate canvas instance, Embedding fig in root
-        # self.df
+# class FigureFrame(ttk.Frame):
+#     def __init__(self, container):
+#         super().__init__(container)  # Generate canvas instance, Embedding fig in root
+#         # self.df
 
 class InputFrame(ttk.Frame):
     def __init__(self, container):
@@ -98,7 +103,8 @@ class InputFrame(ttk.Frame):
         self.columns_span = 4
 
         ## browse frame
-        self.browse_frame = ttk.LabelFrame(self, text="CSV File")
+        self.browse_frame = tk.LabelFrame(self, text="CSV File")
+        # self.browse_frame = tk.LabelFrame(self, )
         self.browse_frame.grid(column=0, row=0, ipadx=5, ipady=3, sticky=tk.EW)
         self.browse_frame.columnconfigure( [0,],weight=1,)
         ## filepath entry
@@ -114,12 +120,12 @@ class InputFrame(ttk.Frame):
         self.load_button.grid(column=1, row=0, sticky=tk.E, padx=(0, 5), )
 
         ## setting frame
-        self.setting_frame = ttk.LabelFrame(self, text="Plot Setting")
+        self.setting_frame = tk.LabelFrame(self, text="Plot Setting")
         self.setting_frame.grid(column=0, row=1, ipadx=5, ipady=3, sticky=tk.EW)
         self.setting_frame.columnconfigure([0,], weight=1,)
         ## ticks frame
         self.axes_frame = ttk.LabelFrame(self.setting_frame, text="Axis Scale")
-        self.axes_frame.grid(column=0, row=0, padx=5, ipadx=5, ipady=3, sticky=tk.EW)
+        self.axes_frame.grid(column=0, row=0, ipadx=5, ipady=3, sticky=tk.EW)
         self.axes_frame.columnconfigure([1,], weight=1,)
         self.xaxis_interval = tk.DoubleVar()
         self.yaxis_interval = tk.DoubleVar()
@@ -133,7 +139,7 @@ class InputFrame(ttk.Frame):
         self.yaxis_cbox.grid(column=1, row=1, sticky=tk.E)
         ## colorscale_frame
         self.colorscale_frame = ttk.LabelFrame(self.setting_frame, text="Color Scale")
-        self.colorscale_frame.grid(column=0, row=1, padx=5, ipadx=5, ipady=3, sticky=tk.EW)
+        self.colorscale_frame.grid(column=0, row=1, ipadx=5, ipady=3, sticky=tk.EW)
         self.colorscale_frame.columnconfigure([1,], weight=1,)
         self.scalemax_label = ttk.Label(self.colorscale_frame, text="Max")
         self.scalemax_label.grid(column=0, row=0, sticky=tk.W)
@@ -152,7 +158,7 @@ class InputFrame(ttk.Frame):
         self.scaleintervals_cbox.grid(column=1, row=2, sticky=tk.E)
         ## axes labal frame
         self.label_frame = ttk.LabelFrame(self.setting_frame, text="Label")
-        self.label_frame.grid(column=0, row=2, padx=5, ipadx=5, ipady=3, sticky=tk.EW)
+        self.label_frame.grid(column=0, row=2, ipadx=5, ipady=3, sticky=tk.EW)
         self.label_frame.columnconfigure([1,], weight=1,)
         self.xlabel_label = ttk.Label(self.label_frame, text="x-Label")
         self.xlabel_label.grid(column=0, row=0, sticky=tk.W)
@@ -171,7 +177,7 @@ class InputFrame(ttk.Frame):
         self.cbarlabel_entry.grid(column=1, row=2, sticky=tk.E)
         ## fontsize
         self.font_frame = ttk.LabelFrame(self.setting_frame, text="Fontsize")
-        self.font_frame.grid(column=0, row=3, padx=5, ipadx=5, ipady=3, sticky=tk.EW)
+        self.font_frame.grid(column=0, row=3, ipadx=5, ipady=3, sticky=tk.EW)
         self.font_frame.columnconfigure([1,], weight=1,)
         self.labelsize_label = ttk.Label(self.font_frame, text="Axis Label")
         self.labelsize_label.grid(column=0, row=0, sticky=tk.W)
@@ -186,18 +192,22 @@ class InputFrame(ttk.Frame):
         ## colormap
         self.which_cm = StringVar(value="magma")
         self.cm_frame = ttk.LabelFrame(self.setting_frame, text="Colormap")
-        self.cm_frame.grid(column=0, row=4, padx=5, ipadx=5, ipady=3, sticky=tk.EW)
+        self.cm_frame.grid(column=0, row=4, ipadx=5, ipady=3, sticky=tk.EW)
         self.cm_button = ttk.Button(self.cm_frame, text="Select Colormap")
         self.cm_button["command"] = self.select_cm
         self.cm_button.grid(column=0,row=0)
-        # self.cm_label = ttk.Label(self.cm_frame, text="reversed")
-        # self.cm_label.grid(column=0, row=0)
         self.cm_reversed = BooleanVar()
         self.cm_check = ttk.Checkbutton(self.cm_frame, text='reversed', onvalue=True, offvalue=False, variable=self.cm_reversed)
         self.cm_check.grid(column=1, row=0)
+        ## 3d
+        self.is_3d = BooleanVar()
+        self.threeD_check = ttk.Checkbutton(self.setting_frame, text='3D', onvalue=True, offvalue=False, variable=self.is_3d)
+        self.threeD_check.grid(column=0, row=5, sticky=tk.W)
         ## shared option
         for child in self.setting_frame.winfo_children():
-            child.grid_configure(pady=3)
+            child.grid_configure(padx=3, pady=3)
+        # for child in self.winfo_children():
+        #     child.configure(bg='white')
 
         ## button frame
         self.button_frame = ttk.Frame(self)
@@ -332,7 +342,14 @@ class App(tk.Tk):
         try:
             figure_canvas = FigureCanvasTkAgg(fig, master=self.figure_frame)
             figure_canvas.draw()
-            figure_canvas.get_tk_widget().grid(column=1, row=0, sticky=tk.NSEW)
+            toolbar = MyNavigationToolbar(figure_canvas, self.figure_frame, pack_toolbar=False)
+            toolbar.update()
+            toolbar.grid(column=0, row=0, sticky=tk.EW)
+            # figure_canvas.mpl_connect(
+            #     "key_press_event", lambda event: print(f"you pressed {event.key}"))
+            # figure_canvas.mpl_connect("key_press_event", key_press_handler)
+            figure_canvas.get_tk_widget().grid(column=0, row=1, sticky=tk.NSEW)
+            # plt.show()
         except ValueError as e: # Error(Latex) in drawing figure
             pass
             # print(traceback.format_exception(*sys.exc_info()))
@@ -345,7 +362,6 @@ class App(tk.Tk):
 
         df = self.figure_frame.df
         fig = plt.figure(figsize=(9,6), dpi=100)
-        ax = fig.add_subplot(111)
 
         df_width = len(df.columns)
         df_height = len(df)
@@ -391,53 +407,39 @@ class App(tk.Tk):
             x_interval = self.input_frame.xaxis_interval.get()
             y_interval = self.input_frame.yaxis_interval.get()
 
-
         cbar_step = int((cmax-cmin)/cinterval)
         cbar_norm = mpl.colors.Normalize(cmin, cmax)
-        extent = 0.5, df_width+0.5, df_height+0.5, 0.5
-        print(df.columns)
-        print(extent)
-
         cmap = self.input_frame.which_cm.get()
         if(self.input_frame.cm_reversed.get()):
             cmap =cmap+"_r"
-        ax.matshow(df, norm=cbar_norm, cmap=cmap, extent=extent)
-        # ax.matshow(df, norm=cbar_norm, cmap=cmap,)
-        cbar = fig.colorbar(mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
-                    ax=ax,)
+        
+        if(self.input_frame.is_3d.get()):
+            ax = fig.add_subplot(111, projection="3d")
+            x = np.arange(1, df_width+1)
+            y = np.arange(1, df_height+1)
+            X, Y = np.meshgrid(x, y)
+            ax.plot_surface(X, Y, df, cmap = cmap)
+        else:
+            ax = fig.add_subplot(111)
+            extent = 0.5, df_width+0.5, df_height+0.5, 0.5
+            ax.matshow(df, norm=cbar_norm, cmap=cmap, extent=extent)
+            # # ax.matshow(df, norm=cbar_norm, cmap=cmap,)
+            ax.xaxis.set_label_position('top')
+            ax.yaxis.set_ticks_position('both')
+        cbar = fig.colorbar(mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),ax=ax,)
         cbar.ax.set_yticks([cmin+i*cinterval for i in range(cbar_step+1)])
         cbar.ax.set_yticklabels([fr"$\leq {float(cmin)}$"]+[f"${round(cmin+(i+1)*cinterval, 3)}$" for i in range(cbar_step-1)]+[fr"$\geq {float(cmax)}$"])
-        ax.xaxis.set_label_position('top')
-        ax.yaxis.set_ticks_position('both')
         ax.set_xticks([1]+[i for i in range(int(x_interval), df_width+1, int(x_interval))])
         ax.set_yticks([1]+[i for i in range(int(y_interval), df_height+1, int(y_interval))])
         labelsize = self.input_frame.labelsize.get()
         tickslabelsize = self.input_frame.tickslabelsize.get()
-        # ax.set_yticklabels(xvalues, fontsize=tickslabelsize)
-        # ax.set_xticklabels(xvalues, fontsize=tickslabelsize)
-        # ax.set_yticklabels(xvalues, fontsize=tickslabelsize)
         cbar.ax.tick_params(axis='y', labelsize=tickslabelsize)
         ax.tick_params(axis='x', labelsize=tickslabelsize)
         ax.tick_params(axis='y', labelsize=tickslabelsize)
-        # try:
-        #     cbar.set_label(fr"${(cbarlabel := self.input_frame.cbarlabel.get())}$", fontsize=labelsize)
-        # except ValueError:
-        #     cbar.set_label(fr"{cbarlabel}", fontsize=labelsize)
-        # try:
-        #     ax.set_xlabel(fr"${(xlabel := self.input_frame.xlabel.get())}$", fontsize=labelsize)
-        # except ValueError:
-        #     ax.set_xlabel(fr"{xlabel}", fontsize=labelsize)
-        # try:
-        #     ax.set_ylabel(fr"${(ylabel := self.input_frame.ylabel.get())}$", fontsize=labelsize)
-        # except ValueError:
-        #     ax.set_ylabel(fr"{ylabel}", fontsize=labelsize)
         cbar.set_label(fr"${(self.input_frame.cbarlabel.get())}$", fontsize=labelsize)
         ax.set_xlabel(fr"${(self.input_frame.xlabel.get())}$", fontsize=labelsize)
         ax.set_ylabel(fr"${(self.input_frame.ylabel.get())}$", fontsize=labelsize)
-        # global fig_width, fig_height
-        # fig_width, fig_height = fig.get_size_inches()*fig.dpi
-        # print(fig_width, fig_height)
-
+        
 
         _ = list(range(1,10))+[i for i in range(10, df_width, 5)]+[df_width] if df_width > 10 else list(range(1, df_width+1))
         self.input_frame.xaxis_cbox["values"] = [i for i in _ if df_width/i < 21]
