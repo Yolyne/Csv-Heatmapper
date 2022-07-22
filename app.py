@@ -1,3 +1,12 @@
+"""
+app.py
+
+Copyright (c) 2022 yoririn
+
+This software is released under the MIT license.
+See https://opensource.org/licenses/MIT
+
+"""
 import tkinter as tk
 from tkinter import BooleanVar, StringVar, ttk
 from tkinter import filedialog
