@@ -3,4 +3,7 @@
 /Lib
 /build
 /dist
+/share
 desktop.ini
+sample.py
+pyvenv.cfg
