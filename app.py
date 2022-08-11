@@ -290,7 +290,7 @@ class InputFrame(tk.Frame):
             self.label_frame, text="Colorbar Label"
         )
         self.cbarlabel_label.grid(column=0, row=2, sticky=tk.W)
-        self.cbarlabel = tk.StringVar(value="z()")
+        self.cbarlabel = tk.StringVar(value="z ()")
         self.cbarlabel_entry = ttk.Entry(
             self.label_frame, textvariable=self.cbarlabel
         )
@@ -754,13 +754,13 @@ class App(tk.Tk):
         ax.tick_params(axis="x", labelsize=tickslabelsize)
         ax.tick_params(axis="y", labelsize=tickslabelsize)
         cbar.set_label(
-            fr"${(self.input_frame.cbarlabel.get())}$", fontsize=labelsize
+            fr"{(self.input_frame.cbarlabel.get())}", fontsize=labelsize
         )
         ax.set_xlabel(
-            fr"${(self.input_frame.xlabel.get())}$", fontsize=labelsize
+            fr"{(self.input_frame.xlabel.get())}", fontsize=labelsize
         )
         ax.set_ylabel(
-            fr"${(self.input_frame.ylabel.get())}$", fontsize=labelsize
+            fr"{(self.input_frame.ylabel.get())}", fontsize=labelsize
         )
         # cbar.ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
         # cbar.ax.ticklabel_format(style="sci",  axis="y",scilimits=(0,0))
