@@ -1,5 +1,7 @@
 # python setup.py bdist_msi
 from cx_Freeze import setup, Executable
+import sys
+
 app_name = "CsvHeatmapper"
 version = "2.0"
 # Dependencies are automatically detected, but it might need
@@ -11,33 +13,34 @@ includes = [
     "tkinter",
     "pandas",
     "math",
-    "matplotlib",]
+    "matplotlib",
+]
 
 # excludesでは、パッケージ化しないライブラリやモジュールを指定する。
 """
 numpy,pandas,lxmlは非常に重いので使わないなら、除く。（合計で80MBほど）
 他にも、PIL(5MB)など。
 """
-excludes = [
-    "lxml",
-    "PyQt4",
-    "PyQt5",
-    "pip"
-]
-build_options = {'includes': includes, 'packages': [], 'excludes': excludes, "include_files": "images",}
+excludes = ["lxml", "PyQt4", "PyQt5", "pip", "pip-license"]
+build_options = {
+    "includes": includes,
+    "packages": [],
+    "excludes": excludes,
+    "include_files": "images",
+}
 
-import sys
-base = 'Win32GUI' if sys.platform=='win32' else None
+
+base = "Win32GUI" if sys.platform == "win32" else None
 
 executables = [
     Executable(
-        'app.py',
+        "app.py",
         base=base,
         icon="images/icon.ico",
-        target_name = app_name,
+        target_name=app_name,
         shortcut_name=f"{app_name} {version}",
         shortcut_dir="ProgramMenuFolder",
-        copyright="Copyright (c) yoririn 2022"
+        copyright="Copyright (c) yoririn 2022",
     )
 ]
 
@@ -70,12 +73,12 @@ bdist_msi_options = {
 
 setup(
     name=app_name,
-    version = version,
+    version=version,
     author="yoririn",
-    description = 'convert 2-dimention csv to Heatmap',
-    options = {
-        'build_exe': build_options,
+    description="convert 2-dimention csv to Heatmap",
+    options={
+        "build_exe": build_options,
         "bdist_msi": bdist_msi_options,
     },
-    executables = executables
+    executables=executables,
 )
