@@ -56,21 +56,20 @@ class MyNavigationToolbar(NavigationToolbar2Tk):
 class ColormapsWindow(tk.Toplevel):
     def __init__(self, container):
         super().__init__(container)
-        w = app.winfo_screenwidth()  # モニター横幅取得
-        h = app.winfo_screenheight()  # モニター縦幅取得
-        self.geometry("+" + str(w // 4) + "+" + str(h // 4))  # ウィンドウサイズ(幅x高さ)
+        icon = tk.PhotoImage(file=resource_path("icon.png"))
+        self.tk.call("wm", "iconphoto", self._w, icon)
         self.resizable(width=False, height=False)
-        # gradient = np.linspace(1, 0, 256)
-        # self.gradient = np.vstack((gradient, gradient)).T
+        root_x = container.winfo_x()
+        root_y = container.winfo_y()
+        # root_width = container.winfo_width()
+        # root_height = container.winfo_height()
+        # x = root_x + root_width - size[0]/2
+        # y = root_y + root_height - size[1]/2
+        self.geometry("+%d+%d" % (root_x+30, root_y+30))
 
         cmap_list = list(mpl.cm._colormaps._cmaps.keys())
         cm_num = int(len(cmap_list) / 2)
         self.ncols = int(cm_num // 3 + 1)
-        # fig = self.plot_color_gradients(cmap_list)
-        # self.frame.grid(padx=20, pady=20)
-        # cms_canvas = FigureCanvasTkAgg(fig, master=self)
-        # cms_canvas.draw()
-        # cms_canvas.get_tk_widget().grid(column=0, row=0, sticky=tk.NSEW)
         self.background = tk.PhotoImage(file=resource_path("cm.png"))
         bg = tk.Label(self, image=self.background)
         bg.grid(column=0, row=0, sticky=tk.NSEW)
@@ -91,22 +90,6 @@ class ColormapsWindow(tk.Toplevel):
             )
             for i in range(cm_num)
         ]
-
-    # def plot_color_gradients(self, cmap_list):
-    #     # Create figure and adjust figure height to number of colormaps
-    #     figw = (self.ncols + (self.ncols - 1) * 0.1) * 20
-    #     figh = 40*3+480
-    #     fig, axs = plt.subplots(nrows=3, ncols=self.ncols, figsize=(figw, figh), dpi=1)
-    #     fig.subplots_adjust(top=1-40/figh, bottom=0, left=0, right=1, hspace=40/160)
-
-    #     for i,cm in enumerate(cmap_list[:int(len(cmap_list)/2)]):
-    #         axs[i//self.ncols,i%self.ncols].imshow(self.gradient, aspect='auto', cmap=plt.get_cmap(cm))
-
-    #     # Turn off *all* ticks & spines, not just the ones with colormaps.
-    #     for i in range(self.ncols*3):
-    #         axs[i//self.ncols,i%self.ncols].set_axis_off()
-
-    #     return fig
 
 
 # class FigureFrame(ttk.Frame):
@@ -810,12 +793,16 @@ class App(tk.Tk):
 
 
 def center(win):
-    w = win.winfo_screenwidth()  # モニター横幅取得
-    h = win.winfo_screenheight()  # モニター縦幅取得
+    screen_width = win.winfo_screenwidth()  # モニター横幅取得
+    screen_height = win.winfo_screenheight()  # モニター縦幅取得
     # w = int((w - float(re.split("[+]", win.geometry())[1]))/2)  # メイン画面横幅分調整
     # h = int((h - float(re.split("[+]", win.geometry())[2]))/2)  # メイン画面縦幅分調整
-    win.geometry("+" + str(w // 2 - 572) + "+" + str(h // 2 - 310))  # 位置設定
-    win.attributes("-alpha", 1.0)
+    # win.geometry("+" + str(w // 2 - 572) + "+" + str(h // 2 - 310))  # 位置設定
+    size = tuple(int(_) for _ in win.geometry().split('+')[0].split('x'))
+    print(screen_width, screen_height, size, sep="\n")
+    x = screen_width/2 - size[0]/2
+    y = screen_height/2 - size[1]/2
+    win.geometry("+%d+%d" % (x, y))
 
 
 def on_closing():
@@ -824,9 +811,11 @@ def on_closing():
 
 
 if __name__ == "__main__":
-    df = pd.DataFrame()
+    # df = pd.DataFrame()
     app = App()
-    center(app)
+    # center(app)
+    app.eval('tk::PlaceWindow . center')
 
+    app.attributes("-alpha", 1.0)
     app.protocol("WM_DELETE_WINDOW", on_closing)
     app.mainloop()
