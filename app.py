@@ -417,7 +417,8 @@ class InputFrame(tk.Frame):
                 self.msg_dict.pop("Color Scale", None)
             self.calculate_button["state"] = "disabled"
             self.msg_dict[name] = (
-                f"＊ {name}\n       :Enter half-width digits!\n")
+                f"＊ {name}\n"
+                "       :Enter half-width digits!\n")
             # return False
             print("b")
         else:  # When "input" is half-width digits.
@@ -431,8 +432,9 @@ class InputFrame(tk.Frame):
                     else:
                         self.calculate_button["state"] = "disabled"
                         self.msg_dict["Color Scale"] = (
-                            "＊ Color Scale\n       "
-                            ":Min is equal to or greater than\n        Max!\n"
+                            "＊ Color Scale\n"
+                            "       :Min is equal to or greater than\n"
+                            "        Max!\n"
                         )
                 elif name == "Color Scale-Min":
                     if self.scalemax.get() > input:
@@ -441,9 +443,18 @@ class InputFrame(tk.Frame):
                     else:
                         self.calculate_button["state"] = "disabled"
                         self.msg_dict["Color Scale"] = (
-                            "＊ Color Scale\n       "
-                            ":Min is equal to or greater than\n        Max!\n"
+                            "＊ Color Scale\n"
+                            "       :Min is equal to or greater than\n"
+                            "        Max!\n"
                         )
+                elif name == "Color Scale-Interval":
+                    if input <= self.scalemax.get()-self.scalemin.get():
+                        self.msg_dict.pop("Color Scale", None)
+                    else:
+                        self.msg_dict[name] = (
+                            f"＊ {name}\n"
+                            "       :Interval is greater than distance\n"
+                            "        between Max & Min!\n")
             except ValueError:
                 # When Max or Min is not half-width digits.
                 # print(e, "inner")
