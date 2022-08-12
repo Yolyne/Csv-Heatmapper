@@ -568,36 +568,34 @@ class App(tk.Tk):
         # self.figure_frame.grid(
         #     column=1, row=0, sticky=tk.NSEW, padx=(0, 10), pady=10
         # )
-        self.canvas_frame = tk.Frame(
-            self, background="red"
-        )
+        self.canvas_frame = tk.Frame(self)
         self.canvas_frame.grid(
             column=1, row=0, sticky=tk.NSEW, padx=(0, 10), pady=10
         )
         # self.canvas_frame.grid_propagate(False)
         self.canvas_frame.columnconfigure([0], weight=1)
-        self.canvas_frame.rowconfigure([0], weight=1)
+        self.canvas_frame.rowconfigure([1], weight=1)
         self.frame_canvas = tk.Canvas(
             self.canvas_frame, width=900, height=720, background="#E6E6FA"
         )
-        self.frame_canvas.grid(
-            column=0, row=0, sticky=tk.NSEW
-        )
+        self.frame_canvas.grid(column=0, row=1, sticky=tk.NSEW)
         # self.frame_canvas.propagate(False)
         v_scrollbar = tk.Scrollbar(self.canvas_frame, orient=tk.VERTICAL)
-        v_scrollbar.grid(row=0, column=1, sticky="news")
+        v_scrollbar.grid(row=0, column=1, sticky="news", rowspan=2)
         v_scrollbar.configure(command=self.frame_canvas.yview)
         h_scrollbar = tk.Scrollbar(self.canvas_frame, orient=tk.HORIZONTAL)
-        h_scrollbar.grid(row=1, column=0, sticky="news")
+        h_scrollbar.grid(row=2, column=0, sticky="news")
         h_scrollbar.configure(command=self.frame_canvas.xview)
-        self.frame_canvas.configure(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
-        self.figure_frame = tk.Frame(master=self.frame_canvas,  background="red")
+        self.frame_canvas.configure(
+            xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set
+        )
+        self.figure_frame = tk.Frame(master=self.frame_canvas)
         self.figure_frame.bind(
             "<Configure>",
             # lambda e: self.frame_canvas.configure(
             #     scrollregion=self.frame_canvas.bbox("all")
             # ),
-            self.on_resize
+            self.on_resize,
         )
         self.frame_canvas.create_window(
             (0, 0), window=self.figure_frame, anchor="nw"
@@ -617,9 +615,7 @@ class App(tk.Tk):
         self.is_first = True
 
     def on_resize(self, event):
-        self.frame_canvas.configure(
-            scrollregion=self.frame_canvas.bbox("all")
-        )
+        self.frame_canvas.configure(scrollregion=self.frame_canvas.bbox("all"))
         # print(self.frame_canvas.bbox("all"))
 
     def browse_inputfile(self):
@@ -663,12 +659,10 @@ class App(tk.Tk):
         if (fig := self.plot()) is None:
             return
         try:
-            figure_canvas = FigureCanvasTkAgg(
-                fig, master=self.figure_frame
-            )
+            figure_canvas = FigureCanvasTkAgg(fig, master=self.figure_frame)
             figure_canvas.draw()
             toolbar = MyNavigationToolbar(
-                figure_canvas, self.figure_frame, pack_toolbar=False
+                figure_canvas, self.canvas_frame, pack_toolbar=False
             )
             toolbar.update()
             # toolbar.pack(
@@ -681,9 +675,7 @@ class App(tk.Tk):
             # self.figure_canvas.get_tk_widget().pack(
             #     side="top", fill="both", expand=True
             # )
-            figure_canvas.get_tk_widget().grid(
-                column=0, row=1, sticky=tk.NSEW
-            )
+            figure_canvas.get_tk_widget().grid(column=0, row=1, sticky=tk.NSEW)
             # plt.show()
         except ValueError:  # Error(Latex) in drawing figure
             pass
