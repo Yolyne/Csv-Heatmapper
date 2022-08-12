@@ -55,9 +55,8 @@ class MyNavigationToolbar(NavigationToolbar2Tk):
 
 class ColormapsWindow(tk.Toplevel):
     def __init__(self, container):
-        super().__init__(container)
-        icon = tk.PhotoImage(file=resource_path("icon.png"))
-        self.tk.call("wm", "iconphoto", self._w, icon)
+        super().__init__(container, width=1, height=1)
+        # self.attributes("-alpha", 0.0)
         self.resizable(width=False, height=False)
         root_x = container.winfo_x()
         root_y = container.winfo_y()
@@ -65,7 +64,9 @@ class ColormapsWindow(tk.Toplevel):
         # root_height = container.winfo_height()
         # x = root_x + root_width - size[0]/2
         # y = root_y + root_height - size[1]/2
-        self.geometry("+%d+%d" % (root_x + 30, root_y + 30))
+        self.geometry("+%d+%d" % (root_x - 30, root_y))
+        icon = tk.PhotoImage(file=resource_path("icon.png"))
+        self.tk.call("wm", "iconphoto", self._w, icon)
 
         cmap_list = list(mpl.cm._colormaps._cmaps.keys())
         cm_num = int(len(cmap_list) / 2)
@@ -90,6 +91,7 @@ class ColormapsWindow(tk.Toplevel):
             )
             for i in range(cm_num)
         ]
+        # self.attributes("-alpha", 1.0)
 
 
 # class FigureFrame(ttk.Frame):
@@ -465,12 +467,12 @@ class InputFrame(tk.Frame):
         dlg_modal.title("Select Colormap")  # ウィンドウタイトル
 
         # モーダルにする設定
-        dlg_modal.grab_set()  # モーダルにする
-        dlg_modal.focus_set()  # フォーカスを新しいウィンドウをへ移す
+        # dlg_modal.grab_set()  # モーダルにする
+        dlg_modal.focus_set()  # フォーカスを新しいウィンドウへ移す
         # dlg_modal.transient(app)   # タスクバーに表示しない
 
         # ダイアログが閉じられるまで待つ
-        app.wait_window(dlg_modal)
+        # app.wait_window(dlg_modal)
 
     def save_image(self):
         savepath = filedialog.asksaveasfilename(
