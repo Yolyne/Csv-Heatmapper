@@ -52,6 +52,12 @@ def resource_path(relative_path):
 class MyNavigationToolbar(NavigationToolbar2Tk):
     toolitems = [t for t in NavigationToolbar2Tk.toolitems[:-2]]
 
+    def __init__(self, canvas, window, *, pack_toolbar=True):
+        super().__init__(canvas, window, pack_toolbar=pack_toolbar)
+        self.config(background="#E6E6FA")
+        self._message_label.config(background="#E6E6FA")
+        # self.update()
+
 
 class ColormapsWindow(tk.Toplevel):
     def __init__(self, container):
@@ -547,13 +553,6 @@ class App(tk.Tk):
         self.columnconfigure([1], weight=1)
         self.rowconfigure([0], weight=1)
         # create the input frame
-        self.figure_frame = tk.Frame(
-            self, width=900, height=720, background="#E6E6FA"
-        )
-        self.figure_frame.grid(
-            column=1, row=0, sticky=tk.NSEW, padx=(0, 10), pady=10
-        )
-        # self.figure_frame.columnconfigure([0], weight=1)
         self.input_frame = InputFrame(
             self,
             width=200,
@@ -562,6 +561,49 @@ class App(tk.Tk):
             column=0, row=0, sticky=tk.NSEW, padx=10, pady=10
         )
         self.input_frame.grid_propagate(False)
+
+        # self.figure_frame = tk.Frame(
+        #     self, width=900, height=720, background="#E6E6FA"
+        # )
+        # self.figure_frame.grid(
+        #     column=1, row=0, sticky=tk.NSEW, padx=(0, 10), pady=10
+        # )
+        self.canvas_frame = tk.Frame(
+            self, background="red"
+        )
+        self.canvas_frame.grid(
+            column=1, row=0, sticky=tk.NSEW, padx=(0, 10), pady=10
+        )
+        # self.canvas_frame.grid_propagate(False)
+        self.canvas_frame.columnconfigure([0], weight=1)
+        self.canvas_frame.rowconfigure([0], weight=1)
+        self.frame_canvas = tk.Canvas(
+            self.canvas_frame, width=900, height=720, background="#E6E6FA"
+        )
+        self.frame_canvas.grid(
+            column=0, row=0, sticky=tk.NSEW
+        )
+        # self.frame_canvas.propagate(False)
+        v_scrollbar = tk.Scrollbar(self.canvas_frame, orient=tk.VERTICAL)
+        v_scrollbar.grid(row=0, column=1, sticky="news")
+        v_scrollbar.configure(command=self.frame_canvas.yview)
+        h_scrollbar = tk.Scrollbar(self.canvas_frame, orient=tk.HORIZONTAL)
+        h_scrollbar.grid(row=1, column=0, sticky="news")
+        h_scrollbar.configure(command=self.frame_canvas.xview)
+        self.frame_canvas.configure(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
+        self.figure_frame = tk.Frame(master=self.frame_canvas,  background="red")
+        self.figure_frame.bind(
+            "<Configure>",
+            # lambda e: self.frame_canvas.configure(
+            #     scrollregion=self.frame_canvas.bbox("all")
+            # ),
+            self.on_resize
+        )
+        self.frame_canvas.create_window(
+            (0, 0), window=self.figure_frame, anchor="nw"
+        )  # フレームをキャンバスへ描画
+        # self.figure_frame.columnconfigure([0], weight=1)
+
         self.analyzedvalues = tk.StringVar(value="Load a csv-like file.")
         self.statusbar = tk.Label(
             self,
@@ -573,6 +615,12 @@ class App(tk.Tk):
         self.statusbar.grid(column=0, row=1, columnspan=2, sticky=tk.EW)
 
         self.is_first = True
+
+    def on_resize(self, event):
+        self.frame_canvas.configure(
+            scrollregion=self.frame_canvas.bbox("all")
+        )
+        # print(self.frame_canvas.bbox("all"))
 
     def browse_inputfile(self):
         """
@@ -615,12 +663,12 @@ class App(tk.Tk):
         if (fig := self.plot()) is None:
             return
         try:
-            self.figure_canvas = FigureCanvasTkAgg(
+            figure_canvas = FigureCanvasTkAgg(
                 fig, master=self.figure_frame
             )
-            self.figure_canvas.draw()
+            figure_canvas.draw()
             toolbar = MyNavigationToolbar(
-                self.figure_canvas, self.figure_frame, pack_toolbar=False
+                figure_canvas, self.figure_frame, pack_toolbar=False
             )
             toolbar.update()
             # toolbar.pack(
@@ -633,7 +681,7 @@ class App(tk.Tk):
             # self.figure_canvas.get_tk_widget().pack(
             #     side="top", fill="both", expand=True
             # )
-            self.figure_canvas.get_tk_widget().grid(
+            figure_canvas.get_tk_widget().grid(
                 column=0, row=1, sticky=tk.NSEW
             )
             # plt.show()
