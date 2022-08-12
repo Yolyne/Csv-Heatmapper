@@ -56,21 +56,20 @@ class MyNavigationToolbar(NavigationToolbar2Tk):
 class ColormapsWindow(tk.Toplevel):
     def __init__(self, container):
         super().__init__(container)
-        w = app.winfo_screenwidth()  # モニター横幅取得
-        h = app.winfo_screenheight()  # モニター縦幅取得
-        self.geometry("+" + str(w // 4) + "+" + str(h // 4))  # ウィンドウサイズ(幅x高さ)
+        icon = tk.PhotoImage(file=resource_path("icon.png"))
+        self.tk.call("wm", "iconphoto", self._w, icon)
         self.resizable(width=False, height=False)
-        # gradient = np.linspace(1, 0, 256)
-        # self.gradient = np.vstack((gradient, gradient)).T
+        root_x = container.winfo_x()
+        root_y = container.winfo_y()
+        # root_width = container.winfo_width()
+        # root_height = container.winfo_height()
+        # x = root_x + root_width - size[0]/2
+        # y = root_y + root_height - size[1]/2
+        self.geometry("+%d+%d" % (root_x+30, root_y+30))
 
         cmap_list = list(mpl.cm._colormaps._cmaps.keys())
         cm_num = int(len(cmap_list) / 2)
         self.ncols = int(cm_num // 3 + 1)
-        # fig = self.plot_color_gradients(cmap_list)
-        # self.frame.grid(padx=20, pady=20)
-        # cms_canvas = FigureCanvasTkAgg(fig, master=self)
-        # cms_canvas.draw()
-        # cms_canvas.get_tk_widget().grid(column=0, row=0, sticky=tk.NSEW)
         self.background = tk.PhotoImage(file=resource_path("cm.png"))
         bg = tk.Label(self, image=self.background)
         bg.grid(column=0, row=0, sticky=tk.NSEW)
@@ -92,22 +91,6 @@ class ColormapsWindow(tk.Toplevel):
             for i in range(cm_num)
         ]
 
-    # def plot_color_gradients(self, cmap_list):
-    #     # Create figure and adjust figure height to number of colormaps
-    #     figw = (self.ncols + (self.ncols - 1) * 0.1) * 20
-    #     figh = 40*3+480
-    #     fig, axs = plt.subplots(nrows=3, ncols=self.ncols, figsize=(figw, figh), dpi=1)
-    #     fig.subplots_adjust(top=1-40/figh, bottom=0, left=0, right=1, hspace=40/160)
-
-    #     for i,cm in enumerate(cmap_list[:int(len(cmap_list)/2)]):
-    #         axs[i//self.ncols,i%self.ncols].imshow(self.gradient, aspect='auto', cmap=plt.get_cmap(cm))
-
-    #     # Turn off *all* ticks & spines, not just the ones with colormaps.
-    #     for i in range(self.ncols*3):
-    #         axs[i//self.ncols,i%self.ncols].set_axis_off()
-
-    #     return fig
-
 
 # class FigureFrame(ttk.Frame):
 #     def __init__(self, container):
@@ -118,6 +101,7 @@ class ColormapsWindow(tk.Toplevel):
 class InputFrame(tk.Frame):
     def __init__(self, container, **kwargs):
         super().__init__(container, **kwargs)
+        tcl_validate_input = container.register(self.validate_input)  # Register validate func to app.
         self.container = container
         # setup the grid layout manager
         self.columnconfigure(
@@ -192,14 +176,26 @@ class InputFrame(tk.Frame):
         self.xaxis_label.grid(column=0, row=0, sticky=tk.W)
         self.yaxis_label = ttk.Label(self.axes_frame, text="y-Interval")
         self.yaxis_label.grid(column=0, row=1, sticky=tk.W)
-        self.xaxis_cbox = ttk.Combobox(
-            self.axes_frame, state="readonly", textvariable=self.xaxis_interval
+        self.xaxis_entry = ttk.Entry(
+            self.axes_frame,
+            textvariable=self.xaxis_interval,
+            validate="key",
+            validatecommand=(tcl_validate_input, "%P", "x-Interval"),
         )
-        self.xaxis_cbox.grid(column=1, row=0, sticky=tk.E)
-        self.yaxis_cbox = ttk.Combobox(
-            self.axes_frame, state="readonly", textvariable=self.yaxis_interval
+        # self.xaxis_cbox = ttk.Combobox(
+        #     self.axes_frame, state="readonly", textvariable=self.xaxis_interval
+        # )
+        self.xaxis_entry.grid(column=1, row=0, sticky=tk.E)
+        self.yaxis_entry = ttk.Entry(
+            self.axes_frame,
+            textvariable=self.yaxis_interval,
+            validate="key",
+            validatecommand=(tcl_validate_input, "%P", "y-Interval"),
         )
-        self.yaxis_cbox.grid(column=1, row=1, sticky=tk.E)
+        # self.yaxis_cbox = ttk.Combobox(
+        #     self.axes_frame, state="readonly", textvariable=self.yaxis_interval
+        # )
+        self.yaxis_entry.grid(column=1, row=1, sticky=tk.E)
         ## colorscale_frame
         self.colorscale_frame = ttk.LabelFrame(
             self.setting_frame, text="Color Scale"
@@ -223,7 +219,6 @@ class InputFrame(tk.Frame):
         self.scaleintervals_label.grid(column=0, row=2, sticky=tk.W)
         self.scalemax = tk.DoubleVar(value=None)
         self.scalemin = tk.DoubleVar(value=None)
-        tcl_validate_input = container.register(self.validate_input)
         self.scalemax_entry = ttk.Entry(
             self.colorscale_frame,
             textvariable=self.scalemax,
@@ -244,13 +239,12 @@ class InputFrame(tk.Frame):
             textvariable=self.scaleinterval,
             validate="key",
             validatecommand=(tcl_validate_input, "%P", "Color Scale-Interval"),
-            # invalidcommand=lambda : self.show_warning(),
-        )  # state="readonly", )
+        )
         # self.scaleintervals_cbox = ttk.Combobox(
         #     self.colorscale_frame,
         #     postcommand=self.change_intervalslist,
         #     textvariable=self.scaleinterval,
-        # )  # state="readonly", )
+        # )
         self.scaleinterval_entry.grid(column=1, row=2, sticky=tk.E)
         ## axes labal frame
         self.label_frame = ttk.LabelFrame(self.setting_frame, text="Label")
@@ -279,7 +273,7 @@ class InputFrame(tk.Frame):
             self.label_frame, text="Colorbar Label"
         )
         self.cbarlabel_label.grid(column=0, row=2, sticky=tk.W)
-        self.cbarlabel = tk.StringVar(value="z()")
+        self.cbarlabel = tk.StringVar(value="z ()")
         self.cbarlabel_entry = ttk.Entry(
             self.label_frame, textvariable=self.cbarlabel
         )
@@ -409,7 +403,6 @@ class InputFrame(tk.Frame):
             input = float(input)  # Check if half-width digits
             self.calculate_button["state"] = "normal"
             self.msg_dict.pop(name, None)
-            print("a")
         except ValueError:  # When "input" is not half-width digits.
             # print(e.__class__)
             if name in ("Color Scale-Max", "Color Scale-Min"):
@@ -419,9 +412,7 @@ class InputFrame(tk.Frame):
                 f"＊ {name}\n" "       :Enter half-width digits!\n"
             )
             # return False
-            print("b")
         else:  # When "input" is half-width digits.
-            print("c")
             try:
                 if name == "Color Scale-Max":
                     # Also check if half-width digits
@@ -513,9 +504,7 @@ class InputFrame(tk.Frame):
 
     @staticmethod
     def make_divisors(n):
-        print(n)
         multiplier = 10 ** (len(str(n).split(".")[-1]) + 1)
-        print(multiplier)
         n_bymultiplier = n * multiplier
         lower_divisors, upper_divisors = [], []
         i = 1
@@ -594,7 +583,6 @@ class App(tk.Tk):
             initialdir=os.path.expanduser("~/Documents"),
         )
         if csvpath and csvpath != self.input_frame.filepath.get():
-            print("aaa")
             if os.path.splitext(csvpath)[-1].lower() == ".csv":
                 self.figure_frame.df = pd.read_csv(
                     csvpath, header=None
@@ -666,8 +654,8 @@ class App(tk.Tk):
             self.input_frame.scalemax.set(cmax)
             self.input_frame.scalemin.set(cmin)
             self.input_frame.scaleinterval.set(cinterval)
-            self.input_frame.xaxis_cbox.set(x_interval)
-            self.input_frame.yaxis_cbox.set(y_interval)
+            self.input_frame.xaxis_interval.set(x_interval)
+            self.input_frame.yaxis_interval.set(y_interval)
             self.input_frame.msg_dict = {}
             self.input_frame.msg.set("")
             self.input_frame.calculate_button["state"] = "normal"
@@ -694,6 +682,10 @@ class App(tk.Tk):
             y = np.arange(1, df_height + 1)
             X, Y = np.meshgrid(x, y)
             ax.plot_surface(X, Y, df, cmap=cmap)
+            cbar = fig.colorbar(
+                mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
+                ax=ax,
+            )
         else:
             ax = fig.add_subplot(111)
             extent = 0.5, df_width + 0.5, df_height + 0.5, 0.5
@@ -701,14 +693,14 @@ class App(tk.Tk):
             # # ax.matshow(df, norm=cbar_norm, cmap=cmap,)
             ax.xaxis.set_label_position("top")
             ax.yaxis.set_ticks_position("both")
-        divider = make_axes_locatable(ax)  # axに紐付いたAxesDividerを取得
-        cax = divider.append_axes(
-            "right", size="3%", pad=0.2
-        )  # append_axesで新しいaxesを作成
-        cbar = fig.colorbar(
-            mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
-            cax=cax,
-        )
+            divider = make_axes_locatable(ax)  # axに紐付いたAxesDividerを取得
+            cax = divider.append_axes(
+                "right", size="3%", pad=0.2
+            )  # append_axesで新しいaxesを作成
+            cbar = fig.colorbar(
+                mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
+                cax=cax,
+            )
         cbar.ax.set_yticks(
             # [cmin]
             # + (
@@ -721,7 +713,6 @@ class App(tk.Tk):
             # + [cmax]
             np.concatenate([_ := np.arange(cmin, cmax, cinterval), [cmax]])
         )
-        print(cmax, cmin, cbar.ax.get_yticks())
         cbar.ax.set_yticklabels(
             [fr"$\leq {float(cmin)}$"]
             + [f"${i}$" for i in _[1:]]
@@ -737,7 +728,6 @@ class App(tk.Tk):
             #     ]
             + list(np.arange(x_interval, df_width + 1, x_interval))
         )
-        print(ax.get_xticks())
         ax.set_yticks(
             list(np.arange(y_interval, df_height + 1, y_interval))
             if y_interval == 1
@@ -754,39 +744,39 @@ class App(tk.Tk):
         ax.tick_params(axis="x", labelsize=tickslabelsize)
         ax.tick_params(axis="y", labelsize=tickslabelsize)
         cbar.set_label(
-            fr"${(self.input_frame.cbarlabel.get())}$", fontsize=labelsize
+            fr"{(self.input_frame.cbarlabel.get())}", fontsize=labelsize
         )
         ax.set_xlabel(
-            fr"${(self.input_frame.xlabel.get())}$", fontsize=labelsize
+            fr"{(self.input_frame.xlabel.get())}", fontsize=labelsize
         )
         ax.set_ylabel(
-            fr"${(self.input_frame.ylabel.get())}$", fontsize=labelsize
+            fr"{(self.input_frame.ylabel.get())}", fontsize=labelsize
         )
         # cbar.ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
         # cbar.ax.ticklabel_format(style="sci",  axis="y",scilimits=(0,0))
         # cbar.ax.yaxis.set_offset_position('left')
         # cbar.ax.text(0, 90, r'$\times$10$^{-1}$', va='bottom', ha='left')
 
-        _ = (
-            list(range(1, 10))
-            + [i for i in range(10, df_width, 5)]
-            + [df_width]
-            if df_width > 10
-            else list(range(1, df_width + 1))
-        )
-        self.input_frame.xaxis_cbox["values"] = [
-            i for i in _ if df_width / i < 21
-        ]
-        _ = (
-            list(range(1, 10))
-            + [i for i in range(10, df_height, 5)]
-            + [df_height]
-            if df_height > 10
-            else list(range(1, df_height + 1))
-        )
-        self.input_frame.yaxis_cbox["values"] = [
-            i for i in _ if df_height / i < 21
-        ]
+        # _ = (
+        #     list(range(1, 10))
+        #     + [i for i in range(10, df_width, 5)]
+        #     + [df_width]
+        #     if df_width > 10
+        #     else list(range(1, df_width + 1))
+        # )
+        # self.input_frame.xaxis_entry["values"] = [
+        #     i for i in _ if df_width / i < 21
+        # ]
+        # _ = (
+        #     list(range(1, 10))
+        #     + [i for i in range(10, df_height, 5)]
+        #     + [df_height]
+        #     if df_height > 10
+        #     else list(range(1, df_height + 1))
+        # )
+        # self.input_frame.yaxis_entry["values"] = [
+        #     i for i in _ if df_height / i < 21
+        # ]
 
         return fig
 
@@ -810,12 +800,16 @@ class App(tk.Tk):
 
 
 def center(win):
-    w = win.winfo_screenwidth()  # モニター横幅取得
-    h = win.winfo_screenheight()  # モニター縦幅取得
+    screen_width = win.winfo_screenwidth()  # モニター横幅取得
+    screen_height = win.winfo_screenheight()  # モニター縦幅取得
     # w = int((w - float(re.split("[+]", win.geometry())[1]))/2)  # メイン画面横幅分調整
     # h = int((h - float(re.split("[+]", win.geometry())[2]))/2)  # メイン画面縦幅分調整
-    win.geometry("+" + str(w // 2 - 572) + "+" + str(h // 2 - 310))  # 位置設定
-    win.attributes("-alpha", 1.0)
+    # win.geometry("+" + str(w // 2 - 572) + "+" + str(h // 2 - 310))  # 位置設定
+    size = tuple(int(_) for _ in win.geometry().split('+')[0].split('x'))
+    print(screen_width, screen_height, size, sep="\n")
+    x = screen_width/2 - size[0]/2
+    y = screen_height/2 - size[1]/2
+    win.geometry("+%d+%d" % (x, y))
 
 
 def on_closing():
@@ -824,9 +818,11 @@ def on_closing():
 
 
 if __name__ == "__main__":
-    df = pd.DataFrame()
+    # df = pd.DataFrame()
     app = App()
-    center(app)
+    # center(app)
+    app.eval('tk::PlaceWindow . center')
 
+    app.attributes("-alpha", 1.0)
     app.protocol("WM_DELETE_WINDOW", on_closing)
     app.mainloop()
