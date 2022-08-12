@@ -65,7 +65,7 @@ class ColormapsWindow(tk.Toplevel):
         # root_height = container.winfo_height()
         # x = root_x + root_width - size[0]/2
         # y = root_y + root_height - size[1]/2
-        self.geometry("+%d+%d" % (root_x+30, root_y+30))
+        self.geometry("+%d+%d" % (root_x + 30, root_y + 30))
 
         cmap_list = list(mpl.cm._colormaps._cmaps.keys())
         cm_num = int(len(cmap_list) / 2)
@@ -101,7 +101,9 @@ class ColormapsWindow(tk.Toplevel):
 class InputFrame(tk.Frame):
     def __init__(self, container, **kwargs):
         super().__init__(container, **kwargs)
-        tcl_validate_input = container.register(self.validate_input)  # Register validate func to app.
+        tcl_validate_input = container.register(
+            self.validate_input
+        )  # Register validate func to app.
         self.container = container
         # setup the grid layout manager
         self.columnconfigure(
@@ -361,7 +363,6 @@ class InputFrame(tk.Frame):
         ## save button
         self.img_save = tk.PhotoImage(file=resource_path("save.png"))
         self.save_button = ttk.Button(
-
             self.button_frame, image=self.img_save, command=self.save_image
         )
         self.save_button.grid(column=1, row=0, padx=(5, 0))
@@ -410,8 +411,8 @@ class InputFrame(tk.Frame):
                 self.msg_dict.pop("Color Scale", None)
             self.calculate_button["state"] = "disabled"
             self.msg_dict[name] = (
-                f"＊ {name}\n"
-                "       :Enter half-width digits!\n")
+                f"＊ {name}\n" "       :Enter half-width digits!\n"
+            )
             # return False
         else:  # When "input" is half-width digits.
             try:
@@ -439,13 +440,14 @@ class InputFrame(tk.Frame):
                             "        Max!\n"
                         )
                 elif name == "Color Scale-Interval":
-                    if input <= self.scalemax.get()-self.scalemin.get():
+                    if input <= self.scalemax.get() - self.scalemin.get():
                         self.msg_dict.pop("Color Scale", None)
                     else:
                         self.msg_dict[name] = (
                             f"＊ {name}\n"
                             "       :Interval is greater than distance\n"
-                            "        between Max & Min!\n")
+                            "        between Max & Min!\n"
+                        )
             except ValueError:
                 # When Max or Min is not half-width digits.
                 # print(e, "inner")
@@ -491,7 +493,7 @@ class InputFrame(tk.Frame):
             defaultextension="png",
             initialdir=os.path.expanduser("~/Documents"),
         )
-        plt.savefig(savepath, facecolor="white")
+        self.container.figure_frame.fig.savefig(savepath, transparent=True)
 
     def change_intervalslist(self):
         if "" in (self.scalemax.get(), self.scalemin.get()):
@@ -549,6 +551,7 @@ class App(tk.Tk):
         self.figure_frame.grid(
             column=1, row=0, sticky=tk.NSEW, padx=(0, 10), pady=10
         )
+        # self.figure_frame.columnconfigure([0], weight=1)
         self.input_frame = InputFrame(
             self,
             width=200,
@@ -596,7 +599,11 @@ class App(tk.Tk):
             self.figure_frame.df_max = self.figure_frame.df.max().max()
             self.figure_frame.df_min = self.figure_frame.df.min().min()
             self.analyzedvalues.set(
-                f"Max: {self.figure_frame.df_max}, Min: {self.figure_frame.df_min}, Mean: {self.figure_frame.df_mean}"
+                (
+                    f"Max: {self.figure_frame.df_max}, "
+                    f"Min: {self.figure_frame.df_min}, "
+                    f"Mean: {self.figure_frame.df_mean}"
+                )
             )
             self.input_frame.filepath.set(csvpath)
             app.is_first = True  # regard when csv is read as the first time
@@ -606,17 +613,27 @@ class App(tk.Tk):
         if (fig := self.plot()) is None:
             return
         try:
-            figure_canvas = FigureCanvasTkAgg(fig, master=self.figure_frame)
-            figure_canvas.draw()
+            self.figure_canvas = FigureCanvasTkAgg(
+                fig, master=self.figure_frame
+            )
+            self.figure_canvas.draw()
             toolbar = MyNavigationToolbar(
-                figure_canvas, self.figure_frame, pack_toolbar=False
+                self.figure_canvas, self.figure_frame, pack_toolbar=False
             )
             toolbar.update()
+            # toolbar.pack(
+            #     side="top",
+            # )
             toolbar.grid(column=0, row=0, sticky=tk.EW)
             # figure_canvas.mpl_connect(
             #     "key_press_event", lambda event: print(f"you pressed {event.key}"))
             # figure_canvas.mpl_connect("key_press_event", key_press_handler)
-            figure_canvas.get_tk_widget().grid(column=0, row=1, sticky=tk.NSEW)
+            # self.figure_canvas.get_tk_widget().pack(
+            #     side="top", fill="both", expand=True
+            # )
+            self.figure_canvas.get_tk_widget().grid(
+                column=0, row=1, sticky=tk.NSEW
+            )
             # plt.show()
         except ValueError:  # Error(Latex) in drawing figure
             pass
@@ -713,18 +730,18 @@ class App(tk.Tk):
         )
         ax.set_xticks(
             list(np.arange(x_interval, df_width + 1, x_interval))
-            if x_interval == 1 else
-            [1]
-        #     + [
-        #         i
-        #         for i in range(int(x_interval), df_width + 1, int(x_interval))
-        #     ]
+            if x_interval == 1
+            else [1]
+            #     + [
+            #         i
+            #         for i in range(int(x_interval), df_width + 1, int(x_interval))
+            #     ]
             + list(np.arange(x_interval, df_width + 1, x_interval))
         )
         ax.set_yticks(
             list(np.arange(y_interval, df_height + 1, y_interval))
-            if y_interval == 1 else
-            [1]
+            if y_interval == 1
+            else [1]
             # + [
             #     i
             #     for i in range(int(y_interval), df_height + 1, int(y_interval))
@@ -771,6 +788,7 @@ class App(tk.Tk):
         #     i for i in _ if df_height / i < 21
         # ]
 
+        self.figure_frame.fig = fig
         return fig
 
     @staticmethod
@@ -798,10 +816,10 @@ def center(win):
     # w = int((w - float(re.split("[+]", win.geometry())[1]))/2)  # メイン画面横幅分調整
     # h = int((h - float(re.split("[+]", win.geometry())[2]))/2)  # メイン画面縦幅分調整
     # win.geometry("+" + str(w // 2 - 572) + "+" + str(h // 2 - 310))  # 位置設定
-    size = tuple(int(_) for _ in win.geometry().split('+')[0].split('x'))
+    size = tuple(int(_) for _ in win.geometry().split("+")[0].split("x"))
     print(screen_width, screen_height, size, sep="\n")
-    x = screen_width/2 - size[0]/2
-    y = screen_height/2 - size[1]/2
+    x = screen_width / 2 - size[0] / 2
+    y = screen_height / 2 - size[1] / 2
     win.geometry("+%d+%d" % (x, y))
 
 
@@ -814,7 +832,7 @@ if __name__ == "__main__":
     # df = pd.DataFrame()
     app = App()
     # center(app)
-    app.eval('tk::PlaceWindow . center')
+    app.eval("tk::PlaceWindow . center")
 
     app.attributes("-alpha", 1.0)
     app.protocol("WM_DELETE_WINDOW", on_closing)
