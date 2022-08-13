@@ -1,7 +1,7 @@
 """
 app.py
 
-Copyright (c) 2022 yoririn
+Copyright (c) 2022 Yolyne
 
 This software is released under the MIT license.
 See https://opensource.org/licenses/MIT
