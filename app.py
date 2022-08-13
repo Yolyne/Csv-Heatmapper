@@ -129,7 +129,7 @@ class InputFrame(tk.Frame):
         )
         # # self.columns_span = 4
 
-        ## browse frame
+        # browse frame
         self.browse_frame = tk.LabelFrame(self, text="CSV File")
         # self.browse_frame = tk.LabelFrame(self, )
         self.browse_frame.grid(column=0, row=0, ipadx=5, ipady=3, sticky=tk.EW)
@@ -139,7 +139,7 @@ class InputFrame(tk.Frame):
             ],
             weight=1,
         )
-        ## filepath entry
+        # filepath entry
         self.filepath = tk.StringVar()
         self.filepath_label = ttk.Label(
             self.browse_frame, textvariable=self.filepath, wraplength=155
@@ -167,12 +167,12 @@ class InputFrame(tk.Frame):
             padx=(0, 5),
         )
 
-        ## setting frame
+        # setting frame
         self.setting_frame = tk.LabelFrame(self, text="Plot Setting")
         self.setting_frame.grid(
             column=0, row=1, ipadx=5, ipady=3, sticky=tk.EW
         )
-        ## ticks frame
+        # ticks frame
         self.axes_frame = ttk.LabelFrame(self.setting_frame, text="Axis Scale")
         self.axes_frame.grid(column=0, row=0, ipadx=5, ipady=3, sticky=tk.EW)
         self.axes_frame.columnconfigure(
@@ -194,7 +194,8 @@ class InputFrame(tk.Frame):
             validatecommand=(tcl_validate_input, "%P", "x-Interval"),
         )
         # self.xaxis_cbox = ttk.Combobox(
-        #     self.axes_frame, state="readonly", textvariable=self.xaxis_interval
+        #     self.axes_frame, state="readonly",
+        #     textvariable=self.xaxis_interval
         # )
         self.xaxis_entry.grid(column=1, row=0, sticky=tk.E)
         self.yaxis_entry = ttk.Entry(
@@ -204,10 +205,11 @@ class InputFrame(tk.Frame):
             validatecommand=(tcl_validate_input, "%P", "y-Interval"),
         )
         # self.yaxis_cbox = ttk.Combobox(
-        #     self.axes_frame, state="readonly", textvariable=self.yaxis_interval
+        #     self.axes_frame, state="readonly",
+        #     textvariable=self.yaxis_interval
         # )
         self.yaxis_entry.grid(column=1, row=1, sticky=tk.E)
-        ## colorscale_frame
+        # colorscale_frame
         self.colorscale_frame = ttk.LabelFrame(
             self.setting_frame, text="Color Scale"
         )
@@ -257,7 +259,7 @@ class InputFrame(tk.Frame):
         #     textvariable=self.scaleinterval,
         # )
         self.scaleinterval_entry.grid(column=1, row=2, sticky=tk.E)
-        ## axes labal frame
+        # axes labal frame
         self.label_frame = ttk.LabelFrame(self.setting_frame, text="Label")
         self.label_frame.grid(column=0, row=2, ipadx=5, ipady=3, sticky=tk.EW)
         self.label_frame.columnconfigure(
@@ -289,7 +291,7 @@ class InputFrame(tk.Frame):
             self.label_frame, textvariable=self.cbarlabel
         )
         self.cbarlabel_entry.grid(column=1, row=2, sticky=tk.E)
-        ## fontsize
+        # fontsize
         self.font_frame = ttk.LabelFrame(self.setting_frame, text="Fontsize")
         self.font_frame.grid(column=0, row=3, ipadx=5, ipady=3, sticky=tk.EW)
         self.font_frame.columnconfigure(
@@ -322,7 +324,7 @@ class InputFrame(tk.Frame):
             to=30,
         )
         self.tickslabelsize_sbox.grid(column=1, row=1, sticky=tk.E)
-        ## colormap
+        # colormap
         self.which_cm = StringVar(value="magma")
         self.cm_frame = ttk.LabelFrame(self.setting_frame, text="Colormap")
         self.cm_frame.grid(column=0, row=4, ipadx=5, ipady=3, sticky=tk.EW)
@@ -338,7 +340,7 @@ class InputFrame(tk.Frame):
             variable=self.cm_reversed,
         )
         self.cm_check.grid(column=1, row=0)
-        ## 3d
+        # 3d
         self.is_3d = BooleanVar()
         self.threeD_check = ttk.Checkbutton(
             self.setting_frame,
@@ -348,13 +350,13 @@ class InputFrame(tk.Frame):
             variable=self.is_3d,
         )
         self.threeD_check.grid(column=0, row=5, sticky=tk.W)
-        ## shared option
+        # shared option
         for child in self.setting_frame.winfo_children():
             child.grid_configure(padx=3, pady=3)
         # for child in self.winfo_children():
         #     child.configure(bg='white')
 
-        ## button frame
+        # button frame
         self.button_frame = ttk.Frame(self)
         self.button_frame.grid(column=0, row=3, sticky=tk.EW)
         self.button_frame.columnconfigure(
@@ -363,23 +365,23 @@ class InputFrame(tk.Frame):
             ],
             weight=1,
         )
-        ## plot button
+        # plot button
         self.calculate_button = ttk.Button(
             self.button_frame, text="Plot", state="key"
         )
         self.calculate_button["command"] = self.master.screen
         self.calculate_button.grid(column=0, row=0, sticky=tk.NSEW)
-        ## save button
+        # save button
         self.img_save = tk.PhotoImage(file=resource_path("imgs/save.png"))
         self.save_button = ttk.Button(
             self.button_frame, image=self.img_save, command=self.save_image
         )
         self.save_button.grid(column=1, row=0, padx=(5, 0))
 
-        ## result frame
+        # result frame
         self.msg_frame = tk.Frame(self, bg="white")
         self.msg_frame.grid(column=0, row=4, sticky=tk.NSEW)
-        ## result text
+        # result text
         self.msg = tk.StringVar()
         self.msg_dict = {}
         self.msg_box = tk.Message(
@@ -392,7 +394,7 @@ class InputFrame(tk.Frame):
         )
         self.msg_box.grid(column=0, row=0, sticky=tk.NSEW)
 
-        ## shared option
+    # shared option
         for child in self.winfo_children():
             child.grid_configure(pady=(0, 3))
             child.columnconfigure(
@@ -537,7 +539,6 @@ class InputFrame(tk.Frame):
 
 #     # def preview_csv(self):
 #     #     de
-# # sheet_df_dictonary = pd.read_excel('toeic.xlsx', sheet_name=['Page024', skiprows=0)
 
 
 class App(tk.Tk):
@@ -552,8 +553,8 @@ class App(tk.Tk):
 
         menubar = tk.Menu(self)
         helpmenu = tk.Menu(menubar, tearoff=0)
-        helpmenu.add_command(label='Document', command=self.display_doc)
-        menubar.add_cascade(label='Help', menu=helpmenu)
+        helpmenu.add_command(label="Document", command=self.display_doc)
+        menubar.add_cascade(label="Help", menu=helpmenu)
         self.config(menu=menubar)
 
         # layout on the root window
@@ -680,14 +681,7 @@ class App(tk.Tk):
             #     side="top",
             # )
             toolbar.grid(column=0, row=0, sticky=tk.EW)
-            # figure_canvas.mpl_connect(
-            #     "key_press_event", lambda event: print(f"you pressed {event.key}"))
-            # figure_canvas.mpl_connect("key_press_event", key_press_handler)
-            # self.figure_canvas.get_tk_widget().pack(
-            #     side="top", fill="both", expand=True
-            # )
             figure_canvas.get_tk_widget().grid(column=0, row=1, sticky=tk.NSEW)
-            # plt.show()
         except ValueError:  # Error(Latex) in drawing figure
             pass
             # print(traceback.format_exception(*sys.exc_info()))
@@ -711,7 +705,6 @@ class App(tk.Tk):
             cmax = math.ceil(self.figure_frame.df_max)
             cmin = math.floor(self.figure_frame.df_min)
             cinterval = self.determine_interval(cmax - cmin, True)
-            # cinterval = (cmax-cmin)//10
             x_interval = self.determine_interval(df_width)
             y_interval = self.determine_interval(df_height)
             self.input_frame.scalemax.set(cmax)
@@ -723,8 +716,6 @@ class App(tk.Tk):
             self.input_frame.msg.set("")
             self.input_frame.calculate_button["state"] = "normal"
             # self.input_frame.change_intervalslist()
-        # elif cmax <= cmin:
-        #     return None
         else:
             cmax = self.input_frame.scalemax.get()
             cmin = self.input_frame.scalemin.get()
@@ -733,7 +724,6 @@ class App(tk.Tk):
             x_interval = self.input_frame.xaxis_interval.get()
             y_interval = self.input_frame.yaxis_interval.get()
 
-        cbar_step = int((cmax - cmin) / cinterval)
         cbar_norm = mpl.colors.Normalize(cmin, cmax)
         cmap = self.input_frame.which_cm.get()
         if self.input_frame.cm_reversed.get():
@@ -777,9 +767,12 @@ class App(tk.Tk):
             np.concatenate([_ := np.arange(cmin, cmax, cinterval), [cmax]])
         )
         cbar.ax.set_yticklabels(
-            [fr"$\leq {float(cmin)}$"]
-            + [f"${i}$" for i in _[1:]]
-            + [fr"$\geq {float(cmax)}$"]
+            # [fr"$\leq {float(cmin)}$"]
+            # + [f"${i}$" for i in _[1:]]
+            # + [fr"$\geq {float(cmax)}$"]
+            [r"$\leq %s$" % str(cmin).rstrip("0").rstrip(".")]
+            + [r"$%s$" % str(i).rstrip("0").rstrip(".") for i in _[1:]]
+            + [r"$\geq %s$" % str(cmax).rstrip("0").rstrip(".")]
         )
         ax.set_xticks(
             list(np.arange(x_interval, df_width + 1, x_interval))
