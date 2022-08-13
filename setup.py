@@ -14,6 +14,7 @@ includes = [
     "pandas",
     "math",
     "matplotlib",
+    "webbrowser"
 ]
 
 # excludesでは、パッケージ化しないライブラリやモジュールを指定する。
@@ -36,11 +37,11 @@ executables = [
     Executable(
         "app.py",
         base=base,
-        icon="images/icon.ico",
+        icon="imgs/icon.ico",
         target_name=app_name,
         shortcut_name=f"{app_name} {version}",
         shortcut_dir="ProgramMenuFolder",
-        copyright="Copyright (c) yoririn 2022",
+        copyright="Copyright (c) 2022 Yolyne",
     )
 ]
 
