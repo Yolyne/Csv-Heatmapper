@@ -18,6 +18,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import webbrowser
 
 # from matplotlib.ticker import ScalarFormatter
 from matplotlib.backends.backend_tkagg import (
@@ -35,7 +36,7 @@ from matplotlib.backends.backend_tkagg import (
 def resource_path(relative_path):
     if hasattr(sys, "_MEIPASS"):
         return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), "images", relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 
 # mpl.use("pgf") #set drawing driver (latexを使える
@@ -71,13 +72,13 @@ class ColormapsWindow(tk.Toplevel):
         # x = root_x + root_width - size[0]/2
         # y = root_y + root_height - size[1]/2
         self.geometry("+%d+%d" % (root_x - 30, root_y))
-        icon = tk.PhotoImage(file=resource_path("icon.png"))
+        icon = tk.PhotoImage(file=resource_path("imgs/icon.png"))
         self.tk.call("wm", "iconphoto", self._w, icon)
 
         cmap_list = list(mpl.cm._colormaps._cmaps.keys())
         cm_num = int(len(cmap_list) / 2)
         self.ncols = int(cm_num // 3 + 1)
-        self.background = tk.PhotoImage(file=resource_path("cm.png"))
+        self.background = tk.PhotoImage(file=resource_path("imgs/cm.png"))
         bg = tk.Label(self, image=self.background)
         bg.grid(column=0, row=0, sticky=tk.NSEW)
         self.cm_rbtns = [
@@ -153,7 +154,7 @@ class InputFrame(tk.Frame):
         # self.filepath_delta_entry = ttk.Entry(self.browse_frame, textvariable=self.filepath_delta)
         # self.filepath_delta_entry.grid(column=1, row=1, sticky=tk.EW)
         ## browse button
-        self.img_mglass = tk.PhotoImage(file=resource_path("mglass.png"))
+        self.img_mglass = tk.PhotoImage(file=resource_path("imgs/mglass.png"))
         self.load_button = ttk.Button(
             self.browse_frame,
             image=self.img_mglass,
@@ -369,7 +370,7 @@ class InputFrame(tk.Frame):
         self.calculate_button["command"] = self.master.screen
         self.calculate_button.grid(column=0, row=0, sticky=tk.NSEW)
         ## save button
-        self.img_save = tk.PhotoImage(file=resource_path("save.png"))
+        self.img_save = tk.PhotoImage(file=resource_path("imgs/save.png"))
         self.save_button = ttk.Button(
             self.button_frame, image=self.img_save, command=self.save_image
         )
@@ -546,8 +547,14 @@ class App(tk.Tk):
         self.attributes("-alpha", 0.0)
         # self.resizable(width=False, height=False)
         self.minsize(width=400, height=720)
-        icon = tk.PhotoImage(file=resource_path("icon.png"))
+        icon = tk.PhotoImage(file=resource_path("imgs/icon.png"))
         self.tk.call("wm", "iconphoto", self._w, icon)
+
+        menubar = tk.Menu(self)
+        helpmenu = tk.Menu(menubar, tearoff=0)
+        helpmenu.add_command(label='Document', command=self.display_doc)
+        menubar.add_cascade(label='Help', menu=helpmenu)
+        self.config(menu=menubar)
 
         # layout on the root window
         self.columnconfigure([1], weight=1)
@@ -613,6 +620,10 @@ class App(tk.Tk):
         self.statusbar.grid(column=0, row=1, columnspan=2, sticky=tk.EW)
 
         self.is_first = True
+
+    @staticmethod
+    def display_doc():
+        webbrowser.open(resource_path("docs/index.html"))
 
     def on_resize(self, event):
         self.frame_canvas.configure(scrollregion=self.frame_canvas.bbox("all"))
