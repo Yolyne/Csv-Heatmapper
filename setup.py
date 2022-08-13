@@ -26,7 +26,7 @@ build_options = {
     "includes": includes,
     "packages": [],
     "excludes": excludes,
-    "include_files": "images",
+    "include_files": ["imgs", "docs"],
 }
 
 

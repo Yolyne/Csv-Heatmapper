@@ -1,0 +1,114 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", メイリオ, Meiryo, "ＭＳ Ｐゴシック", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+header {
+  padding: 10px 10px 0;
+}
+
+header a {
+  color: black;
+}
+
+a {
+  text-decoration: none;
+}
+
+main {
+  padding: 10px;
+  position: relative;
+  display: flex;
+}
+
+p {
+  margin: 0 0 10px
+}
+
+img {
+  max-width: 100%;
+}
+
+table {
+  table-layout: auto;
+  width: 100%;
+  margin: 15px 0 15px 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+}
+
+td {
+  border-top: 1px solid gray;
+  /* border-bottom: 1px solid gray; */
+  text-align: left;
+  vertical-align: top;
+}
+
+td, th {
+  padding: 0 0.5rem 0 0.5rem;
+}
+
+li a {
+  color: black;
+}
+
+li a:hover {
+  /* color: #fff; */
+  text-decoration: underline;
+  /* background-color: gray;
+  border-radius: 0.5rem 0.5rem 0.5rem 0.5rem */
+}
+
+footer {
+  margin-top: 40px;
+  padding: 40px 0 40px;
+  border-top: 1px solid gray;
+  text-align: center;
+}
+
+.header-text {
+  font-weight: 600;
+}
+
+.sidebar-content {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 10px;
+  font-size: 0.9rem;
+  /* padding: 10px; */
+}
+
+.side-toc {
+  padding: 0;
+  list-style: none;
+}
+
+.main {
+  margin-left: 10px;
+}
+
+.main-icon {
+  height: 24px;
+  margin-right: 4px;
+}
+
+.column {
+  display: flex;
+}
+
+
+.vertical-middle {
+  vertical-align: middle;
+}
+
+@media (max-width: 700px) {
+  /* 横幅が320px以下の場合に適用するスタイル */
+  .sidebar { display: none;}
+}
