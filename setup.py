@@ -3,7 +3,7 @@ from cx_Freeze import setup, Executable
 import sys
 
 app_name = "CsvHeatmapper"
-version = "2.0"
+version = "3.0"
 # Dependencies are automatically detected, but it might need
 # fine tuning.
 # # importして使っているライブラリを記載（こちらの方が軽くなるという噂）
@@ -74,7 +74,7 @@ bdist_msi_options = {
 setup(
     name=app_name,
     version=version,
-    author="yoririn",
+    author="Yolyne",
     description="convert 2-dimention csv to Heatmap",
     options={
         "build_exe": build_options,
