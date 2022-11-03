@@ -19,7 +19,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import webbrowser
-from decimal import Decimal
 
 # from matplotlib.ticker import ScalarFormatter
 from matplotlib.backends.backend_tkagg import (
@@ -797,7 +796,7 @@ class App(tk.Tk):
                 else str(cmax)
             ]
         )
-        print([f"${Decimal(str(i))}$" for i in _[1:]])
+
         ax.set_xticks(
             list(np.arange(x_interval, df_width + 1, x_interval))
             if x_interval == 1

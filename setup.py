@@ -3,7 +3,7 @@ from cx_Freeze import setup, Executable
 import sys
 
 app_name = "CsvHeatmapper"
-version = "3.0"
+version = "3.0.1"
 # Dependencies are automatically detected, but it might need
 # fine tuning.
 # # importして使っているライブラリを記載（こちらの方が軽くなるという噂）
@@ -14,7 +14,7 @@ includes = [
     "pandas",
     "math",
     "matplotlib",
-    "webbrowser"
+    "webbrowser",
 ]
 
 # excludesでは、パッケージ化しないライブラリやモジュールを指定する。
@@ -22,7 +22,7 @@ includes = [
 numpy,pandas,lxmlは非常に重いので使わないなら、除く。（合計で80MBほど）
 他にも、PIL(5MB)など。
 """
-excludes = ["lxml", "PyQt4", "PyQt5", "pip", "pip-license"]
+excludes = ["cx_Freeze", "pip", "pip-license", "setuptools", "cv2"]
 build_options = {
     "includes": includes,
     "packages": [],
