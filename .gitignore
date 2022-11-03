@@ -6,4 +6,4 @@
 /share
 desktop.ini
 sample.py
-pyvenv.cfg
+/.venv
