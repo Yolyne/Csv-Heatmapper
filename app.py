@@ -19,6 +19,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import webbrowser
+from decimal import Decimal
 
 # from matplotlib.ticker import ScalarFormatter
 from matplotlib.backends.backend_tkagg import (
@@ -394,7 +395,7 @@ class InputFrame(tk.Frame):
         )
         self.msg_box.grid(column=0, row=0, sticky=tk.NSEW)
 
-    # shared option
+        # shared option
         for child in self.winfo_children():
             child.grid_configure(pady=(0, 3))
             child.columnconfigure(
@@ -764,16 +765,39 @@ class App(tk.Tk):
             #     ]
             # )
             # + [cmax]
-            np.concatenate([_ := np.arange(cmin, cmax, cinterval), [cmax]])
+            np.concatenate(
+                [
+                    [cmin],
+                    _ := np.round(
+                        np.arange(cmin + cinterval, cmax, cinterval),
+                        len(str(cinterval).split(".")[-1]),
+                    ),
+                    [cmax],
+                ]
+            )
         )
         cbar.ax.set_yticklabels(
-            # [fr"$\leq {float(cmin)}$"]
-            # + [f"${i}$" for i in _[1:]]
-            # + [fr"$\geq {float(cmax)}$"]
-            [r"$\leq %s$" % str(cmin).rstrip("0").rstrip(".")]
-            + [r"$%s$" % str(i).rstrip("0").rstrip(".") for i in _[1:]]
-            + [r"$\geq %s$" % str(cmax).rstrip("0").rstrip(".")]
+            # [rf"$\leq {float(cmin)}$"]
+            # + [f"${i}$" for i in _]
+            # + [rf"$\geq {float(cmax)}$"]
+            [
+                r"$\leq %s$" % str(cmin).rstrip("0").rstrip(".")
+                if "." in str(cmin)
+                else str(cmin)
+            ]
+            + [
+                r"$%s$" % str(i).rstrip("0").rstrip(".")
+                if "." in str(i)
+                else str(i)
+                for i in _
+            ]
+            + [
+                r"$\geq %s$" % str(cmax).rstrip("0").rstrip(".")
+                if "." in str(cmin)
+                else str(cmax)
+            ]
         )
+        print([f"${Decimal(str(i))}$" for i in _[1:]])
         ax.set_xticks(
             list(np.arange(x_interval, df_width + 1, x_interval))
             if x_interval == 1
@@ -800,13 +824,13 @@ class App(tk.Tk):
         ax.tick_params(axis="x", labelsize=tickslabelsize)
         ax.tick_params(axis="y", labelsize=tickslabelsize)
         cbar.set_label(
-            fr"{(self.input_frame.cbarlabel.get())}", fontsize=labelsize
+            rf"{(self.input_frame.cbarlabel.get())}", fontsize=labelsize
         )
         ax.set_xlabel(
-            fr"{(self.input_frame.xlabel.get())}", fontsize=labelsize
+            rf"{(self.input_frame.xlabel.get())}", fontsize=labelsize
         )
         ax.set_ylabel(
-            fr"{(self.input_frame.ylabel.get())}", fontsize=labelsize
+            rf"{(self.input_frame.ylabel.get())}", fontsize=labelsize
         )
         # cbar.ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
         # cbar.ax.ticklabel_format(style="sci",  axis="y",scilimits=(0,0))
