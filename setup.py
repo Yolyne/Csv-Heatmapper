@@ -1,9 +1,10 @@
 # python setup.py bdist_msi
 from cx_Freeze import setup, Executable
 import sys
+import os
 
 app_name = "CsvHeatmapper"
-version = "3.0.1"
+version = "3.0.2"
 # Dependencies are automatically detected, but it might need
 # fine tuning.
 # # importして使っているライブラリを記載（こちらの方が軽くなるという噂）
@@ -22,12 +23,27 @@ includes = [
 numpy,pandas,lxmlは非常に重いので使わないなら、除く。（合計で80MBほど）
 他にも、PIL(5MB)など。
 """
+matches = ["LICENSE", "LICENCE.rst", "LICENSE.txt", "METADATA", "PKG-INFO"]
+lics = []
+print("Find 3rd party dependency license files")
+for root, dir, files in os.walk(".venv/Lib/site-packages"):
+    for file in files:
+        if file in matches:
+            src = f"{root}/{file}"
+            dest = f"licenses/{os.path.basename(root)}/{file}"
+            lics.append((src, dest))
+            print(f"\tLicense file: {root}/{file}")
+            # print(dest)
+print(
+    f"{len(lics)} dependency licenses found. Copying to /license folder in distribution"
+)
+print(["imgs", "docs", *lics])
 excludes = ["cx_Freeze", "pip", "pip-license", "setuptools", "cv2"]
 build_options = {
     "includes": includes,
     "packages": [],
     "excludes": excludes,
-    "include_files": ["imgs", "docs"],
+    "include_files": ["imgs", "docs", "LICENSE", *lics],
 }
 
 
