@@ -702,8 +702,8 @@ class App(tk.Tk):
         # cmin = df.min().min()
         if self.is_first:  # set initial values
             self.is_first = False
-            cmax = math.ceil(self.figure_frame.df_max)
-            cmin = math.floor(self.figure_frame.df_min)
+            cmax = float(math.ceil(self.figure_frame.df_max))
+            cmin = float(math.floor(self.figure_frame.df_min))
             cinterval = self.determine_interval(cmax - cmin, True)
             x_interval = self.determine_interval(df_width)
             y_interval = self.determine_interval(df_height)
@@ -779,22 +779,9 @@ class App(tk.Tk):
             # [rf"$\leq {float(cmin)}$"]
             # + [f"${i}$" for i in _]
             # + [rf"$\geq {float(cmax)}$"]
-            [
-                r"$\leq %s$" % str(cmin).rstrip("0").rstrip(".")
-                if "." in str(cmin)
-                else str(cmin)
-            ]
-            + [
-                r"$%s$" % str(i).rstrip("0").rstrip(".")
-                if "." in str(i)
-                else str(i)
-                for i in _
-            ]
-            + [
-                r"$\geq %s$" % str(cmax).rstrip("0").rstrip(".")
-                if "." in str(cmin)
-                else str(cmax)
-            ]
+            [r"$\leq %s$" % str(cmin).rstrip("0").rstrip(".")]
+            + [r"$%s$" % str(i).rstrip("0").rstrip(".") for i in _]
+            + [r"$\geq %s$" % str(cmax).rstrip("0").rstrip(".")]
         )
 
         ax.set_xticks(
