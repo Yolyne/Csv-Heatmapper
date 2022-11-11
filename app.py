@@ -597,7 +597,7 @@ class App(tk.Tk):
         self.frame_canvas.configure(
             xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set
         )
-        self.figure_frame = tk.Frame(master=self.frame_canvas)
+        self.figure_frame: pd.DataFrame = tk.Frame(master=self.frame_canvas)
         self.figure_frame.bind(
             "<Configure>",
             # lambda e: self.frame_canvas.configure(
@@ -731,14 +731,34 @@ class App(tk.Tk):
 
         if self.input_frame.is_3d.get():
             ax = fig.add_subplot(111, projection="3d")
-            x = np.arange(1, df_width + 1)
-            y = np.arange(1, df_height + 1)
-            X, Y = np.meshgrid(x, y)
-            ax.plot_surface(X, Y, df, cmap=cmap)
+            ax.set_box_aspect((1, 1, 0.1))
+            # x = np.arange(1, df_width + 1)
+            # y = np.arange(1, df_height + 1)
+            list_x = np.array(
+                [
+                    x + (-1) ** n * 0.5
+                    for x in range(1, df_width + 1)
+                    for n in range(1, 3)
+                ]
+            )
+            list_y = np.array(
+                [
+                    x + (-1) ** n * 0.5
+                    for x in range(1, df_height + 1)
+                    for n in range(1, 3)
+                ]
+            )
+            X, Y = np.meshgrid(list_x, list_y)
+            arr = np.kron(df, np.ones((2, 2)))
+            ax.plot_surface(X, Y, arr, cmap=cmap, rstride=1, cstride=1)
             cbar = fig.colorbar(
                 mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
                 ax=ax,
             )
+            ax.set_xlim3d(0.5, df_width + 0.5)
+            ax.set_ylim3d(df_height + 0.5, 0.5)
+            ax.set_zlim3d(cmin, cmax)
+            ax.set_box_aspect((df_width, df_height, max(df_height, df_width)))
         else:
             ax = fig.add_subplot(111)
             extent = 0.5, df_width + 0.5, df_height + 0.5, 0.5
@@ -754,6 +774,7 @@ class App(tk.Tk):
                 mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
                 cax=cax,
             )
+
         cbar.ax.set_yticks(
             # [cmin]
             # + (

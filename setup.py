@@ -4,7 +4,7 @@ import sys
 import os
 
 app_name = "CsvHeatmapper"
-version = "3.0.2"
+version = "3.0.3"
 # Dependencies are automatically detected, but it might need
 # fine tuning.
 # # importして使っているライブラリを記載（こちらの方が軽くなるという噂）
