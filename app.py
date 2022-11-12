@@ -158,7 +158,7 @@ class InputFrame(tk.Frame):
         self.load_button = ttk.Button(
             self.browse_frame,
             image=self.img_mglass,
-            command=self.master.browse_inputfile,
+            command=self.master.load_button_clicked,
         )
         self.load_button.grid(
             column=1,
@@ -369,7 +369,7 @@ class InputFrame(tk.Frame):
         self.calculate_button = ttk.Button(
             self.button_frame, text="Plot", state="key"
         )
-        self.calculate_button["command"] = self.master.screen
+        self.calculate_button["command"] = self.master.display_figure
         self.calculate_button.grid(column=0, row=0, sticky=tk.NSEW)
         # save button
         self.img_save = tk.PhotoImage(file=resource_path("imgs/save.png"))
@@ -620,6 +620,10 @@ class App(tk.Tk):
         )
         self.statusbar.grid(column=0, row=1, columnspan=2, sticky=tk.EW)
 
+        self.df: pd.DataFrame = None
+        self.df_mean = 0.0
+        self.df_max = 0.0
+        self.df_min = 0.0
         self.is_first = True
 
     @staticmethod
@@ -630,11 +634,23 @@ class App(tk.Tk):
         self.frame_canvas.configure(scrollregion=self.frame_canvas.bbox("all"))
         # print(self.frame_canvas.bbox("all"))
 
-    def browse_inputfile(self):
-        """
-        Handle button click event
-        """
-        csvpath = filedialog.askopenfilename(
+    def load_button_clicked(self):
+        csv_path = self._browse_inputfile()
+        if csv_path and csv_path != self.input_frame.filepath.get():
+            self.is_first = True  # regard when csv is read as the first time
+            self.input_frame.filepath.set(csv_path)
+            self._create_df(csv_path)
+            self._update_analyzedvalues()
+            if self.df.size > 10_000:
+                self.input_frame.is_3d.set(False)
+                self.input_frame.threeD_check["state"] = "disabled"
+            else:
+                self.input_frame.threeD_check["state"] = "normal"
+
+            self.display_figure()
+
+    def _browse_inputfile(self):
+        return filedialog.askopenfilename(
             filetypes=[
                 ("CSV-like files", "*.csv"),
                 ("CSV-like files", "*.xlsx"),
@@ -642,32 +658,27 @@ class App(tk.Tk):
             title="load",
             initialdir=os.path.expanduser("~/Documents"),
         )
-        if csvpath and csvpath != self.input_frame.filepath.get():
-            if os.path.splitext(csvpath)[-1].lower() == ".csv":
-                self.figure_frame.df = pd.read_csv(
-                    csvpath, header=None
-                ).dropna(axis=1)
-            else:
-                df_file = pd.ExcelFile(csvpath)
-                self.figure_frame.df = df_file.parse(
-                    sheet_name=0, header=None
-                ).dropna(axis=1)
-            # self.input_frame.df = df = df
-            self.figure_frame.df_mean = self.figure_frame.df.mean().mean()
-            self.figure_frame.df_max = self.figure_frame.df.max().max()
-            self.figure_frame.df_min = self.figure_frame.df.min().min()
-            self.analyzedvalues.set(
-                (
-                    f"Max: {self.figure_frame.df_max}, "
-                    f"Min: {self.figure_frame.df_min}, "
-                    f"Mean: {self.figure_frame.df_mean}"
-                )
-            )
-            self.input_frame.filepath.set(csvpath)
-            app.is_first = True  # regard when csv is read as the first time
-            self.screen()
 
-    def screen(self):
+    def _create_df(self, csv_path):
+        if os.path.splitext(csv_path)[-1].lower() == ".csv":
+            self.df = pd.read_csv(csv_path, header=None).dropna(axis=1)
+        else:
+            df_file = pd.ExcelFile(csv_path)
+            self.df = df_file.parse(sheet_name=0, header=None).dropna(axis=1)
+
+    def _update_analyzedvalues(self):
+        self.df_mean = self.df.mean().mean()
+        self.df_max = self.df.max().max()
+        self.df_min = self.df.min().min()
+        self.analyzedvalues.set(
+            (
+                f"Max: {self.df_max}, "
+                f"Min: {self.df_min}, "
+                f"Mean: {self.df_mean}"
+            )
+        )
+
+    def display_figure(self):
         if (fig := self.plot()) is None:
             return
         try:
@@ -692,7 +703,7 @@ class App(tk.Tk):
             return None
         plt.close("all")
 
-        df = self.figure_frame.df
+        df = self.df
         fig = plt.figure(figsize=(9, 6), dpi=100, tight_layout=True)
 
         df_width = len(df.columns)
@@ -702,8 +713,8 @@ class App(tk.Tk):
         # cmin = df.min().min()
         if self.is_first:  # set initial values
             self.is_first = False
-            cmax = float(math.ceil(self.figure_frame.df_max))
-            cmin = float(math.floor(self.figure_frame.df_min))
+            cmax = float(math.ceil(self.df_max))
+            cmin = float(math.floor(self.df_min))
             cinterval = self.determine_interval(cmax - cmin, True)
             x_interval = self.determine_interval(df_width)
             y_interval = self.determine_interval(df_height)
