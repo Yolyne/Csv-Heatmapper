@@ -7,6 +7,11 @@ This software is released under the MIT license.
 See https://opensource.org/licenses/MIT
 
 """
+
+import logging
+from logging.handlers import RotatingFileHandler
+from time import perf_counter
+
 import tkinter as tk
 from tkinter import BooleanVar, StringVar, ttk
 from tkinter import filedialog
@@ -16,6 +21,7 @@ import os
 import math
 import numpy as np
 import matplotlib as mpl
+from matplotlib import cm
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import webbrowser
@@ -30,7 +36,32 @@ from matplotlib.backends.backend_tkagg import (
 
 # plt.switch_backend("tkagg")
 
-# IMAGES_PATH = pathlib.Path(__file__).parent / "images"
+
+# APP_NAME = "Ellipso Microscope Commander"
+# COMPANY = "Yolyne"
+# setting = QSettings(COMPANY, APP_NAME)
+# if setting.value("last_dir") == "":
+#     setting.setValue("last_dir", os.path.expanduser("~/Documents"))
+
+
+# create logger with 'spam_application'
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = RotatingFileHandler("app.log", maxBytes=500_000, backupCount=2)
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)
+# create formatter and add it to the handlers
+formatter = logging.Formatter(
+    "[%(asctime)s] %(name)s %(threadName)s(%(levelname)s): %(message)s"
+)
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# add the handlers to the logger
+logger.addHandler(fh)
+logger.addHandler(ch)
 
 
 def resource_path(relative_path):
@@ -268,23 +299,21 @@ class InputFrame(tk.Frame):
             ],
             weight=1,
         )
-        self.xlabel_label = ttk.Label(self.label_frame, text="x-Label")
+        self.xlabel_label = ttk.Label(self.label_frame, text="X Label")
         self.xlabel_label.grid(column=0, row=0, sticky=tk.W)
         self.xlabel = tk.StringVar(value="x")
         self.xlabel_entry = ttk.Entry(
             self.label_frame, textvariable=self.xlabel
         )
         self.xlabel_entry.grid(column=1, row=0, sticky=tk.E)
-        self.ylabel_label = ttk.Label(self.label_frame, text="y-Label")
+        self.ylabel_label = ttk.Label(self.label_frame, text="Y Label")
         self.ylabel_label.grid(column=0, row=1, sticky=tk.W)
         self.ylabel = tk.StringVar(value="y")
         self.ylabel_entry = ttk.Entry(
             self.label_frame, textvariable=self.ylabel
         )
         self.ylabel_entry.grid(column=1, row=1, sticky=tk.E)
-        self.cbarlabel_label = ttk.Label(
-            self.label_frame, text="Colorbar Label"
-        )
+        self.cbarlabel_label = ttk.Label(self.label_frame, text="Z Label")
         self.cbarlabel_label.grid(column=0, row=2, sticky=tk.W)
         self.cbarlabel = tk.StringVar(value="z ()")
         self.cbarlabel_entry = ttk.Entry(
@@ -679,8 +708,10 @@ class App(tk.Tk):
         )
 
     def display_figure(self):
+        t_before = perf_counter()
         if (fig := self.plot()) is None:
             return
+        logger.info("ploting time: {} s".format(perf_counter() - t_before))
         try:
             figure_canvas = FigureCanvasTkAgg(fig, master=self.figure_frame)
             figure_canvas.draw()
@@ -708,9 +739,9 @@ class App(tk.Tk):
 
         df_width = len(df.columns)
         df_height = len(df)
-        # ax_ = ax_.ravel()
-        # cmax = df.max().max()
-        # cmin = df.min().min()
+        labelsize = self.input_frame.labelsize.get()
+        tickslabelsize = self.input_frame.tickslabelsize.get()
+
         if self.is_first:  # set initial values
             self.is_first = False
             cmax = float(math.ceil(self.df_max))
@@ -743,8 +774,6 @@ class App(tk.Tk):
         if self.input_frame.is_3d.get():
             ax = fig.add_subplot(111, projection="3d")
             ax.set_box_aspect((1, 1, 0.1))
-            # x = np.arange(1, df_width + 1)
-            # y = np.arange(1, df_height + 1)
             list_x = np.array(
                 [
                     x + (-1) ** n * 0.5
@@ -761,14 +790,115 @@ class App(tk.Tk):
             )
             X, Y = np.meshgrid(list_x, list_y)
             arr = np.kron(df, np.ones((2, 2)))
-            ax.plot_surface(X, Y, arr, cmap=cmap, rstride=1, cstride=1)
+            ax.plot_surface(
+                X,
+                Y,
+                arr,
+                cmap=cmap,
+                norm=cbar_norm,
+                linewidth=0.1,
+                edgecolor="black",
+                rstride=1,
+                cstride=1,
+            )
+            # ax.plot_surface(
+            #     X,
+            #     Y,
+            #     arr,
+            #     linewidth=0.4,
+            #     facecolors=cm.get_cmap(cmap)(cbar_norm(arr)),
+            #     rstride=1,
+            #     cstride=1,
+            # )
+
+            # list_x = np.arange(1, df_width + 1)
+            # list_y = np.arange(1, df_height + 1)
+            # x, y = np.meshgrid(list_x, list_y)
+            # ax.plot_surface(
+            #     x,
+            #     y,
+            #     df,
+            #     facecolors=cm.get_cmap(cmap)(cbar_norm(df)),
+            #     rstride=1,
+            #     cstride=1,
+            #     shade=False,
+            # )
+
+            # ax.plot_trisurf(
+            #     x.ravel(),
+            #     y.ravel(),
+            #     df.to_numpy().ravel(),
+            #     cmap=cmap,
+            #     shade=False,
+            # )
+
+            Xs_2d, Ys_2d = np.meshgrid(
+                np.arange(1, df_width + 1), np.arange(1, df_height + 1)
+            )
+            Xs = Xs_2d.ravel()
+            Ys = Ys_2d.ravel()
+            Zs = df.to_numpy().ravel()
+            data = np.stack((Xs, Ys, Zs), axis=-1)
+            ind = np.argsort(data[:, -1])
+            data_sorted = data[ind]
+            # print(data_sorted)
+            tops = Zs - self.df_min
+            cmap_instance = cm.get_cmap(cmap)
+            # for x, y, z in data_sorted:
+            #     ax.bar3d(
+            #         x=x - 0.5,
+            #         y=y - 0.5,
+            #         z=self.df_min,
+            #         dx=1,
+            #         dy=1,
+            #         dz=z - self.df_min,
+            #         shade=True,
+            #         alpha=1,
+            #         color=cmap_instance(cbar_norm(z)),
+            #         rasterized=True,
+            #     )
+            # i = 2
+            # for x, y, z in zip(Xs, Ys, Zs):
+            #     print(f"({x},{y},{z})")
+            #     ax.bar3d(
+            #         x=x - 0.5,
+            #         y=y - 0.5,
+            #         z=self.df_min,
+            #         dx=1,
+            #         dy=1,
+            #         dz=z - self.df_min,
+            #         shade=True,
+            #         alpha=1,
+            #         color=cmap_instance(cbar_norm(z)),
+            #         rasterized=True,
+            #         zorder=i,
+            #     )
+            #     i += 1
+            # ax.bar3d(
+            #     x=Xs - 0.5,
+            #     y=Ys - 0.5,
+            #     z=self.df_min,
+            #     dx=1,
+            #     dy=1,
+            #     dz=tops,
+            #     shade=True,
+            #     alpha=1,
+            #     color=cmap_instance(cbar_norm(Zs)),
+            #     rasterized=True,
+            # )
             cbar = fig.colorbar(
                 mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
                 ax=ax,
             )
+            ax.tick_params(axis="z", labelsize=tickslabelsize, pad=10)
             ax.set_xlim3d(0.5, df_width + 0.5)
             ax.set_ylim3d(df_height + 0.5, 0.5)
-            ax.set_zlim3d(cmin, cmax)
+            ax.set_zlim3d(math.floor(self.df_min), math.ceil(self.df_max))
+            # ax.set_zlabel(
+            #     rf"{(self.input_frame.cbarlabel.get())}",
+            #     fontsize=labelsize,
+            #     labelpad=15,
+            # )
             ax.set_box_aspect((df_width, df_height, max(df_height, df_width)))
         else:
             ax = fig.add_subplot(111)
@@ -777,6 +907,7 @@ class App(tk.Tk):
             # # ax.matshow(df, norm=cbar_norm, cmap=cmap,)
             ax.xaxis.set_label_position("top")
             ax.yaxis.set_ticks_position("both")
+
             divider = make_axes_locatable(ax)  # axに紐付いたAxesDividerを取得
             cax = divider.append_axes(
                 "right", size="3%", pad=0.2
@@ -785,7 +916,9 @@ class App(tk.Tk):
                 mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
                 cax=cax,
             )
-
+        cbar.set_label(
+            rf"{(self.input_frame.cbarlabel.get())}", fontsize=labelsize
+        )
         cbar.ax.set_yticks(
             # [cmin]
             # + (
@@ -836,14 +969,9 @@ class App(tk.Tk):
             # ]
             + list(np.arange(y_interval, df_height + 1, y_interval))
         )
-        labelsize = self.input_frame.labelsize.get()
-        tickslabelsize = self.input_frame.tickslabelsize.get()
         cbar.ax.tick_params(axis="y", labelsize=tickslabelsize)
         ax.tick_params(axis="x", labelsize=tickslabelsize)
         ax.tick_params(axis="y", labelsize=tickslabelsize)
-        cbar.set_label(
-            rf"{(self.input_frame.cbarlabel.get())}", fontsize=labelsize
-        )
         ax.set_xlabel(
             rf"{(self.input_frame.xlabel.get())}", fontsize=labelsize
         )
