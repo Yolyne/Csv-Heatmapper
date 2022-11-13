@@ -370,15 +370,32 @@ class InputFrame(tk.Frame):
         )
         self.cm_check.grid(column=1, row=0)
         # 3d
+        self.frame_3d = tk.Frame(self.setting_frame)
+        self.frame_3d.grid(column=0, row=5)
         self.is_3d = BooleanVar()
         self.threeD_check = ttk.Checkbutton(
-            self.setting_frame,
+            self.frame_3d,
             text="3D",
             onvalue=True,
             offvalue=False,
             variable=self.is_3d,
         )
-        self.threeD_check.grid(column=0, row=5, sticky=tk.W)
+        self.threeD_check.grid(column=0, row=0, sticky=tk.W)
+        self.type_3d = StringVar(value="scatter")
+        self.radbutton_3Dtype_scatter = tk.Radiobutton(
+            self.frame_3d,
+            text="scatter",
+            variable=self.type_3d,
+            value="scatter",
+        )
+        self.radbutton_3Dtype_scatter.grid(column=1, row=0)
+        self.radbutton_3Dtype_surface = tk.Radiobutton(
+            self.frame_3d,
+            text="surface",
+            variable=self.type_3d,
+            value="surface",
+        )
+        self.radbutton_3Dtype_surface.grid(column=2, row=0)
         # shared option
         for child in self.setting_frame.winfo_children():
             child.grid_configure(padx=3, pady=3)
@@ -531,7 +548,6 @@ class InputFrame(tk.Frame):
             ],
             # title="",
             defaultextension="png",
-            initialdir=os.path.expanduser("~/Documents"),
         )
         self.container.figure_frame.fig.savefig(savepath, transparent=True)
 
@@ -685,7 +701,6 @@ class App(tk.Tk):
                 ("CSV-like files", "*.xlsx"),
             ],
             title="load",
-            initialdir=os.path.expanduser("~/Documents"),
         )
 
     def _create_df(self, csv_path):
@@ -699,11 +714,13 @@ class App(tk.Tk):
         self.df_mean = self.df.mean().mean()
         self.df_max = self.df.max().max()
         self.df_min = self.df.min().min()
+        self.df_std = self.df.to_numpy().std(ddof=1)
         self.analyzedvalues.set(
             (
                 f"Max: {self.df_max}, "
                 f"Min: {self.df_min}, "
-                f"Mean: {self.df_mean}"
+                f"Mean: {self.df_mean}, "
+                f"Sample Std: {self.df_std}"
             )
         )
 
@@ -774,131 +791,71 @@ class App(tk.Tk):
         if self.input_frame.is_3d.get():
             ax = fig.add_subplot(111, projection="3d")
             ax.set_box_aspect((1, 1, 0.1))
-            list_x = np.array(
-                [
-                    x + (-1) ** n * 0.5
-                    for x in range(1, df_width + 1)
-                    for n in range(1, 3)
-                ]
-            )
-            list_y = np.array(
-                [
-                    x + (-1) ** n * 0.5
-                    for x in range(1, df_height + 1)
-                    for n in range(1, 3)
-                ]
-            )
-            X, Y = np.meshgrid(list_x, list_y)
-            arr = np.kron(df, np.ones((2, 2)))
-            ax.plot_surface(
-                X,
-                Y,
-                arr,
-                cmap=cmap,
-                norm=cbar_norm,
-                linewidth=0.1,
-                edgecolor="black",
-                rstride=1,
-                cstride=1,
-            )
-            # ax.plot_surface(
-            #     X,
-            #     Y,
-            #     arr,
-            #     linewidth=0.4,
-            #     facecolors=cm.get_cmap(cmap)(cbar_norm(arr)),
-            #     rstride=1,
-            #     cstride=1,
-            # )
-
-            # list_x = np.arange(1, df_width + 1)
-            # list_y = np.arange(1, df_height + 1)
-            # x, y = np.meshgrid(list_x, list_y)
-            # ax.plot_surface(
-            #     x,
-            #     y,
-            #     df,
-            #     facecolors=cm.get_cmap(cmap)(cbar_norm(df)),
-            #     rstride=1,
-            #     cstride=1,
-            #     shade=False,
-            # )
-
-            # ax.plot_trisurf(
-            #     x.ravel(),
-            #     y.ravel(),
-            #     df.to_numpy().ravel(),
-            #     cmap=cmap,
-            #     shade=False,
-            # )
-
-            Xs_2d, Ys_2d = np.meshgrid(
-                np.arange(1, df_width + 1), np.arange(1, df_height + 1)
-            )
-            Xs = Xs_2d.ravel()
-            Ys = Ys_2d.ravel()
-            Zs = df.to_numpy().ravel()
-            data = np.stack((Xs, Ys, Zs), axis=-1)
-            ind = np.argsort(data[:, -1])
-            data_sorted = data[ind]
-            # print(data_sorted)
-            tops = Zs - self.df_min
-            cmap_instance = cm.get_cmap(cmap)
-            # for x, y, z in data_sorted:
-            #     ax.bar3d(
-            #         x=x - 0.5,
-            #         y=y - 0.5,
-            #         z=self.df_min,
-            #         dx=1,
-            #         dy=1,
-            #         dz=z - self.df_min,
-            #         shade=True,
-            #         alpha=1,
-            #         color=cmap_instance(cbar_norm(z)),
-            #         rasterized=True,
-            #     )
-            # i = 2
-            # for x, y, z in zip(Xs, Ys, Zs):
-            #     print(f"({x},{y},{z})")
-            #     ax.bar3d(
-            #         x=x - 0.5,
-            #         y=y - 0.5,
-            #         z=self.df_min,
-            #         dx=1,
-            #         dy=1,
-            #         dz=z - self.df_min,
-            #         shade=True,
-            #         alpha=1,
-            #         color=cmap_instance(cbar_norm(z)),
-            #         rasterized=True,
-            #         zorder=i,
-            #     )
-            #     i += 1
-            # ax.bar3d(
-            #     x=Xs - 0.5,
-            #     y=Ys - 0.5,
-            #     z=self.df_min,
-            #     dx=1,
-            #     dy=1,
-            #     dz=tops,
-            #     shade=True,
-            #     alpha=1,
-            #     color=cmap_instance(cbar_norm(Zs)),
-            #     rasterized=True,
-            # )
+            if self.input_frame.type_3d.get() == "surface":
+                alpha = 1
+                list_x = np.array(
+                    [
+                        x + (-1) ** n * 0.5
+                        for x in range(1, df_width + 1)
+                        for n in range(1, 3)
+                    ]
+                )
+                list_y = np.array(
+                    [
+                        x + (-1) ** n * 0.5
+                        for x in range(1, df_height + 1)
+                        for n in range(1, 3)
+                    ]
+                )
+                X, Y = np.meshgrid(list_x, list_y)
+                arr = np.kron(df, np.ones((2, 2)))
+                ax.plot_surface(
+                    X,
+                    Y,
+                    arr,
+                    cmap=cmap,
+                    norm=cbar_norm,
+                    linewidth=0.1,
+                    edgecolor="black",
+                    rstride=1,
+                    cstride=1,
+                )
+                # ax.plot_surface(
+                #     X,
+                #     Y,
+                #     df,
+                #     cmap=cmap,
+                #     norm=cbar_norm,
+                #     linewidth=0.1,
+                #     edgecolor="black",
+                #     rstride=1,
+                #     cstride=1,
+                # )
+            elif self.input_frame.is_3d.get():
+                alpha = 0.3
+                list_x = np.arange(1, df_width + 1)
+                list_y = np.arange(1, df_height + 1)
+                X, Y = np.meshgrid(list_x, list_y)
+                ax.scatter(
+                    X,
+                    Y,
+                    df,
+                    c=df,
+                    marker="o",
+                    cmap=cmap,
+                    norm=cbar_norm,
+                    alpha=alpha,
+                )
+                alpha *= 2
             cbar = fig.colorbar(
                 mpl.cm.ScalarMappable(norm=cbar_norm, cmap=cmap),
                 ax=ax,
+                alpha=alpha if alpha <= 1 else 1,
             )
             ax.tick_params(axis="z", labelsize=tickslabelsize, pad=10)
             ax.set_xlim3d(0.5, df_width + 0.5)
             ax.set_ylim3d(df_height + 0.5, 0.5)
             ax.set_zlim3d(math.floor(self.df_min), math.ceil(self.df_max))
-            # ax.set_zlabel(
-            #     rf"{(self.input_frame.cbarlabel.get())}",
-            #     fontsize=labelsize,
-            #     labelpad=15,
-            # )
             ax.set_box_aspect((df_width, df_height, max(df_height, df_width)))
         else:
             ax = fig.add_subplot(111)
@@ -920,15 +877,6 @@ class App(tk.Tk):
             rf"{(self.input_frame.cbarlabel.get())}", fontsize=labelsize
         )
         cbar.ax.set_yticks(
-            # [cmin]
-            # + (
-            #     _ := [
-            #         tick
-            #         for i in range(cbar_step)
-            #         if (tick := round(cmin + (i + 1) * cinterval, 3)) != cmax
-            #     ]
-            # )
-            # + [cmax]
             np.concatenate(
                 [
                     [cmin],
@@ -952,22 +900,12 @@ class App(tk.Tk):
         ax.set_xticks(
             list(np.arange(x_interval, df_width + 1, x_interval))
             if x_interval == 1
-            else [1]
-            #     + [
-            #         i
-            #         for i in range(int(x_interval), df_width + 1, int(x_interval))
-            #     ]
-            + list(np.arange(x_interval, df_width + 1, x_interval))
+            else [1] + list(np.arange(x_interval, df_width + 1, x_interval))
         )
         ax.set_yticks(
             list(np.arange(y_interval, df_height + 1, y_interval))
             if y_interval == 1
-            else [1]
-            # + [
-            #     i
-            #     for i in range(int(y_interval), df_height + 1, int(y_interval))
-            # ]
-            + list(np.arange(y_interval, df_height + 1, y_interval))
+            else [1] + list(np.arange(y_interval, df_height + 1, y_interval))
         )
         cbar.ax.tick_params(axis="y", labelsize=tickslabelsize)
         ax.tick_params(axis="x", labelsize=tickslabelsize)
