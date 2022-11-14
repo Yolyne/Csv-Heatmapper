@@ -666,9 +666,9 @@ class App(tk.Tk):
         self.statusbar.grid(column=0, row=1, columnspan=2, sticky=tk.EW)
 
         self.df: pd.DataFrame = None
-        self.df_mean = 0.0
-        self.df_max = 0.0
-        self.df_min = 0.0
+        self.indata_mean = 0.0
+        self.indata_max = 0.0
+        self.indata_min = 0.0
         self.is_first = True
 
     @staticmethod
@@ -711,16 +711,19 @@ class App(tk.Tk):
             self.df = df_file.parse(sheet_name=0, header=None).dropna(axis=1)
 
     def _update_analyzedvalues(self):
-        self.df_mean = self.df.mean().mean()
-        self.df_max = self.df.max().max()
-        self.df_min = self.df.min().min()
-        self.df_std = self.df.to_numpy().std(ddof=1)
+        self.indata_arr = self.df.to_numpy()
+        self.indata_mean = np.mean(self.indata_arr)
+        self.indata_max = np.amax(self.indata_arr)
+        self.indata_min = np.amin(self.indata_arr)
+        self.indata_median = np.median(self.indata_arr)
+        self.indata_std = np.std(self.indata_arr, ddof=1)
         self.analyzedvalues.set(
             (
-                f"Max: {self.df_max}, "
-                f"Min: {self.df_min}, "
-                f"Mean: {self.df_mean}, "
-                f"Sample Std: {self.df_std}"
+                f"Max: {self.indata_max}, "
+                f"Min: {self.indata_min}, "
+                f"Mean: {self.indata_mean}, "
+                f"Median: {self.indata_median}, "
+                f"Sample Std: {self.indata_std}"
             )
         )
 
@@ -761,8 +764,8 @@ class App(tk.Tk):
 
         if self.is_first:  # set initial values
             self.is_first = False
-            cmax = float(math.ceil(self.df_max))
-            cmin = float(math.floor(self.df_min))
+            cmax = float(math.ceil(self.indata_max))
+            cmin = float(math.floor(self.indata_min))
             cinterval = self.determine_interval(cmax - cmin, True)
             x_interval = self.determine_interval(df_width)
             y_interval = self.determine_interval(df_height)
@@ -855,7 +858,9 @@ class App(tk.Tk):
             ax.tick_params(axis="z", labelsize=tickslabelsize, pad=10)
             ax.set_xlim3d(0.5, df_width + 0.5)
             ax.set_ylim3d(df_height + 0.5, 0.5)
-            ax.set_zlim3d(math.floor(self.df_min), math.ceil(self.df_max))
+            ax.set_zlim3d(
+                math.floor(self.indata_min), math.ceil(self.indata_max)
+            )
             ax.set_box_aspect((df_width, df_height, max(df_height, df_width)))
         else:
             ax = fig.add_subplot(111)
