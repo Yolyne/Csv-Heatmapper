@@ -214,32 +214,40 @@ class InputFrame(tk.Frame):
         )
         self.xaxis_interval = tk.DoubleVar()
         self.yaxis_interval = tk.DoubleVar()
-        self.xaxis_label = ttk.Label(self.axes_frame, text="x-Interval")
+        self.xaxis_label = ttk.Label(self.axes_frame, text="X Interval")
         self.xaxis_label.grid(column=0, row=0, sticky=tk.W)
-        self.yaxis_label = ttk.Label(self.axes_frame, text="y-Interval")
+        self.yaxis_label = ttk.Label(self.axes_frame, text="Y Interval")
         self.yaxis_label.grid(column=0, row=1, sticky=tk.W)
-        self.xaxis_entry = ttk.Entry(
+        self.sbox_xinterval = ttk.Spinbox(
             self.axes_frame,
             textvariable=self.xaxis_interval,
             validate="key",
-            validatecommand=(tcl_validate_input, "%P", "x-Interval"),
+            validatecommand=(tcl_validate_input, "%P", "X Interval"),
+            command=(tcl_validate_input, 0, "X Interval"),
+            format="%.1f",
+            from_=0,
+            increment=1,
         )
         # self.xaxis_cbox = ttk.Combobox(
         #     self.axes_frame, state="readonly",
         #     textvariable=self.xaxis_interval
         # )
-        self.xaxis_entry.grid(column=1, row=0, sticky=tk.E)
-        self.yaxis_entry = ttk.Entry(
+        self.sbox_xinterval.grid(column=1, row=0, sticky=tk.E)
+        self.sbox_yinterval = ttk.Spinbox(
             self.axes_frame,
             textvariable=self.yaxis_interval,
             validate="key",
-            validatecommand=(tcl_validate_input, "%P", "y-Interval"),
+            validatecommand=(tcl_validate_input, "%P", "Y Interval"),
+            command=(tcl_validate_input, 0, "Y Interval"),
+            format="%.1f",
+            from_=0,
+            increment=1,
         )
         # self.yaxis_cbox = ttk.Combobox(
         #     self.axes_frame, state="readonly",
         #     textvariable=self.yaxis_interval
         # )
-        self.yaxis_entry.grid(column=1, row=1, sticky=tk.E)
+        self.sbox_yinterval.grid(column=1, row=1, sticky=tk.E)
         # colorscale_frame
         self.colorscale_frame = ttk.LabelFrame(
             self.setting_frame, text="Color Scale"
@@ -263,26 +271,48 @@ class InputFrame(tk.Frame):
         self.scaleintervals_label.grid(column=0, row=2, sticky=tk.W)
         self.scalemax = tk.DoubleVar(value=None)
         self.scalemin = tk.DoubleVar(value=None)
-        self.scalemax_entry = ttk.Entry(
+        self.scalemax_entry = ttk.Spinbox(
             self.colorscale_frame,
             textvariable=self.scalemax,
             validate="key",
             validatecommand=(tcl_validate_input, "%P", "Color Scale-Max"),
+            command=(
+                tcl_validate_input,
+                "up_down",
+                "Color Scale-Max",
+            ),
+            format="%.1f",
+            increment=1,
         )
         self.scalemax_entry.grid(column=1, row=0, sticky=tk.E)
-        self.scalemin_entry = ttk.Entry(
+        self.scalemin_entry = ttk.Spinbox(
             self.colorscale_frame,
             textvariable=self.scalemin,
             validate="key",
             validatecommand=(tcl_validate_input, "%P", "Color Scale-Min"),
+            command=(
+                tcl_validate_input,
+                "up_down",
+                "Color Scale-Min",
+            ),
+            format="%.1f",
+            increment=1,
         )
         self.scalemin_entry.grid(column=1, row=1, sticky=tk.E)
         self.scaleinterval = tk.DoubleVar()
-        self.scaleinterval_entry = ttk.Entry(
+        self.scaleinterval_entry = ttk.Spinbox(
             self.colorscale_frame,
             textvariable=self.scaleinterval,
             validate="key",
             validatecommand=(tcl_validate_input, "%P", "Color Scale-Interval"),
+            command=(
+                tcl_validate_input,
+                "up_down",
+                "Color Scale-Interval",
+            ),
+            format="%.1f",
+            increment=1,
+            from_=0,
         )
         # self.scaleintervals_cbox = ttk.Combobox(
         #     self.colorscale_frame,
@@ -457,7 +487,15 @@ class InputFrame(tk.Frame):
                 if isinstance(child, (ttk.Label)):
                     child["width"] = 15
 
-    def validate_input(self, input, name):
+    def validate_input(self, input=None, name=None):
+        if input == "up_down":
+            if name == "Color Scale-Max":
+                input = self.scalemax.get()
+            elif name == "Color Scale-Min":
+                input = self.scalemin.get()
+            elif name == "Color Scale-Interval":
+                input = self.scaleinterval.get()
+        print(input, " ", name)
         try:
             input = float(input)  # Check if half-width digits
             self.calculate_button["state"] = "normal"
@@ -475,36 +513,61 @@ class InputFrame(tk.Frame):
             try:
                 if name == "Color Scale-Max":
                     # Also check if half-width digits
-                    if input > self.scalemin.get():
-                        self.calculate_button["state"] = "normal"
-                        self.msg_dict.pop("Color Scale", None)
-                    else:
+                    if input >= self.scalemin.get():
                         self.calculate_button["state"] = "disabled"
                         self.msg_dict["Color Scale"] = (
                             "＊ Color Scale\n"
-                            "       :Min is equal to or greater than\n"
-                            "        Max!\n"
+                            "       :Max must be greater than\n"
+                            "        Min!\n"
                         )
+                    elif (
+                        self.scaleinterval.get() > input - self.scalemin.get()
+                    ):
+                        self.msg_dict["Color Scale-Interval"] = (
+                            "＊ Color Scale-Interval\n"
+                            "       :Interval must be smaller than\n"
+                            "        distance between Max & Min!\n"
+                        )
+                        self.msg_dict.pop("Color Scale", None)
+                    else:
+                        self.calculate_button["state"] = "normal"
+                        self.msg_dict.pop("Color Scale", None)
+                        self.msg_dict.pop("Color Scale-Interval", None)
                 elif name == "Color Scale-Min":
-                    if self.scalemax.get() > input:
-                        self.calculate_button["state"] = "normal"
-                        self.msg_dict.pop("Color Scale", None)
-                    else:
+                    if self.scalemax.get() <= input:
                         self.calculate_button["state"] = "disabled"
                         self.msg_dict["Color Scale"] = (
                             "＊ Color Scale\n"
-                            "       :Min is equal to or greater than\n"
+                            "       :Min must be smaller than\n"
                             "        Max!\n"
                         )
-                elif name == "Color Scale-Interval":
-                    if input <= self.scalemax.get() - self.scalemin.get():
+                    elif (
+                        self.scaleinterval.get() > self.scalemax.get() - input
+                    ):
+                        self.msg_dict["Color Scale-Interval"] = (
+                            "＊ Color Scale-Interval\n"
+                            "       :Interval must be smaller than\n"
+                            "        distance between Max & Min!\n"
+                        )
                         self.msg_dict.pop("Color Scale", None)
                     else:
+                        self.calculate_button["state"] = "normal"
+                        self.msg_dict.pop("Color Scale", None)
+                        self.msg_dict.pop("Color Scale-Interval", None)
+                elif name == "Color Scale-Interval":
+                    if input == 0:
                         self.msg_dict[name] = (
                             f"＊ {name}\n"
-                            "       :Interval is greater than distance\n"
-                            "        between Max & Min!\n"
+                            "       :Interval must not be zero!\n"
                         )
+                    elif input > self.scalemax.get() - self.scalemin.get():
+                        self.msg_dict[name] = (
+                            f"＊ {name}\n"
+                            "       :Interval must be smaller than\n"
+                            "        distance between Max & Min!\n"
+                        )
+                    else:
+                        self.msg_dict.pop("Color Scale", None)
             except ValueError:
                 # When Max or Min is not half-width digits.
                 # print(e, "inner")
@@ -683,14 +746,17 @@ class App(tk.Tk):
         csv_path = self._browse_inputfile()
         if csv_path and csv_path != self.input_frame.filepath.get():
             self.is_first = True  # regard when csv is read as the first time
+
             self.input_frame.filepath.set(csv_path)
             self._create_df(csv_path)
+            self._analyze_indata()
             self._update_analyzedvalues()
             if self.df.size > 10_000:
                 self.input_frame.is_3d.set(False)
                 self.input_frame.threeD_check["state"] = "disabled"
             else:
                 self.input_frame.threeD_check["state"] = "normal"
+            self._update_sbox_max()
 
             self.display_figure()
 
@@ -710,13 +776,16 @@ class App(tk.Tk):
             df_file = pd.ExcelFile(csv_path)
             self.df = df_file.parse(sheet_name=0, header=None).dropna(axis=1)
 
+    def _analyze_indata(self):
+        self.indata_arr = arr = self.df.to_numpy()
+        self.indata_height, self.indata_width = arr.shape
+        self.indata_mean = np.mean(arr)
+        self.indata_max = np.amax(arr)
+        self.indata_min = np.amin(arr)
+        self.indata_median = np.median(arr)
+        self.indata_std = np.std(arr, ddof=1)
+
     def _update_analyzedvalues(self):
-        self.indata_arr = self.df.to_numpy()
-        self.indata_mean = np.mean(self.indata_arr)
-        self.indata_max = np.amax(self.indata_arr)
-        self.indata_min = np.amin(self.indata_arr)
-        self.indata_median = np.median(self.indata_arr)
-        self.indata_std = np.std(self.indata_arr, ddof=1)
         self.analyzedvalues.set(
             (
                 f"Max: {self.indata_max}, "
@@ -726,6 +795,10 @@ class App(tk.Tk):
                 f"Sample Std: {self.indata_std}"
             )
         )
+
+    def _update_sbox_max(self):
+        self.input_frame.sbox_xinterval.config(to=self.indata_width)
+        self.input_frame.sbox_yinterval.config(to=self.indata_height)
 
     def display_figure(self):
         t_before = perf_counter()
@@ -757,8 +830,8 @@ class App(tk.Tk):
         df = self.df
         fig = plt.figure(figsize=(9, 6), dpi=100, tight_layout=True)
 
-        df_width = len(df.columns)
-        df_height = len(df)
+        # self.indata_width = len(df.columns)
+        # self.indata_width = len(df)
         labelsize = self.input_frame.labelsize.get()
         tickslabelsize = self.input_frame.tickslabelsize.get()
 
@@ -767,10 +840,13 @@ class App(tk.Tk):
             cmax = float(math.ceil(self.indata_max))
             cmin = float(math.floor(self.indata_min))
             cinterval = self.determine_interval(cmax - cmin, True)
-            x_interval = self.determine_interval(df_width)
-            y_interval = self.determine_interval(df_height)
+            x_interval = self.determine_interval(self.indata_width)
+            y_interval = self.determine_interval(self.indata_height)
             self.input_frame.scalemax.set(cmax)
             self.input_frame.scalemin.set(cmin)
+            self.input_frame.scalemax_entry.config(from_=cmin, to=cmax)
+            self.input_frame.scalemin_entry.config(from_=cmin, to=cmax)
+            self.input_frame.scaleinterval_entry.config(to=cmax - cmin)
             self.input_frame.scaleinterval.set(cinterval)
             self.input_frame.xaxis_interval.set(x_interval)
             self.input_frame.yaxis_interval.set(y_interval)
@@ -799,14 +875,14 @@ class App(tk.Tk):
                 list_x = np.array(
                     [
                         x + (-1) ** n * 0.5
-                        for x in range(1, df_width + 1)
+                        for x in range(1, self.indata_width + 1)
                         for n in range(1, 3)
                     ]
                 )
                 list_y = np.array(
                     [
                         x + (-1) ** n * 0.5
-                        for x in range(1, df_height + 1)
+                        for x in range(1, self.indata_height + 1)
                         for n in range(1, 3)
                     ]
                 )
@@ -836,8 +912,8 @@ class App(tk.Tk):
                 # )
             elif self.input_frame.is_3d.get():
                 alpha = 0.3
-                list_x = np.arange(1, df_width + 1)
-                list_y = np.arange(1, df_height + 1)
+                list_x = np.arange(1, self.indata_width + 1)
+                list_y = np.arange(1, self.indata_height + 1)
                 X, Y = np.meshgrid(list_x, list_y)
                 ax.scatter(
                     X,
@@ -856,15 +932,26 @@ class App(tk.Tk):
                 alpha=alpha if alpha <= 1 else 1,
             )
             ax.tick_params(axis="z", labelsize=tickslabelsize, pad=10)
-            ax.set_xlim3d(0.5, df_width + 0.5)
-            ax.set_ylim3d(df_height + 0.5, 0.5)
+            ax.set_xlim3d(0.5, self.indata_width + 0.5)
+            ax.set_ylim3d(self.indata_height + 0.5, 0.5)
             ax.set_zlim3d(
                 math.floor(self.indata_min), math.ceil(self.indata_max)
             )
-            ax.set_box_aspect((df_width, df_height, max(df_height, df_width)))
+            ax.set_box_aspect(
+                (
+                    self.indata_width,
+                    self.indata_height,
+                    max(self.indata_width, self.indata_height),
+                )
+            )
         else:
             ax = fig.add_subplot(111)
-            extent = 0.5, df_width + 0.5, df_height + 0.5, 0.5
+            extent = (
+                0.5,
+                self.indata_width + 0.5,
+                self.indata_height + 0.5,
+                0.5,
+            )
             ax.matshow(df, norm=cbar_norm, cmap=cmap, extent=extent)
             # # ax.matshow(df, norm=cbar_norm, cmap=cmap,)
             ax.xaxis.set_label_position("top")
@@ -903,14 +990,16 @@ class App(tk.Tk):
         )
 
         ax.set_xticks(
-            list(np.arange(x_interval, df_width + 1, x_interval))
+            list(np.arange(x_interval, self.indata_width + 1, x_interval))
             if x_interval == 1
-            else [1] + list(np.arange(x_interval, df_width + 1, x_interval))
+            else [1]
+            + list(np.arange(x_interval, self.indata_width + 1, x_interval))
         )
         ax.set_yticks(
-            list(np.arange(y_interval, df_height + 1, y_interval))
+            list(np.arange(y_interval, self.indata_height + 1, y_interval))
             if y_interval == 1
-            else [1] + list(np.arange(y_interval, df_height + 1, y_interval))
+            else [1]
+            + list(np.arange(y_interval, self.indata_height + 1, y_interval))
         )
         cbar.ax.tick_params(axis="y", labelsize=tickslabelsize)
         ax.tick_params(axis="x", labelsize=tickslabelsize)
@@ -928,23 +1017,23 @@ class App(tk.Tk):
 
         # _ = (
         #     list(range(1, 10))
-        #     + [i for i in range(10, df_width, 5)]
-        #     + [df_width]
-        #     if df_width > 10
-        #     else list(range(1, df_width + 1))
+        #     + [i for i in range(10, self.indata_width, 5)]
+        #     + [self.indata_width]
+        #     if self.indata_width > 10
+        #     else list(range(1, self.indata_width + 1))
         # )
         # self.input_frame.xaxis_entry["values"] = [
-        #     i for i in _ if df_width / i < 21
+        #     i for i in _ if self.indata_width / i < 21
         # ]
         # _ = (
         #     list(range(1, 10))
-        #     + [i for i in range(10, df_height, 5)]
-        #     + [df_height]
-        #     if df_height > 10
-        #     else list(range(1, df_height + 1))
+        #     + [i for i in range(10, self.indata_height, 5)]
+        #     + [self.indata_height]
+        #     if self.indata_height > 10
+        #     else list(range(1, self.indata_height + 1))
         # )
         # self.input_frame.yaxis_entry["values"] = [
-        #     i for i in _ if df_height / i < 21
+        #     i for i in _ if self.indata_height / i < 21
         # ]
 
         self.figure_frame.fig = fig
