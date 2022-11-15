@@ -70,6 +70,14 @@ def resource_path(relative_path):
     return os.path.join(os.path.abspath("."), relative_path)
 
 
+def _can_float(text):
+    try:
+        float(text)
+        return True
+    except ValueError:
+        return False
+
+
 # mpl.use("pgf") #set drawing driver (latexを使える
 # # 文字に latex を利用するための設定
 # config = {
@@ -141,9 +149,10 @@ class ColormapsWindow(tk.Toplevel):
 class InputFrame(tk.Frame):
     def __init__(self, container, **kwargs):
         super().__init__(container, **kwargs)
-        tcl_validate_input = container.register(
-            self.validate_input
+        tcl_validate_scale = container.register(
+            self._validate_scale
         )  # Register validate func to app.
+        tcl_on_validate_scale = container.register(self._on_invalid)
         self.container = container
         # setup the grid layout manager
         self.columnconfigure(
@@ -222,12 +231,15 @@ class InputFrame(tk.Frame):
             self.axes_frame,
             textvariable=self.xaxis_interval,
             validate="key",
-            validatecommand=(tcl_validate_input, "%P", "X Interval"),
-            command=(tcl_validate_input, 0, "X Interval"),
+            validatecommand=(tcl_validate_scale, "%P", "X Interval"),
+            invalidcommand=(tcl_on_validate_scale, "%P"),
+            # command=(tcl_validate_scale, 0, "X Interval"),
             format="%.1f",
             from_=0,
             increment=1,
         )
+        self.sbox_xinterval.bind("<<Increment>>", self._on_click)
+        # self.sbox_xinterval.bind("<Button-1>", self._on_click)
         # self.xaxis_cbox = ttk.Combobox(
         #     self.axes_frame, state="readonly",
         #     textvariable=self.xaxis_interval
@@ -237,8 +249,9 @@ class InputFrame(tk.Frame):
             self.axes_frame,
             textvariable=self.yaxis_interval,
             validate="key",
-            validatecommand=(tcl_validate_input, "%P", "Y Interval"),
-            command=(tcl_validate_input, 0, "Y Interval"),
+            validatecommand=(tcl_validate_scale, "%P", "Y Interval"),
+            invalidcommand=(tcl_on_validate_scale, "%P"),
+            command=(tcl_validate_scale, 0, "Y Interval"),
             format="%.1f",
             from_=0,
             increment=1,
@@ -275,10 +288,12 @@ class InputFrame(tk.Frame):
             self.colorscale_frame,
             textvariable=self.scalemax,
             validate="key",
-            validatecommand=(tcl_validate_input, "%P", "Color Scale-Max"),
+            validatecommand=(tcl_validate_scale, "%P", "Color Scale-Max"),
+            invalidcommand=(tcl_on_validate_scale, "%P"),
             command=(
-                tcl_validate_input,
-                "up_down",
+                tcl_validate_scale,
+                # "up_down",
+                0,
                 "Color Scale-Max",
             ),
             format="%.1f",
@@ -289,25 +304,29 @@ class InputFrame(tk.Frame):
             self.colorscale_frame,
             textvariable=self.scalemin,
             validate="key",
-            validatecommand=(tcl_validate_input, "%P", "Color Scale-Min"),
+            validatecommand=(tcl_validate_scale, "%P", "Color Scale-Min"),
+            invalidcommand=(tcl_on_validate_scale, "%P"),
             command=(
-                tcl_validate_input,
-                "up_down",
+                tcl_validate_scale,
+                # "up_down",
+                0,
                 "Color Scale-Min",
             ),
             format="%.1f",
             increment=1,
         )
         self.scalemin_entry.grid(column=1, row=1, sticky=tk.E)
-        self.scaleinterval = tk.DoubleVar()
+        self.colorinterval = tk.DoubleVar()
         self.scaleinterval_entry = ttk.Spinbox(
             self.colorscale_frame,
-            textvariable=self.scaleinterval,
+            textvariable=self.colorinterval,
             validate="key",
-            validatecommand=(tcl_validate_input, "%P", "Color Scale-Interval"),
+            validatecommand=(tcl_validate_scale, "%P", "Color Scale-Interval"),
+            invalidcommand=(tcl_on_validate_scale, "%P"),
             command=(
-                tcl_validate_input,
-                "up_down",
+                tcl_validate_scale,
+                # "up_down",
+                0,
                 "Color Scale-Interval",
             ),
             format="%.1f",
@@ -487,93 +506,114 @@ class InputFrame(tk.Frame):
                 if isinstance(child, (ttk.Label)):
                     child["width"] = 15
 
-    def validate_input(self, input=None, name=None):
-        if input == "up_down":
-            if name == "Color Scale-Max":
-                input = self.scalemax.get()
-            elif name == "Color Scale-Min":
-                input = self.scalemin.get()
-            elif name == "Color Scale-Interval":
-                input = self.scaleinterval.get()
-        print(input, " ", name)
-        try:
-            input = float(input)  # Check if half-width digits
-            self.calculate_button["state"] = "normal"
-            self.msg_dict.pop(name, None)
-        except ValueError:  # When "input" is not half-width digits.
-            # print(e.__class__)
-            if name in ("Color Scale-Max", "Color Scale-Min"):
-                self.msg_dict.pop("Color Scale", None)
-            self.calculate_button["state"] = "disabled"
-            self.msg_dict[name] = (
-                f"＊ {name}\n" "       :Enter half-width digits!\n"
-            )
-            # return False
-        else:  # When "input" is half-width digits.
-            try:
-                if name == "Color Scale-Max":
-                    # Also check if half-width digits
-                    if input >= self.scalemin.get():
-                        self.calculate_button["state"] = "disabled"
-                        self.msg_dict["Color Scale"] = (
-                            "＊ Color Scale\n"
-                            "       :Max must be greater than\n"
-                            "        Min!\n"
-                        )
-                    elif (
-                        self.scaleinterval.get() > input - self.scalemin.get()
-                    ):
-                        self.msg_dict["Color Scale-Interval"] = (
-                            "＊ Color Scale-Interval\n"
-                            "       :Interval must be smaller than\n"
-                            "        distance between Max & Min!\n"
-                        )
-                        self.msg_dict.pop("Color Scale", None)
-                    else:
-                        self.calculate_button["state"] = "normal"
-                        self.msg_dict.pop("Color Scale", None)
-                        self.msg_dict.pop("Color Scale-Interval", None)
-                elif name == "Color Scale-Min":
-                    if self.scalemax.get() <= input:
-                        self.calculate_button["state"] = "disabled"
-                        self.msg_dict["Color Scale"] = (
-                            "＊ Color Scale\n"
-                            "       :Min must be smaller than\n"
-                            "        Max!\n"
-                        )
-                    elif (
-                        self.scaleinterval.get() > self.scalemax.get() - input
-                    ):
-                        self.msg_dict["Color Scale-Interval"] = (
-                            "＊ Color Scale-Interval\n"
-                            "       :Interval must be smaller than\n"
-                            "        distance between Max & Min!\n"
-                        )
-                        self.msg_dict.pop("Color Scale", None)
-                    else:
-                        self.calculate_button["state"] = "normal"
-                        self.msg_dict.pop("Color Scale", None)
-                        self.msg_dict.pop("Color Scale-Interval", None)
-                elif name == "Color Scale-Interval":
-                    if input == 0:
-                        self.msg_dict[name] = (
-                            f"＊ {name}\n"
-                            "       :Interval must not be zero!\n"
-                        )
-                    elif input > self.scalemax.get() - self.scalemin.get():
-                        self.msg_dict[name] = (
-                            f"＊ {name}\n"
-                            "       :Interval must be smaller than\n"
-                            "        distance between Max & Min!\n"
-                        )
-                    else:
-                        self.msg_dict.pop("Color Scale", None)
-            except ValueError:
-                # When Max or Min is not half-width digits.
-                # print(e, "inner")
-                pass
-        self.msg.set("".join(self.msg_dict.values()))
-        return True
+    def _on_click(self, *args):
+        print(args)
+
+    def _validate_scale(self, text, name=None):
+        max = self.scalemax.get()
+        min = self.scalemin.get()
+        interval = self.colorinterval.get()
+        print(f"text: {text}, max: {max}, min: {min}, interval: {interval}")
+        if _can_float(text):
+            if max < min:
+                return False
+            elif interval > max - min:
+                print("test")
+                return False
+            return True
+        else:
+            return False
+
+    def _on_invalid(self, text):
+        print("ng")
+
+    # def _validate_scale(self, input=None, name=None):
+    #     if input == "up_down":
+    #         if name == "Color Scale-Max":
+    #             input = self.scalemax.get()
+    #         elif name == "Color Scale-Min":
+    #             input = self.scalemin.get()
+    #         elif name == "Color Scale-Interval":
+    #             input = self.scaleinterval.get()
+    #     print(input, " ", name)
+    #     try:
+    #         input = float(input)  # Check if half-width digits
+    #         self.calculate_button["state"] = "normal"
+    #         self.msg_dict.pop(name, None)
+    #     except ValueError:  # When "input" is not half-width digits.
+    #         # print(e.__class__)
+    #         if name in ("Color Scale-Max", "Color Scale-Min"):
+    #             self.msg_dict.pop("Color Scale", None)
+    #         self.calculate_button["state"] = "disabled"
+    #         self.msg_dict[name] = (
+    #             f"＊ {name}\n" "       :Enter half-width digits!\n"
+    #         )
+    #         # return False
+    #     else:  # When "input" is half-width digits.
+    #         try:
+    #             if name == "Color Scale-Max":
+    #                 # Also check if half-width digits
+    #                 if input >= self.scalemin.get():
+    #                     self.calculate_button["state"] = "disabled"
+    #                     self.msg_dict["Color Scale"] = (
+    #                         "＊ Color Scale\n"
+    #                         "       :Max must be greater than\n"
+    #                         "        Min!\n"
+    #                     )
+    #                 elif (
+    #                     self.scaleinterval.get() > input - self.scalemin.get()
+    #                 ):
+    #                     self.msg_dict["Color Scale-Interval"] = (
+    #                         "＊ Color Scale-Interval\n"
+    #                         "       :Interval must be smaller than\n"
+    #                         "        distance between Max & Min!\n"
+    #                     )
+    #                     self.msg_dict.pop("Color Scale", None)
+    #                 else:
+    #                     self.calculate_button["state"] = "normal"
+    #                     self.msg_dict.pop("Color Scale", None)
+    #                     self.msg_dict.pop("Color Scale-Interval", None)
+    #             elif name == "Color Scale-Min":
+    #                 if self.scalemax.get() <= input:
+    #                     self.calculate_button["state"] = "disabled"
+    #                     self.msg_dict["Color Scale"] = (
+    #                         "＊ Color Scale\n"
+    #                         "       :Min must be smaller than\n"
+    #                         "        Max!\n"
+    #                     )
+    #                 elif (
+    #                     self.scaleinterval.get() > self.scalemax.get() - input
+    #                 ):
+    #                     self.msg_dict["Color Scale-Interval"] = (
+    #                         "＊ Color Scale-Interval\n"
+    #                         "       :Interval must be smaller than\n"
+    #                         "        distance between Max & Min!\n"
+    #                     )
+    #                     self.msg_dict.pop("Color Scale", None)
+    #                 else:
+    #                     self.calculate_button["state"] = "normal"
+    #                     self.msg_dict.pop("Color Scale", None)
+    #                     self.msg_dict.pop("Color Scale-Interval", None)
+    #             elif name == "Color Scale-Interval":
+    #                 if input == 0:
+    #                     self.msg_dict[name] = (
+    #                         f"＊ {name}\n"
+    #                         "       :Interval must not be zero!\n"
+    #                     )
+    #                 elif input > self.scalemax.get() - self.scalemin.get():
+    #                     self.msg_dict[name] = (
+    #                         f"＊ {name}\n"
+    #                         "       :Interval must be smaller than\n"
+    #                         "        distance between Max & Min!\n"
+    #                     )
+    #                 else:
+    #                     self.msg_dict.pop("Color Scale", None)
+    #         except ValueError:
+    #             # When Max or Min is not half-width digits.
+    #             # print(e, "inner")
+    #             pass
+    #     self.msg.set("".join(self.msg_dict.values()))
+    #     return True
 
     # def show_warning(self):
     #     if
@@ -847,7 +887,7 @@ class App(tk.Tk):
             self.input_frame.scalemax_entry.config(from_=cmin, to=cmax)
             self.input_frame.scalemin_entry.config(from_=cmin, to=cmax)
             self.input_frame.scaleinterval_entry.config(to=cmax - cmin)
-            self.input_frame.scaleinterval.set(cinterval)
+            self.input_frame.colorinterval.set(cinterval)
             self.input_frame.xaxis_interval.set(x_interval)
             self.input_frame.yaxis_interval.set(y_interval)
             self.input_frame.msg_dict = {}
@@ -858,7 +898,7 @@ class App(tk.Tk):
             cmax = self.input_frame.scalemax.get()
             cmin = self.input_frame.scalemin.get()
             # self.input_frame.change_intervalslist()
-            cinterval = self.input_frame.scaleinterval.get()
+            cinterval = self.input_frame.colorinterval.get()
             x_interval = self.input_frame.xaxis_interval.get()
             y_interval = self.input_frame.yaxis_interval.get()
 
