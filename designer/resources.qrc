@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="icon">
+    <file>../imgs/mglass.png</file>
+    <file>../imgs/save.png</file>
+  </qresource>
+</RCC>

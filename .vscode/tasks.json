@@ -6,12 +6,12 @@
     {
       "label": "pyside6-uic",
       "type": "shell",
-      "command": ".venv/Scripts/pyside6-uic --from-imports ./designer/MainWindow.ui -o ./py_ellipso_microscope/ui/ui_generated_main_window.py ; .venv/Scripts/pyside6-uic --from-imports ./designer/SetupDialog.ui -o ./py_ellipso_microscope/ui/ui_generated_setup_dialog.py"
+      "command": ".venv/Scripts/pyside6-uic --from-imports ./designer/MainWindow.ui -o ./CsvHeatmapper/ui/ui_generated_main_window.py"
     },
     {
       "label": "pyside6-rcc",
       "type": "shell",
-      "command": ".venv/Scripts/pyside6-rcc ./designer/resources.qrc -o ./py_ellipso_microscope/ui/resources_rc.py"
+      "command": ".venv/Scripts/pyside6-rcc ./designer/resources.qrc -o ./CsvHeatmapper/ui/resources_rc.py"
     },
     {
       "label": "qt designer",

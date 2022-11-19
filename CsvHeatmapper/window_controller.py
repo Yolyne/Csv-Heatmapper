@@ -5,6 +5,8 @@
 # import json
 # import logging
 
+from figure import Figure
+
 from PySide6.QtCore import Signal, Slot, QObject, QThread, QMutexLocker, QMutex
 
 
@@ -19,8 +21,7 @@ class WindowController(QObject):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        # self.stage_controller = StageController()
-        # self.camera_controller = CameraController()
+        self.figure = Figure()
         # leftarm = Stage(StageNo.s0, 40, 0)
         # rightarm = Stage(StageNo.s1, 40, 0)
         # polarizer = Stage(StageNo.s2, 0, 0)
