@@ -1,0 +1,32 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "pyside6-uic",
+      "type": "shell",
+      "command": ".venv/Scripts/pyside6-uic --from-imports ./designer/MainWindow.ui -o ./py_ellipso_microscope/ui/ui_generated_main_window.py ; .venv/Scripts/pyside6-uic --from-imports ./designer/SetupDialog.ui -o ./py_ellipso_microscope/ui/ui_generated_setup_dialog.py"
+    },
+    {
+      "label": "pyside6-rcc",
+      "type": "shell",
+      "command": ".venv/Scripts/pyside6-rcc ./designer/resources.qrc -o ./py_ellipso_microscope/ui/resources_rc.py"
+    },
+    {
+      "label": "qt designer",
+      "type": "shell",
+      "command": ".venv/Scripts/pyside6-designer.exe"
+    },
+    {
+      "label": "test",
+      "type": "shell",
+      "command": ".venv/Scripts/python.exe -m unittest discover tests",
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+      },
+    }
+  ]
+}
