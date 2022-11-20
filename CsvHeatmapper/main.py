@@ -4,6 +4,13 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import (
+    FigureCanvasQTAgg as FigureCanvas,
+    NavigationToolbar2QT as NavigationToolbar,
+)
+
+
 # from stage_controller import StageController
 
 # from stage_controller import StageNo
@@ -14,8 +21,11 @@ from PySide6.QtWidgets import (
     QDialog,
     QMessageBox,
     QLabel,
+    QLineEdit,
+    QAbstractSpinBox,
     QWidget,
     QFileDialog,
+    QVBoxLayout,
 )
 from PySide6 import QtGui, QtMultimedia
 from PySide6.QtCore import QRegularExpression, QSettings
@@ -49,81 +59,72 @@ class MainWindow(QMainWindow):
         self._add_ui_properties()
 
     def _connect_signal_slot(self):
-        self.ui.pushButton_browse.clicked.connect(self._button_browse_clicked)
+        ui = self.ui
+        controller = self.controller
 
-        # self.ui.doubleSpinBox.valueChanged.connect(self.controller.set_leftarm)
-        # self.ui.doubleSpinBox_2.valueChanged.connect(
-        #     self.controller.set_rightarm
-        # )
-        # self.ui.doubleSpinBox_3.valueChanged.connect(
-        #     self.controller.set_polarizer
-        # )
-        # self.ui.doubleSpinBox_4.valueChanged.connect(
-        #     self.controller.set_compensator
-        # )
-        # self.ui.doubleSpinBox_5.valueChanged.connect(
-        #     self.controller.set_analyzer
-        # )
-        # self.ui.doubleSpinBox_6.valueChanged.connect(
-        #     self.controller.set_detector
-        # )
+        ui.pushButton_browse.clicked.connect(self._button_browse_clicked)
 
-        # self.ui.button_rotate.clicked.connect(self._on_rotate_button_clicked)
-        # self.controller.ready_rotate.connect(self._on_ready_rotate)
+        # def _set_attr(obj, name, value):
+        #     print(name, value)
+        #     setattr(obj, name, value)
 
-        # self.controller.current_angles_changed.connect(
-        #     self._update_current_angles
-        # )
+        widget: QWidget
+        for widget in self.findChildren(QWidget):
+            if hasattr(widget, "valueChanged"):
+                if widget_name := widget.objectName():
+                    controller_property = widget_name.split("_")[-1]
+                    print(controller_property)
+                    widget.valueChanged.connect(
+                        lambda v: setattr(controller, controller_property, v)
+                    )
+                    # widget.valueChanged.connect(
+                    #     lambda v: _set_attr(controller, controller_property, v)
+                    # )
 
-        # self.ui.button_preview.clicked.connect(self._show_preview)
-        # self.controller.preview_stopped.connect(self._on_preview_stopped)
+        def _on_propertyChanged(property, value):
+            # pattern = QRegularExpression(property)
+            widget = self.findChildren(QWidget, property)[0]
+            if isinstance(widget, QAbstractSpinBox):
+                widget.setValue(value)
+            elif isinstance(widget, QLineEdit):
+                widget.setText(value)
 
-        # self.controller.exposure_time_changed.connect(
-        #     self.ui.doubleSpinBox_exposure.setValue
-        # )
-        # self.ui.doubleSpinBox_exposure.valueChanged.connect(
-        #     self.controller.set_exposure_time
-        # )
-        # self.ui.pushButton_exposure_auto.clicked.connect(
-        #     self._on_exposure_auto
-        # )
-        # self.controller.exposure_auto_completed.connect(
-        #     self._on_exposure_auto_completed
-        # )
-        # self.ui.spinBox_gain.valueChanged.connect(self.controller.set_gain)
+        controller.propertyChanged.connect(_on_propertyChanged)
 
-        # self.ui.comboBox_s3_interval.currentIndexChanged.connect(
-        #     self.controller.set_s3_interval_index
-        # )
-        # self.ui.comboBox_shot.currentIndexChanged.connect(
-        #     self.controller.set_shot_count_index
-        # )
+        def _on_valueRangeChanged(width, height, min, max):
+            ui.doubleSpinBox_Xinterval.setMaximum(width)
+            ui.doubleSpinBox_Yinterval.setMaximum(height)
+            ui.doubleSpinBox_colorMax.setRange(min, max)
+            ui.doubleSpinBox_colorMin.setRange(min, max)
+            ui.doubleSpinBox_colorinterval.setMaximum(max - min)
 
-        # self.ui.comboBox_smoothing_sizes.currentIndexChanged.connect(
-        #     self.controller.set_smoothing_sizes_index
+        controller.valueRangeChanged.connect(_on_valueRangeChanged)
+        # ui.doubleSpinBox_Xinterval.valueChanged.connect(
+        #     controller.set_Xinterval
         # )
-        # self.ui.spinBox_ver_skip.valueChanged.connect(
-        #     self.controller.set_ver_skip
+        # ui.doubleSpinBox_Xinterval.valueChanged.connect(
+        #     controller.set_Yinterval
         # )
-        # self.ui.spinBox_hor_skip.valueChanged.connect(
-        #     self.controller.set_hor_skip
+        # ui.doubleSpinBox_colorMax.valueChanged.connect(lambda _: setattr(controller, "", _))
+        # ui.doubleSpinBox_colorMin.valueChanged.connect(controller.set_colorMin)
+        # ui.doubleSpinBox_colorinterval.valueChanged.connect(
+        #     controller.set_colorinterval
         # )
-
-        # self.ui.comboBox_filter.currentIndexChanged.connect(
-        #     self.controller.set_filters_index
+        # ui.lineEdit_xLabel.textChanged.connect(controller.set_xLabel)
+        # ui.lineEdit_yLabel.textChanged.connect(controller.set_yLabel)
+        # ui.lineEdit_colorLabel.textChanged.connect(controller.set_colorLabel)
+        # ui.spinBox_axisLabelSize.valueChanged.connect(
+        #     controller.set_axisLabelSize
         # )
-        # self.ui.checkBox_delta_range.stateChanged.connect(
-        #     self.controller.set_delta_restriction
+        # ui.spinBox_tickLabelSize.valueChanged.connect(
+        #     controller.set_tickLabelSize
         # )
 
-        # self.ui.button_measure.clicked.connect(self._on_button_measure_clicked)
-        # self.controller.measurement_stopped.connect(
-        #     self._on_measurement_stopped
-        # )
-        # self.controller.measurement_process_changed.connect(
-        #     self._on_measurement_process_changed
-        # )
-        pass
+        ui.checkBox_3d.stateChanged.connect(controller.set_is_3d)
+        controller.data_is_too_big.connect(self._change_checkBox_3d_state)
+        controller.data_changed.connect(self._updata_spinbox_max)
+
+        controller.analyzedvalues_changed.connect(ui.statusbar.showMessage)
 
     def _get_ui_properties(self):
         # self.controller.exposure_time_decimals = (
@@ -132,7 +133,18 @@ class MainWindow(QMainWindow):
         pass
 
     def _add_ui_properties(self):
+        ui = self.ui
+        controller = self.controller
 
+        vlayout = QVBoxLayout(ui.frame_figure)
+        self.canvas = canvas = FigureCanvas(controller.figure)
+        vlayout.addWidget(canvas)
+        vlayout.addWidget(
+            NavigationToolbar(
+                canvas,
+                self,
+            )
+        )
         #     self.status_widget = StatusWidget()
         #     self.status_widget.progressBar.setVisible(False)
         #     self.ui.statusBar.addWidget(self.status_widget, 1)
@@ -204,27 +216,27 @@ class MainWindow(QMainWindow):
 
     def _button_browse_clicked(self):
         csv_path = self._browse_inputfile()
-        if csv_path and csv_path != self.input_frame.filepath.get():
-            self.is_first = True  # regard when csv is read as the first time
-
-            self.input_frame.filepath.set(csv_path)
-            self._create_df(csv_path)
-            self._analyze_indata()
-            self._update_analyzedvalues()
-            if self.df.size > 10_000:
-                self.input_frame.is_3d.set(False)
-                self.input_frame.threeD_check["state"] = "disabled"
-            else:
-                self.input_frame.threeD_check["state"] = "normal"
-            self._update_sbox_max()
-
-            self.display_figure()
+        if csv_path and csv_path != self.ui.label_file.text():
+            self.ui.label_file.setText(csv_path)
+            self.controller.load_file(csv_path)
+            self.controller.display_figure()
+            self.canvas.draw()
 
     def _browse_inputfile(self):
         return QFileDialog.getOpenFileName(
-            self,
-            "Select",
-        )
+            self, "Select", filter="CSV-like files (*.csv *.xlsx)"
+        )[0]
+
+    def _change_checkBox_3d_state(self, data_is_big):
+        if data_is_big:
+            self.ui.checkBox_3d.setChecked(False)
+            self.ui.checkBox_3d.setEnabled(False)
+        else:
+            self.ui.checkBox_3d.setEnabled(True)
+
+    def _updata_spinbox_max(self, data_info):
+        self.ui.doubleSpinBox_Xinterval = data_info[1]
+        self.ui.doubleSpinBox_Yinterval = data_info[0]
 
     # def _show_preview(self):
     #     self.ui.button_preview.setEnabled(False)

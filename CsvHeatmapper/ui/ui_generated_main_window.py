@@ -91,6 +91,7 @@ class Ui_MainWindow(object):
         self.groupBox_2.setObjectName(u"groupBox_2")
         self.verticalLayout_2 = QVBoxLayout(self.groupBox_2)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(-1, 0, -1, -1)
         self.groupBox_3 = QGroupBox(self.groupBox_2)
         self.groupBox_3.setObjectName(u"groupBox_3")
         sizePolicy1.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
@@ -272,10 +273,11 @@ class Ui_MainWindow(object):
         self.frame_3.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_3)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.checkBox_2 = QCheckBox(self.frame_3)
-        self.checkBox_2.setObjectName(u"checkBox_2")
+        self.horizontalLayout.setContentsMargins(-1, 0, -1, 0)
+        self.checkBox_3d = QCheckBox(self.frame_3)
+        self.checkBox_3d.setObjectName(u"checkBox_3d")
 
-        self.horizontalLayout.addWidget(self.checkBox_2)
+        self.horizontalLayout.addWidget(self.checkBox_3d)
 
         self.radioButton = QRadioButton(self.frame_3)
         self.radioButton.setObjectName(u"radioButton")
@@ -327,12 +329,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.frame)
 
-        self.frame_2 = QFrame(self.widget)
-        self.frame_2.setObjectName(u"frame_2")
-        self.frame_2.setFrameShape(QFrame.StyledPanel)
-        self.frame_2.setFrameShadow(QFrame.Raised)
+        self.frame_figure = QFrame(self.widget)
+        self.frame_figure.setObjectName(u"frame_figure")
+        self.frame_figure.setFrameShape(QFrame.StyledPanel)
+        self.frame_figure.setFrameShadow(QFrame.Raised)
 
-        self.horizontalLayout_2.addWidget(self.frame_2)
+        self.horizontalLayout_2.addWidget(self.frame_figure)
 
 
         self.verticalLayout_3.addWidget(self.widget)
@@ -390,7 +392,7 @@ class Ui_MainWindow(object):
         self.groupBox_12.setTitle(QCoreApplication.translate("MainWindow", u"Color Map", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Select", None))
         self.checkBox.setText(QCoreApplication.translate("MainWindow", u"Reversed", None))
-        self.checkBox_2.setText(QCoreApplication.translate("MainWindow", u"3D", None))
+        self.checkBox_3d.setText(QCoreApplication.translate("MainWindow", u"3D", None))
         self.radioButton.setText(QCoreApplication.translate("MainWindow", u"Scatter", None))
         self.radioButton_2.setText(QCoreApplication.translate("MainWindow", u"Surface", None))
         self.pushButton_plot.setText(QCoreApplication.translate("MainWindow", u"Plot", None))
