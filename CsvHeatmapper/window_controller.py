@@ -2,6 +2,7 @@
 from time import sleep, perf_counter
 import os
 import math
+import matplotlib as mpl
 
 # from datetime import datetime
 # import json
@@ -54,14 +55,29 @@ def determine_interval(length, is_colorbar=False):
 class WindowController(QObject):
     analyzedvalues_changed = Signal(str)
     data_is_too_big = Signal(bool)
-    data_changed = Signal(tuple)
-    propertyChanged = Signal(tuple, object)
+    # data_changed = Signal(tuple)
+    propertyChanged = Signal(str, object)
     valueRangeChanged = Signal(float, float, float, float)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.figure_handler = FigureHandler()
         self.figure = self.figure_handler.figure
+        self.__Xinterval = None
+        self.__Yinterval = None
+        self.__colorMax = None
+        self.__colorMin = None
+        self.__colorinterval = None
+        self.__xLabel = "x"
+        self.__yLabel = "y"
+        self.__colorLabel = "z ()"
+        self.__axisLabelSize = 20
+        self.__tickLabelSize = 12
+        self.__colorMap = None
+
+        self.colormaps = list(mpl.cm._colormaps._cmaps.keys())
+        # cm_num = len(self.colormaps) // 2
+        # self.ncols = int(cm_num // 3 + 1)
         # leftarm = Stage(StageNo.s0, 40, 0)
         # rightarm = Stage(StageNo.s1, 40, 0)
         # polarizer = Stage(StageNo.s2, 0, 0)
@@ -132,13 +148,31 @@ class WindowController(QObject):
         # self.workers = {}
         # self.qthread_id = 0
 
-    def load_file(self, file):
+    def load_files(self, files):
         self.is_first = True  # regard when csv is read as the first time
 
-        self.figure_handler.load_data(file)
+        self.figure_handler.load_data(files)
         self._update_analyzedvalues()
+        self._update_properties()
 
-        self._display_figure()
+        self.plot()
+
+    def _update_properties(self):
+        int_min = float(math.floor(self.figure_handler.data_min))
+        int_max = float(math.ceil(self.figure_handler.data_max))
+        self.valueRangeChanged.emit(
+            self.figure_handler.data_width,
+            self.figure_handler.data_height,
+            int_min,
+            int_max,
+        )
+        self.colorMax = int_max
+        self.colorMin = int_min
+        self.Xinterval = determine_interval(self.figure_handler.data_width)
+        self.Yinterval = determine_interval(self.figure_handler.data_height)
+        self.colorinterval = determine_interval(
+            self.colorMax - self.colorMin, True
+        )
 
     def _update_analyzedvalues(self):
         # self.analyzedvalues =
@@ -147,34 +181,21 @@ class WindowController(QObject):
             f"Min: {self.figure_handler.data_min}, "
             f"Mean: {self.figure_handler.data_mean}, "
             f"Median: {self.figure_handler.data_median}, "
-            f"Sample Std: {self.figure_handler.data_std}"
+            # f"Sample Std: {self.figure_handler.data_std}"
         )
         self.analyzedvalues_changed.emit(analyzedvalues)
 
         self.data_is_too_big.emit(
             True if self.figure_handler.data_size > 10_000 else False
         )
-        self.data_changed.emit(
-            (self.figure_handler.data_height, self.figure_handler.data_width)
-        )
+        # self.data_changed.emit(
+        #     (self.figure_handler.data_height, self.figure_handler.data_width)
+        # )
 
-    def _display_figure(self):
+    def plot(self):
         t_before = perf_counter()
         # if (fig := self.plot()) is None:
         #     return
-        self.colorMax = float(math.ceil(self.figure_handler.data_max))
-        self.colorMin = float(math.floor(self.figure_handler.data_min))
-        self.Xinterval = determine_interval(self.figure_handler.data_width)
-        self.Yinterval = determine_interval(self.figure_handler.data_height)
-        self.colorinterval = determine_interval(
-            self.colorMax - self.colorMin, True
-        )
-        self.valueRangeChanged.emit(
-            self.figure_handler.data_width,
-            self.figure_handler.data_height,
-            self.colorMin,
-            self.colorMax,
-        )
         fig = self.figure_handler.plot(
             self.Xinterval,
             self.Yinterval,
@@ -186,6 +207,7 @@ class WindowController(QObject):
             self.colorLabel,
             self.axisLabelSize,
             self.tickLabelSize,
+            self.colorMap,
         )
         # logger.info("ploting time: {} s".format(perf_counter() - t_before))
         # try:
@@ -209,8 +231,8 @@ class WindowController(QObject):
 
     @Xinterval.setter
     def Xinterval(self, value):
-        print(value)
-        self.propertyChanged.emit("Xinterval")
+        # print(value)
+        self.propertyChanged.emit("Xinterval", value)
         self.__Xinterval = value
 
     @property
@@ -220,7 +242,7 @@ class WindowController(QObject):
     @Yinterval.setter
     def Yinterval(self, value):
         self.__Yinterval = value
-        self.propertyChanged.emit("Yinterval")
+        self.propertyChanged.emit("Yinterval", value)
 
     @property
     def colorMax(self):
@@ -229,7 +251,7 @@ class WindowController(QObject):
     @colorMax.setter
     def colorMax(self, value):
         self.__colorMax = value
-        self.propertyChanged.emit("colorMax")
+        self.propertyChanged.emit("colorMax", value)
 
     @property
     def colorMin(self):
@@ -238,7 +260,7 @@ class WindowController(QObject):
     @colorMin.setter
     def colorMin(self, value):
         self.__colorMin = value
-        self.propertyChanged.emit("colorMin")
+        self.propertyChanged.emit("colorMin", value)
 
     @property
     def colorinterval(self):
@@ -247,7 +269,7 @@ class WindowController(QObject):
     @colorinterval.setter
     def colorinterval(self, value):
         self.__colorinterval = value
-        self.propertyChanged.emit("colorinterval")
+        self.propertyChanged.emit("colorinterval", value)
 
     @property
     def xLabel(self):
@@ -256,7 +278,7 @@ class WindowController(QObject):
     @xLabel.setter
     def xLabel(self, value):
         self.__xLabel = value
-        self.propertyChanged.emit("xLabel")
+        self.propertyChanged.emit("xLabel", value)
 
     @property
     def yLabel(self):
@@ -265,7 +287,7 @@ class WindowController(QObject):
     @yLabel.setter
     def yLabel(self, value):
         self.__yLabel = value
-        self.propertyChanged.emit("yLabel")
+        self.propertyChanged.emit("yLabel", value)
 
     @property
     def colorLabel(self):
@@ -274,7 +296,7 @@ class WindowController(QObject):
     @colorLabel.setter
     def colorLabel(self, value):
         self.__colorLabel = value
-        self.propertyChanged.emit("colorLabel")
+        self.propertyChanged.emit("colorLabel", value)
 
     @property
     def axisLabelSize(self):
@@ -283,7 +305,7 @@ class WindowController(QObject):
     @axisLabelSize.setter
     def axisLabelSize(self, value):
         self.__axisLabelSize = value
-        self.propertyChanged.emit("axisLabelSize")
+        self.propertyChanged.emit("axisLabelSize", value)
 
     @property
     def tickLabelSize(self):
@@ -292,16 +314,16 @@ class WindowController(QObject):
     @tickLabelSize.setter
     def tickLabelSize(self, value):
         self.__tickLabelSize = value
-        self.propertyChanged.emit("tickLabelSize")
+        self.propertyChanged.emit("tickLabelSize", value)
 
     @property
     def colorMap(self):
         return self.__colorMap
 
     @colorMap.setter
-    def colorMap(self, value):
-        self.__colorMap = value
-        self.propertyChanged.emit("colorMap")
+    def colorMap(self, i):
+        self.__colorMap = self.colormaps[i]
+        # self.propertyChanged.emit("colorMap", value)
 
     def set_is_3d(self, state: int):
         self.figure.is_3d = bool(state)

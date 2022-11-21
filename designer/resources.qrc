@@ -1,6 +1,10 @@
 <RCC>
   <qresource prefix="icon">
+    <file>../imgs/icon.ico</file>
     <file>../imgs/mglass.png</file>
     <file>../imgs/save.png</file>
+  </qresource>
+  <qresource prefix="background">
+    <file>../imgs/cm.png</file>
   </qresource>
 </RCC>

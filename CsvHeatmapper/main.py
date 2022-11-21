@@ -5,7 +5,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import (
+from matplotlib.backends.backend_qtagg import (
     FigureCanvasQTAgg as FigureCanvas,
     NavigationToolbar2QT as NavigationToolbar,
 )
@@ -26,9 +26,22 @@ from PySide6.QtWidgets import (
     QWidget,
     QFileDialog,
     QVBoxLayout,
+    QButtonGroup,
+    QRadioButton,
+    QToolButton,
+    QScrollArea,
+    QSizePolicy,
+    QFrame,
 )
 from PySide6 import QtGui, QtMultimedia
-from PySide6.QtCore import QRegularExpression, QSettings
+from PySide6.QtCore import (
+    QRegularExpression,
+    QSettings,
+    Qt,
+    QAbstractAnimation,
+    QParallelAnimationGroup,
+    QPropertyAnimation,
+)
 
 # from ui.my_widgets import DoubleDragSpinBox, StatusWidget
 
@@ -36,15 +49,127 @@ from PySide6.QtCore import QRegularExpression, QSettings
 
 # from ui.ui_main_window import UiMainWindow
 from ui.ui_generated_main_window import Ui_MainWindow
+from ui.ui_generated_ColormapPicker import Ui_Dialog
 
 # from ui.ui_generated_setup_dialog import Ui_Dialog
 
 from window_controller import WindowController
 
 
+APP_NAME = "CsvHeatmapper"
+COMPANY = "Yolyne"
+setting = QSettings(COMPANY, APP_NAME)
+if setting.value("last_dir") == "":
+    setting.setValue("last_dir", os.path.expanduser("~/Documents"))
+
+
+class CollapsibleBox(QWidget):
+    def __init__(self, title="", parent=None):
+        super(CollapsibleBox, self).__init__(parent)
+
+        self.toggle_button = QToolButton(
+            text=title, checkable=True, checked=False
+        )
+        self.toggle_button.setStyleSheet("QToolButton { border: none; }")
+        self.toggle_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.toggle_button.setArrowType(Qt.RightArrow)
+        self.toggle_button.pressed.connect(self.on_pressed)
+
+        self.toggle_animation = QParallelAnimationGroup(self)
+
+        self.content_area = QScrollArea(maximumHeight=0, minimumHeight=0)
+        self.content_area.setSizePolicy(
+            QSizePolicy.Expanding, QSizePolicy.Fixed
+        )
+        self.content_area.setFrameShape(QFrame.NoFrame)
+
+        lay = QVBoxLayout(self)
+        lay.setSpacing(0)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.addWidget(self.toggle_button)
+        lay.addWidget(self.content_area)
+
+        self.toggle_animation.addAnimation(
+            QPropertyAnimation(self, b"minimumHeight")
+        )
+        self.toggle_animation.addAnimation(
+            QPropertyAnimation(self, b"maximumHeight")
+        )
+        self.toggle_animation.addAnimation(
+            QPropertyAnimation(self.content_area, b"maximumHeight")
+        )
+
+    # @pyqtSlot()
+    def on_pressed(self):
+        checked = self.toggle_button.isChecked()
+        self.toggle_button.setArrowType(
+            Qt.DownArrow if not checked else Qt.RightArrow
+        )
+        self.toggle_animation.setDirection(
+            QAbstractAnimation.Forward
+            if not checked
+            else QAbstractAnimation.Backward
+        )
+        self.toggle_animation.start()
+
+    def setContentLayout(self, layout):
+        lay = self.content_area.layout()
+        del lay
+        self.content_area.setLayout(layout)
+        collapsed_height = (
+            self.sizeHint().height() - self.content_area.maximumHeight()
+        )
+        content_height = layout.sizeHint().height()
+        for i in range(self.toggle_animation.animationCount()):
+            animation = self.toggle_animation.animationAt(i)
+            animation.setDuration(500)
+            animation.setStartValue(collapsed_height)
+            animation.setEndValue(collapsed_height + content_height)
+
+        content_animation = self.toggle_animation.animationAt(
+            self.toggle_animation.animationCount() - 1
+        )
+        content_animation.setDuration(500)
+        content_animation.setStartValue(0)
+        content_animation.setEndValue(content_height)
+
+
+class ColormapPickerDialog(QDialog):
+    def __init__(self, parent, window_controller: WindowController):
+        super().__init__(parent)
+        self.ui = Ui_Dialog()
+        self.ui.setupUi(self)
+        self.controller = window_controller
+
+        self._arrange_radiobuttons()
+
+    def _arrange_radiobuttons(self):
+        cm_num = len(self.controller.colormaps) // 2
+        ncols = cm_num // 3 + 1
+        radioGroup = QButtonGroup(self)
+        cm_rbtns = [
+            QRadioButton(self.ui.frame_colormaps)
+            for cm in self.controller.colormaps[:cm_num]
+        ]
+        for i, rbtn in enumerate(cm_rbtns):
+            radioGroup.addButton(rbtn, i)
+            rbtn.move(12 + 30 * (i % ncols), 24 + 200 * (i // ncols))
+        radioGroup.idClicked.connect(
+            lambda i: setattr(self.controller, "colorMap", i)
+        )
+        # ラジオボタンオブジェクトのグループ登録
+        # self.radioGroup.addButton(radioButton1, 1)
+        # self.radioGroup.addButton(radioButton2, 2)
+        # self.radioGroup.addButton(radioButton3, 3)
+
+        # # ラジオボタンの配置設定
+        # radioButton1.move(10, 0)
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         self.controller = WindowController()
+        self.colordialog = None
         self._setup_app()
         self._connect_signal_slot()
 
@@ -62,7 +187,10 @@ class MainWindow(QMainWindow):
         ui = self.ui
         controller = self.controller
 
-        ui.pushButton_browse.clicked.connect(self._button_browse_clicked)
+        ui.toolButton_addFile.clicked.connect(self._button_addFile_clicked)
+        ui.toolButton_substractFile.clicked.connect(
+            self._button_sabstractFile_clicked
+        )
 
         # def _set_attr(obj, name, value):
         #     print(name, value)
@@ -70,61 +198,54 @@ class MainWindow(QMainWindow):
 
         widget: QWidget
         for widget in self.findChildren(QWidget):
-            if hasattr(widget, "valueChanged"):
-                if widget_name := widget.objectName():
-                    controller_property = widget_name.split("_")[-1]
-                    print(controller_property)
+            if widget_name := widget.objectName():
+                controller_property = widget_name.split("_")[-1]
+                # print(controller_property)
+                if hasattr(widget, "valueChanged"):
                     widget.valueChanged.connect(
-                        lambda v: setattr(controller, controller_property, v)
+                        lambda v, property=controller_property: setattr(
+                            controller, property, v
+                        )
                     )
                     # widget.valueChanged.connect(
                     #     lambda v: _set_attr(controller, controller_property, v)
                     # )
+                elif hasattr(widget, "textChanged"):
+                    widget.textChanged.connect(
+                        lambda v, property=controller_property: setattr(
+                            controller, property, v
+                        )
+                    )
 
         def _on_propertyChanged(property, value):
-            # pattern = QRegularExpression(property)
-            widget = self.findChildren(QWidget, property)[0]
+            pattern = QRegularExpression(property)
+            print(property, value)
+            widget = self.findChildren(QWidget, pattern)[0]
             if isinstance(widget, QAbstractSpinBox):
                 widget.setValue(value)
             elif isinstance(widget, QLineEdit):
                 widget.setText(value)
 
         controller.propertyChanged.connect(_on_propertyChanged)
+        controller.valueRangeChanged.connect(self._on_valueRangeChanged)
 
-        def _on_valueRangeChanged(width, height, min, max):
-            ui.doubleSpinBox_Xinterval.setMaximum(width)
-            ui.doubleSpinBox_Yinterval.setMaximum(height)
-            ui.doubleSpinBox_colorMax.setRange(min, max)
-            ui.doubleSpinBox_colorMin.setRange(min, max)
-            ui.doubleSpinBox_colorinterval.setMaximum(max - min)
-
-        controller.valueRangeChanged.connect(_on_valueRangeChanged)
-        # ui.doubleSpinBox_Xinterval.valueChanged.connect(
-        #     controller.set_Xinterval
-        # )
-        # ui.doubleSpinBox_Xinterval.valueChanged.connect(
-        #     controller.set_Yinterval
-        # )
-        # ui.doubleSpinBox_colorMax.valueChanged.connect(lambda _: setattr(controller, "", _))
-        # ui.doubleSpinBox_colorMin.valueChanged.connect(controller.set_colorMin)
-        # ui.doubleSpinBox_colorinterval.valueChanged.connect(
-        #     controller.set_colorinterval
-        # )
-        # ui.lineEdit_xLabel.textChanged.connect(controller.set_xLabel)
-        # ui.lineEdit_yLabel.textChanged.connect(controller.set_yLabel)
-        # ui.lineEdit_colorLabel.textChanged.connect(controller.set_colorLabel)
-        # ui.spinBox_axisLabelSize.valueChanged.connect(
-        #     controller.set_axisLabelSize
-        # )
-        # ui.spinBox_tickLabelSize.valueChanged.connect(
-        #     controller.set_tickLabelSize
-        # )
+        ui.pushButton_selectColormap.clicked.connect(self._open_colorpicker)
 
         ui.checkBox_3d.stateChanged.connect(controller.set_is_3d)
         controller.data_is_too_big.connect(self._change_checkBox_3d_state)
-        controller.data_changed.connect(self._updata_spinbox_max)
+        # controller.data_changed.connect(self._updata_spinbox_max)
 
         controller.analyzedvalues_changed.connect(ui.statusbar.showMessage)
+
+        ui.pushButton_plot.clicked.connect(self._on_button_plot_clicked)
+        ui.pushButton_save.clicked.connect(self._on_button_save_clicked)
+
+    def _on_valueRangeChanged(self, width, height, min, max):
+        self.ui.doubleSpinBox_Xinterval.setMaximum(width)
+        self.ui.doubleSpinBox_Yinterval.setMaximum(height)
+        self.ui.doubleSpinBox_colorMax.setRange(min, max)
+        self.ui.doubleSpinBox_colorMin.setRange(min, max)
+        self.ui.doubleSpinBox_colorinterval.setMaximum(max - min)
 
     def _get_ui_properties(self):
         # self.controller.exposure_time_decimals = (
@@ -136,96 +257,88 @@ class MainWindow(QMainWindow):
         ui = self.ui
         controller = self.controller
 
+        # collapsiblebox = CollapsibleBox("Files")
+        # ui.groupBox_file.layout().insertWidget(0, collapsiblebox)
+        # self.vlay = QVBoxLayout()
+        # collapsiblebox.setContentLayout(self.vlay)
+
         vlayout = QVBoxLayout(ui.frame_figure)
+        # vlayout = QVBoxLayout(ui.scrollArea_figure)
         self.canvas = canvas = FigureCanvas(controller.figure)
-        vlayout.addWidget(canvas)
         vlayout.addWidget(
             NavigationToolbar(
                 canvas,
                 self,
             )
         )
-        #     self.status_widget = StatusWidget()
-        #     self.status_widget.progressBar.setVisible(False)
-        #     self.ui.statusBar.addWidget(self.status_widget, 1)
+        scrollArea = QScrollArea()
+        scrollArea.setWidgetResizable(True)
+        scrollArea.setWidget(canvas)
+        # scrollArea.setMaximumHeight(270)
+        scrollArea.setMinimumWidth(900)
+        vlayout.addWidget(scrollArea)
 
-        #     self.ui.tabWidget.setCurrentIndex(1)
-        #     self.ui.tabWidget.removeTab(0)
-        #     self.ui.tabWidget.removeTab(2)
+        def scrolling(event):
+            current = scrollArea.verticalScrollBar().value()
+            if event.button == "down":
+                scrollArea.verticalScrollBar().setValue(current + 100)
+            else:
+                scrollArea.verticalScrollBar().setValue(current - 100)
 
-        #     # self.setWindowFlags(Qt.FramelessWindowHint)
-        #     # self.ui.button_stop.setEnabled(False)
-        #     self.doubledragspinboxes: list[DoubleDragSpinBox] = sorted(
-        #         [dsb for dsb in self.findChildren(DoubleDragSpinBox)],
-        #         key=lambda _: _.objectName(),
-        #     )
-        #     self.doubledragspinboxes[2].setEnabled(False)
-        #     self.doubledragspinboxes[4].setEnabled(False)
-        #     self.current_angle_labels: list[QLabel] = sorted(
-        #         [
-        #             lbl
-        #             for lbl in self.findChildren(
-        #                 QLabel, QRegularExpression("current_angle")
-        #             )
-        #         ],
-        #         key=lambda _: _.objectName(),
-        #     )
+        self.canvas.mpl_connect("scroll_event", scrolling)
 
-        #     self.ui.doubleSpinBox.setMaximum(90)
-        #     self.ui.doubleSpinBox_2.setMaximum(90)
-        #     self.ui.doubleSpinBox_3.setMaximum(360)
-        #     self.ui.doubleSpinBox_4.setMaximum(360)
-        #     self.ui.doubleSpinBox_5.setMaximum(360)
-        #     self.ui.doubleSpinBox_6.setMaximum(65)
-        #     [
-        #         dsb.setValue(stage.target_angle)
-        #         for dsb, stage in zip(
-        #             self.doubledragspinboxes, self.controller.stages
-        #         )
-        #     ]
+        # canvas.setFixedSize(canvas.size())
+        # canvas.setMinimumSize(canvas.size())
 
-        #     self.ui.doubleSpinBox_exposure.setRange(
-        #         0.01, self.controller.exposure_range[1]
-        #     )
-        #     self.ui.doubleSpinBox_exposure.setValue(self.controller.exposure_time)
-        #     self.ui.doubleSpinBox_exposure.divisor = 10
-        #     self.ui.spinBox_gain.setRange(*self.controller.gain_range)
-        #     self.ui.spinBox_gain.setValue(self.controller.gain)
-
-        #     self.ui.comboBox_s3_interval.addItems(
-        #         [f"{_}°" for _ in self.controller.s3_intervals]
-        #     )
-        #     self.ui.comboBox_s3_interval.setCurrentIndex(
-        #         self.controller.s3_interval_index
-        #     )
-
-        #     self.ui.comboBox_shot.setEnabled(False)
-        #     self.ui.comboBox_shot.addItems(self.controller.shot_counts)
-        #     self.ui.comboBox_shot.setCurrentIndex(self.controller.shot_count_index)
-
-        #     self.ui.comboBox_smoothing_sizes.addItems(
-        #         self.controller.smoothing_sizes_text
-        #     )
-
-        #     self.ui.spinBox_ver_skip.setValue(self.controller.ver_skip)
-        #     self.ui.spinBox_hor_skip.setValue(self.controller.hor_skip)
-
-        #     self.ui.comboBox_filter.addItems(self.controller.filter_wavelens)
-        #     self.ui.comboBox_filter.setCurrentIndex(self.controller.filters_index)
-        pass
-
-    def _button_browse_clicked(self):
-        csv_path = self._browse_inputfile()
-        if csv_path and csv_path != self.ui.label_file.text():
-            self.ui.label_file.setText(csv_path)
-            self.controller.load_file(csv_path)
-            self.controller.display_figure()
+    def _button_addFile_clicked(self):
+        csv_paths = self._browse_inputfile()
+        if csv_paths:
+            # if csv_paths and csv_paths != self.ui.label_file.text():
+            # self.ui.label_file.setText(csv_paths)
+            # for csv_path in csv_paths:
+            # label = QLabel(f"{csv_path}")
+            # color = QtGui.QColor(*[random.randint(0, 255) for _ in range(3)])
+            # label.setStyleSheet(
+            #     "background-color: {}; color : white;".format(color.name())
+            # )
+            # label.setAlignment(Qt.AlignCenter)
+            # self.vlay.addWidget(label)
+            self.ui.comboBox_files.addItems(csv_paths)
+            self.controller.load_files(
+                [
+                    self.ui.comboBox_files.itemText(i)
+                    for i in range(self.ui.comboBox_files.count())
+                ]
+            )
+            # self.controller.display_figure()
+            width, height = (
+                self.controller.figure.get_size_inches()
+                * self.controller.figure.dpi
+            )
+            self.canvas.setFixedSize(width, height)
             self.canvas.draw()
 
+    def _button_sabstractFile_clicked(self):
+        pass
+
     def _browse_inputfile(self):
-        return QFileDialog.getOpenFileName(
-            self, "Select", filter="CSV-like files (*.csv *.xlsx)"
+        files = QFileDialog.getOpenFileNames(
+            self,
+            "Select",
+            filter="CSV-like files (*.csv *.xlsx)",
+            dir=setting.value("last_dir"),
         )[0]
+
+        if files:
+            setting.setValue("last_dir", os.path.dirname(files[-1]))
+        return files
+
+    def _open_colorpicker(self):
+        if self.colordialog is None:
+            self.colordialog = ColormapPickerDialog(
+                self, window_controller=self.controller
+            )
+        self.colordialog.show()
 
     def _change_checkBox_3d_state(self, data_is_big):
         if data_is_big:
@@ -234,79 +347,45 @@ class MainWindow(QMainWindow):
         else:
             self.ui.checkBox_3d.setEnabled(True)
 
-    def _updata_spinbox_max(self, data_info):
-        self.ui.doubleSpinBox_Xinterval = data_info[1]
-        self.ui.doubleSpinBox_Yinterval = data_info[0]
+    def _on_button_plot_clicked(self):
+        self.controller.plot()
+        self.canvas.draw()
 
-    # def _show_preview(self):
-    #     self.ui.button_preview.setEnabled(False)
+    def _on_button_save_clicked(self):
+        savepath, filetype = QFileDialog.getSaveFileName(
+            self,
+            "Save as",
+            filter="Info (*.csv);;PNG (*.png);;eps (*.eps);;JPEG (*.jpeg);;JPEG (*.jpg);;PDF (*.pdf);;PGF (*.pgf);;PS (*.ps);;RAW (*.raw);;RGBA (*.rgba);;SVG (*.svg);;SVGZ (*.svgz);;Tiff (*.tif);;Tiff (*.tiff)",
+            dir=setting.value("last_dir"),
+            selectedFilter="PNG",
+        )
+        if filetype == "Info (*.csv)":
+            self._save_analyzed_data(savepath)
+        else:
+            plt.savefig(savepath, bbox_inches="tight", transparent=True)
 
-    #     logger.info("preview button clicked")
-    #     # if self.controller.camera_controller.previewThread:
-    #     #     print(self.controller.camera_controller.previewThread.is_alive())
-    #     des_pos = self.screen().availableGeometry().topLeft()
-    #     self.move(des_pos)
-    #     # sleep(0.1)
+    def _save_analyzed_data(self, savepath):
+        header = ",".join(
+            [
+                "height",
+                "width",
+                "size",
+                "max",
+                "min",
+                "mean",
+                "median",
+                "std",
+            ]
+        )
+        import numpy
 
-    #     # print("creating preview")
-    #     if self.preview_window is None:
-    #         self.preview_window = PreviewWindow(
-    #             window_controller=self.controller
-    #         )
-
-    #     logger.info("showing preview")
-    #     self.preview_window.show()
-
-    # def _export_csv(self):
-    #     dir_bin = QFileDialog.getExistingDirectory(
-    #         self,
-    #         "Select a folder contains binary files",
-    #         self.controller.working_dir,
-    #     )
-    #     if dir_bin:
-    #         self.controller.create_csv(dir_bin)
-
-    # def _show_progressbar(self):
-    #     self.status_widget.progressBar.setVisible(True)
-    #     self.status_widget.progressBar.setRange(0, 0)
-
-    # def _hide_progressbar(self):
-    #     self.status_widget.progressBar.setVisible(False)
-    #     self.status_widget.progressBar.setRange(0, 1)
-
-    # def _fill_progressbar(self):
-    #     self.status_widget.progressBar.setRange(0, 1)
-    #     self.status_widget.progressBar.setValue(1)
-
-    # def closeEvent(self, event):
-    #     arm_stages_are_origin = all(
-    #         angle == 0 for angle in self.controller.current_angles[:2]
-    #     )
-
-    #     if not arm_stages_are_origin:
-    #         ret = self._popup_closing_message()
-    #         if ret != QMessageBox.Ok:
-    #             event.ignore()
-    #             return
-
-    #     # self.controller.app_closing = True
-    #     for window in QApplication.topLevelWidgets():
-    #         if not isinstance(window, QMainWindow):
-    #             window.close()
-    #     self.controller.on_close()
-    #     return super().closeEvent(event)
-
-    # def _popup_closing_message(self):
-    #     message = QMessageBox(self)
-    #     # message.setStyleSheet(".QLabel{min-width: 700px;}")
-    #     message.setIcon(QMessageBox.Icon.Information)
-    #     message.setWindowTitle("Confirmation")
-    #     message.setText("<b>The stages will be returned to its origin.</b>")
-    #     message.setInformativeText(
-    #         '<nobr><font color="red">Set the sample table to the lowest position! (until the orange light under the table goes out)</font></nobr><br/>Press <b>"OK"</b> when you have lowered the table.</span>'
-    #     )
-    #     message.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-    #     return message.exec()
+        numpy.savetxt(
+            savepath,
+            self.controller.figure_handler.datas_analyzed,
+            fmt="%.5f",
+            delimiter=",",
+            header=header,
+        )
 
 
 def main():
