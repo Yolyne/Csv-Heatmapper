@@ -6,7 +6,7 @@
     {
       "label": "pyside6-uic",
       "type": "shell",
-      "command": ".venv/Scripts/pyside6-uic --from-imports ./designer/MainWindow.ui -o ./CsvHeatmapper/ui/ui_generated_main_window.py;.venv/Scripts/pyside6-uic --from-imports ./designer/ColormapPicker.ui -o ./CsvHeatmapper/ui/ui_generated_ColormapPicker.py"
+      "command": ".venv/Scripts/pyside6-uic --from-imports ./designer/MainWindow.ui -o ./CsvHeatmapper/ui/ui_generated_main_window.py;.venv/Scripts/pyside6-uic --from-imports ./designer/ColormapPicker.ui -o ./CsvHeatmapper/ui/ui_generated_ColormapPicker.py;.venv/Scripts/pyside6-uic --from-imports ./designer/LoadedFilesWidget.ui -o ./CsvHeatmapper/ui/ui_generated_LoadedFilesWidget.py"
     },
     {
       "label": "pyside6-rcc",

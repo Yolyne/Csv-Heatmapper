@@ -16,11 +16,11 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBox,
-    QFrame, QGridLayout, QGroupBox, QHBoxLayout,
-    QLabel, QLineEdit, QListWidget, QListWidgetItem,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QRadioButton, QSizePolicy, QSpinBox, QStatusBar,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QDoubleSpinBox, QFrame,
+    QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+    QLineEdit, QListWidget, QListWidgetItem, QMainWindow,
+    QMenu, QMenuBar, QPushButton, QRadioButton,
+    QSizePolicy, QSpacerItem, QSpinBox, QStatusBar,
     QToolButton, QVBoxLayout, QWidget)
 from  . import resources_rc
 
@@ -72,10 +72,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3 = QHBoxLayout(self.groupBox_file)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.horizontalLayout_3.setContentsMargins(-1, 0, -1, 2)
-        self.comboBox_files = QComboBox(self.groupBox_file)
-        self.comboBox_files.setObjectName(u"comboBox_files")
+        self.horizontalSpacer = QSpacerItem(0, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.horizontalLayout_3.addWidget(self.comboBox_files)
+        self.horizontalLayout_3.addItem(self.horizontalSpacer)
 
         self.frame_2 = QFrame(self.groupBox_file)
         self.frame_2.setObjectName(u"frame_2")

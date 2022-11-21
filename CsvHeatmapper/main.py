@@ -32,6 +32,10 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QFrame,
+    QComboBox,
+    QStyledItemDelegate,
+    QListView,
+    QAbstractItemView,
 )
 from PySide6 import QtGui, QtMultimedia
 from PySide6.QtCore import (
@@ -41,6 +45,8 @@ from PySide6.QtCore import (
     QAbstractAnimation,
     QParallelAnimationGroup,
     QPropertyAnimation,
+    QStringListModel,
+    QEvent,
 )
 
 # from ui.my_widgets import DoubleDragSpinBox, StatusWidget
@@ -50,6 +56,8 @@ from PySide6.QtCore import (
 # from ui.ui_main_window import UiMainWindow
 from ui.ui_generated_main_window import Ui_MainWindow
 from ui.ui_generated_ColormapPicker import Ui_Dialog
+
+# from ui.ui_generated_LoadedFilesWidget import Ui_Form
 
 # from ui.ui_generated_setup_dialog import Ui_Dialog
 
@@ -63,24 +71,40 @@ if setting.value("last_dir") == "":
     setting.setValue("last_dir", os.path.expanduser("~/Documents"))
 
 
-class CollapsibleBox(QWidget):
-    def __init__(self, title="", parent=None):
-        super(CollapsibleBox, self).__init__(parent)
+class LoadedFilesWidget(QWidget):
+    def __init__(
+        self, parent=None, title="", window_controller: WindowController = None
+    ):
+        # def __init__(self, parent, window_controller: WindowController):
+        super().__init__(parent)
+        # super().__init__(parent)
+        # self.ui = Ui_Form()
+        # self.ui.setupUi(self)
+        self.controller = window_controller
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        # self.setGeometry(
+        #     self.screen().availableGeometry().right(),
+        #     self.screen().availableGeometry().bottom(),
+        #     window_controller.preview_width,
+        #     window_controller.preview_height,
+        # )
+        self.move(18, 46)
 
         self.toggle_button = QToolButton(
             text=title, checkable=True, checked=False
         )
-        self.toggle_button.setStyleSheet("QToolButton { border: none; }")
+        # self.toggle_button.setStyleSheet("QToolButton { border: none; }")
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         self.toggle_button.setArrowType(Qt.RightArrow)
         self.toggle_button.pressed.connect(self.on_pressed)
-
+        self.toggle_button.setFixedSize(164, 24)
         self.toggle_animation = QParallelAnimationGroup(self)
 
         self.content_area = QScrollArea(maximumHeight=0, minimumHeight=0)
         self.content_area.setSizePolicy(
             QSizePolicy.Expanding, QSizePolicy.Fixed
         )
+        # self.content_area.setFixedSize(150, 24)
         self.content_area.setFrameShape(QFrame.NoFrame)
 
         lay = QVBoxLayout(self)
@@ -99,7 +123,7 @@ class CollapsibleBox(QWidget):
             QPropertyAnimation(self.content_area, b"maximumHeight")
         )
 
-    # @pyqtSlot()
+    # @QtCore.pyqtSlot()
     def on_pressed(self):
         checked = self.toggle_button.isChecked()
         self.toggle_button.setArrowType(
@@ -122,14 +146,14 @@ class CollapsibleBox(QWidget):
         content_height = layout.sizeHint().height()
         for i in range(self.toggle_animation.animationCount()):
             animation = self.toggle_animation.animationAt(i)
-            animation.setDuration(500)
+            animation.setDuration(10)
             animation.setStartValue(collapsed_height)
             animation.setEndValue(collapsed_height + content_height)
 
         content_animation = self.toggle_animation.animationAt(
             self.toggle_animation.animationCount() - 1
         )
-        content_animation.setDuration(500)
+        content_animation.setDuration(10)
         content_animation.setStartValue(0)
         content_animation.setEndValue(content_height)
 
@@ -187,6 +211,10 @@ class MainWindow(QMainWindow):
         ui = self.ui
         controller = self.controller
 
+        self.listView.selectionModel().selectionChanged.connect(
+            self._on_file_selection_changed
+        )
+        # controller.loadedFilesModel.selectionChanged.connect(lambda v: print(v))
         ui.toolButton_addFile.clicked.connect(self._button_addFile_clicked)
         ui.toolButton_substractFile.clicked.connect(
             self._button_sabstractFile_clicked
@@ -219,12 +247,14 @@ class MainWindow(QMainWindow):
 
         def _on_propertyChanged(property, value):
             pattern = QRegularExpression(property)
-            print(property, value)
+            # print(property, value)
             widget = self.findChildren(QWidget, pattern)[0]
             if isinstance(widget, QAbstractSpinBox):
                 widget.setValue(value)
             elif isinstance(widget, QLineEdit):
                 widget.setText(value)
+            # elif isinstance(widget, QComboBox):
+            #     widget.setItems(value)
 
         controller.propertyChanged.connect(_on_propertyChanged)
         controller.valueRangeChanged.connect(self._on_valueRangeChanged)
@@ -239,6 +269,25 @@ class MainWindow(QMainWindow):
 
         ui.pushButton_plot.clicked.connect(self._on_button_plot_clicked)
         ui.pushButton_save.clicked.connect(self._on_button_save_clicked)
+
+    def _on_file_selection_changed(self, selected, deselected):
+        print(selected.indexes(), deselected.indexes())
+        # print(self.controller.selectionModel.selectedIndexes())
+        # self.controller.selected_file_indexes = (
+        #     self.controller.selectionModel.selectedIndexes()
+        # )
+        # for i in self.controller.selectionModel.selectedIndexes():
+        #     if i not in self.controller.selected_file_indexes:
+        #         self.controller.selected_file_indexes.append(i)
+        [
+            self.controller.selected_file_indexes.add(i)
+            for i in selected.indexes()
+        ]
+        [
+            self.controller.selected_file_indexes.remove(i)
+            for i in deselected.indexes()
+        ]
+        print(self.controller.selected_file_indexes)
 
     def _on_valueRangeChanged(self, width, height, min, max):
         self.ui.doubleSpinBox_Xinterval.setMaximum(width)
@@ -257,10 +306,20 @@ class MainWindow(QMainWindow):
         ui = self.ui
         controller = self.controller
 
-        # collapsiblebox = CollapsibleBox("Files")
-        # ui.groupBox_file.layout().insertWidget(0, collapsiblebox)
-        # self.vlay = QVBoxLayout()
-        # collapsiblebox.setContentLayout(self.vlay)
+        loadedFilesWidget = LoadedFilesWidget(self, "Loaded Files", controller)
+        loadedFilesWidget.setMinimumSize(164, 0)
+        lay = QVBoxLayout()
+        lay.setContentsMargins(0, 0, 0, 0)
+        self.listView = listView = QListView(loadedFilesWidget)
+        listView.setModel(controller.loadedFilesModel)
+        listView.setSelectionModel(controller.selectionModel)
+        listView.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        listView.setSelectionBehavior(
+            QAbstractItemView.SelectionBehavior.SelectRows
+        )
+        lay.addWidget(listView)
+        loadedFilesWidget.setContentLayout(lay)
+        loadedFilesWidget.show()
 
         vlayout = QVBoxLayout(ui.frame_figure)
         # vlayout = QVBoxLayout(ui.scrollArea_figure)
@@ -274,7 +333,6 @@ class MainWindow(QMainWindow):
         scrollArea = QScrollArea()
         scrollArea.setWidgetResizable(True)
         scrollArea.setWidget(canvas)
-        # scrollArea.setMaximumHeight(270)
         scrollArea.setMinimumWidth(900)
         vlayout.addWidget(scrollArea)
 
@@ -291,26 +349,9 @@ class MainWindow(QMainWindow):
         # canvas.setMinimumSize(canvas.size())
 
     def _button_addFile_clicked(self):
-        csv_paths = self._browse_inputfile()
-        if csv_paths:
-            # if csv_paths and csv_paths != self.ui.label_file.text():
-            # self.ui.label_file.setText(csv_paths)
-            # for csv_path in csv_paths:
-            # label = QLabel(f"{csv_path}")
-            # color = QtGui.QColor(*[random.randint(0, 255) for _ in range(3)])
-            # label.setStyleSheet(
-            #     "background-color: {}; color : white;".format(color.name())
-            # )
-            # label.setAlignment(Qt.AlignCenter)
-            # self.vlay.addWidget(label)
-            self.ui.comboBox_files.addItems(csv_paths)
-            self.controller.load_files(
-                [
-                    self.ui.comboBox_files.itemText(i)
-                    for i in range(self.ui.comboBox_files.count())
-                ]
-            )
-            # self.controller.display_figure()
+        loading_csvs = self._browse_inputfile()
+        if loading_csvs:
+            self.controller.load_files(loading_csvs)
             width, height = (
                 self.controller.figure.get_size_inches()
                 * self.controller.figure.dpi
@@ -319,7 +360,18 @@ class MainWindow(QMainWindow):
             self.canvas.draw()
 
     def _button_sabstractFile_clicked(self):
-        pass
+        # indexes = self.listView.selectedIndexes()
+        # print(indexes)
+        # if indexes:
+        if self.controller.selected_file_indexes:
+            self.controller.unload_files(self.controller.selected_file_indexes)
+            # Clear the selection (as it is no longer valid).
+            self.listView.clearSelection()
+            width, height = (
+                self.controller.figure.get_size_inches()
+                * self.controller.figure.dpi
+            )
+            self.canvas.setFixedSize(width, height)
 
     def _browse_inputfile(self):
         files = QFileDialog.getOpenFileNames(
@@ -359,10 +411,12 @@ class MainWindow(QMainWindow):
             dir=setting.value("last_dir"),
             selectedFilter="PNG",
         )
-        if filetype == "Info (*.csv)":
-            self._save_analyzed_data(savepath)
-        else:
-            plt.savefig(savepath, bbox_inches="tight", transparent=True)
+        if savepath:
+            if filetype == "Info (*.csv)":
+                self._save_analyzed_data(savepath)
+            else:
+                plt.savefig(savepath, bbox_inches="tight", transparent=True)
+            setting.setValue("last_dir", os.path.dirname(savepath))
 
     def _save_analyzed_data(self, savepath):
         header = ",".join(

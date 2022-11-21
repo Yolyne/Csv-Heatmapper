@@ -57,7 +57,7 @@ class Ui_Dialog(object):
         self.buttonBox.setSizePolicy(sizePolicy1)
         self.buttonBox.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Apply)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         self.buttonBox.setCenterButtons(True)
 
         self.verticalLayout.addWidget(self.buttonBox)

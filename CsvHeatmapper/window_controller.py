@@ -11,7 +11,17 @@ from logging.handlers import RotatingFileHandler
 
 from figure import FigureHandler
 
-from PySide6.QtCore import Signal, Slot, QObject, QThread, QMutexLocker, QMutex
+from PySide6.QtCore import (
+    Signal,
+    Slot,
+    QObject,
+    QThread,
+    QMutexLocker,
+    QMutex,
+    QStringListModel,
+    Qt,
+    QItemSelectionModel,
+)
 
 
 # create logger
@@ -52,6 +62,24 @@ def determine_interval(length, is_colorbar=False):
     return interval
 
 
+class LoadedFilesModel(QStringListModel):
+    def __init__(self, *args, files=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.files = files or []
+        # self.setHeaderData(0, Qt.Horizontal, "Loaded Files")
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            text = self.files[index.row()]
+            return text
+
+    def rowCount(self, index):
+        return len(self.files)
+
+    # def headerData(self, section: int, orientation: PySide6.QtCore.Qt.Orientation, role: int = ...) -> Any:
+    #     return super().headerData(section, orientation, role)
+
+
 class WindowController(QObject):
     analyzedvalues_changed = Signal(str)
     data_is_too_big = Signal(bool)
@@ -63,6 +91,11 @@ class WindowController(QObject):
         super().__init__(parent)
         self.figure_handler = FigureHandler()
         self.figure = self.figure_handler.figure
+        # self.__loadedFiles = []
+        self.loadedFilesModel = LoadedFilesModel()
+        self.selectionModel = QItemSelectionModel(self.loadedFilesModel, self)
+        self.selected_file_indexes = set()
+        # self.__loadedFiles.append = self.my_append
         self.__Xinterval = None
         self.__Yinterval = None
         self.__colorMax = None
@@ -76,117 +109,62 @@ class WindowController(QObject):
         self.__colorMap = None
 
         self.colormaps = list(mpl.cm._colormaps._cmaps.keys())
-        # cm_num = len(self.colormaps) // 2
-        # self.ncols = int(cm_num // 3 + 1)
-        # leftarm = Stage(StageNo.s0, 40, 0)
-        # rightarm = Stage(StageNo.s1, 40, 0)
-        # polarizer = Stage(StageNo.s2, 0, 0)
-        # compensator = Stage(StageNo.s3, 0, 0)
-        # analyzer = Stage(StageNo.s5, 136, 0)
-        # detector = Stage(StageNo.s6, 50, 0)
-        # self.stages = [
-        #     leftarm,
-        #     rightarm,
-        #     polarizer,
-        #     compensator,
-        #     analyzer,
-        #     detector,
-        # ]
-
-        # self.working_dir = ""
-        # self.dir_bin = ""
-        # self.dir_csv = ""
-
-        # self.exposure_time_decimals = 0
-
-        # self.__s3_intervals = [1, 2, 5, 10, 20]
-        # self.s3_interval_index = 2
-        # self.__shot_counts = [1, 10, 20]
-        # self.shot_count_index = 0
-
-        # self.smoothing_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        # self.smoothing_sizes_text = [
-        #     "1x1 (No smoothing)",
-        #     "2x2",
-        #     "3x3",
-        #     "4x4",
-        #     "5x5",
-        #     "6x6",
-        #     "7x7",
-        #     "8x8",
-        #     "9x9",
-        #     "10x10",
-        # ]
-        # self.smoothing_sizes_index = 0
-        # self.ver_skip = 24
-        # self.hor_skip = 24
-
-        # self.filters = [1, 2, 3, 4, 5, 7, 8]
-        # self.filter_wavelens = [
-        #     "1 (530nm)",
-        #     "2 (590nm)",
-        #     "3 (650nm)",
-        #     "4 (720nm)",
-        #     "5 (780nm)",
-        #     "7 (405nm)",
-        #     "8 (470nm)",
-        # ]
-        # self.filters_index = 1
-        # self.delta_restriction = False
-
-        # self.is_rotating = False
-        # self.is_measuring = False
-        # self.rotation_interrupting = False
-
-        # self.__ports = self.stage_controller.list_ports()
-        # if self.__ports:
-        #     self.stages_port = self.__ports[0]
-
-        # # self.app_closing = False
-
-        # self.worker_threads = {}
-        # self.workers = {}
-        # self.qthread_id = 0
 
     def load_files(self, files):
-        self.is_first = True  # regard when csv is read as the first time
+        for file in files:
+            if file not in self.loadedFilesModel.files:
+                self.loadedFilesModel.files.append(file)
+        self.loadedFilesModel.layoutChanged.emit()
 
-        self.figure_handler.load_data(files)
+        # print(self.loadedFilesModel.files)
+        self.figure_handler.load_data(self.loadedFilesModel.files)
         self._update_analyzedvalues()
         self._update_properties()
 
         self.plot()
 
+    def unload_files(self, indexes: set):
+        indexes = sorted(list(indexes), reverse=True)
+        print(indexes)
+        for index in indexes:
+            self.figure_handler.remove_data(index.row())
+            # Remove the item and refresh.
+            del self.loadedFilesModel.files[index.row()]
+        self.loadedFilesModel.layoutChanged.emit()
+        # self.save()
+        self._update_analyzedvalues()
+
     def _update_properties(self):
-        int_min = float(math.floor(self.figure_handler.data_min))
-        int_max = float(math.ceil(self.figure_handler.data_max))
+        int_min = float(math.floor(self.figure_handler.datas_min))
+        int_max = float(math.ceil(self.figure_handler.datas_max))
         self.valueRangeChanged.emit(
-            self.figure_handler.data_width,
-            self.figure_handler.data_height,
+            self.figure_handler.datas_width,
+            self.figure_handler.datas_height,
             int_min,
             int_max,
         )
         self.colorMax = int_max
         self.colorMin = int_min
-        self.Xinterval = determine_interval(self.figure_handler.data_width)
-        self.Yinterval = determine_interval(self.figure_handler.data_height)
+        self.Xinterval = determine_interval(self.figure_handler.datas_width)
+        self.Yinterval = determine_interval(self.figure_handler.datas_height)
         self.colorinterval = determine_interval(
             self.colorMax - self.colorMin, True
         )
 
     def _update_analyzedvalues(self):
-        # self.analyzedvalues =
+        # print(self.figure_handler.datas)
+        # if self.figure_handler.datas
         analyzedvalues = (
-            f"Max: {self.figure_handler.data_max}, "
-            f"Min: {self.figure_handler.data_min}, "
-            f"Mean: {self.figure_handler.data_mean}, "
-            f"Median: {self.figure_handler.data_median}, "
+            f"Max: {self.figure_handler.datas_max}, "
+            f"Min: {self.figure_handler.datas_min}, "
+            f"Mean: {self.figure_handler.datas_mean}, "
+            f"Median: {self.figure_handler.datas_median}, "
             # f"Sample Std: {self.figure_handler.data_std}"
         )
         self.analyzedvalues_changed.emit(analyzedvalues)
 
         self.data_is_too_big.emit(
-            True if self.figure_handler.data_size > 10_000 else False
+            True if self.figure_handler.datas_size > 10_000 else False
         )
         # self.data_changed.emit(
         #     (self.figure_handler.data_height, self.figure_handler.data_width)
@@ -224,6 +202,19 @@ class WindowController(QObject):
         #     figure_canvas.get_tk_widget().grid(column=0, row=1, sticky=tk.NSEW)
         # except ValueError:  # Error(Latex) in drawing figure
         #     pass
+
+    # @property
+    # def loadedFiles(self):
+    #     return self.__loadedFiles
+
+    # @loadedFiles.setter
+    # def loadedFiles(self, values):
+    #     self.__loadedFiles = values
+    #     self.propertyChanged.emit("loadedFiles", self.__loadedFiles)
+
+    # def my_append(self, value):
+    #     self.__loadedFiles.append(value)
+    #     self.propertyChanged.emit("loadedFiles", self.__loadedFiles)
 
     @property
     def Xinterval(self):

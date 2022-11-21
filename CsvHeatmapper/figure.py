@@ -9,11 +9,11 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 class FigureHandler:
     def __init__(self, files=None) -> None:
-        self.figure = plt.figure(figsize=(9, 6), dpi=100)
-        self.figure.subplots_adjust(
-            left=0.05, right=0.95, bottom=0.1, top=0.95
-        )
-        # self.figure = plt.figure(figsize=(9, 6), dpi=100, tight_layout=True)
+        # self.figure = plt.figure(figsize=(9, 6), dpi=100)
+        # self.figure.subplots_adjust(
+        #     left=0.05, right=0.95, bottom=0.1, top=0.95
+        # )
+        self.figure = plt.figure(figsize=(9, 6), dpi=100, tight_layout=True)
         # if files:
         #     self.datas = self._file_to_ndarr(files)
         #     self._analyze_data()
@@ -22,10 +22,16 @@ class FigureHandler:
         self.datas = [self._file_to_ndarr(file) for file in files]
         # print(self.data)
         # self.figure.set_dpi(100 * len(files))
-        self.figure.set_size_inches(9, 6 * len(files))
+        self.figure.set_size_inches(9, 6 * len(self.datas))
+        self._analyze_data()
+
+    def remove_data(self, index):
+        del self.datas[index]
+        self.figure.set_size_inches(9, 6 * len(self.datas))
         self._analyze_data()
 
     def _file_to_ndarr(self, file):
+        # print(file)
         if os.path.splitext(file)[-1].lower() == ".csv":
             df = pd.read_csv(file, header=None).dropna(axis=1)
         else:
@@ -59,22 +65,31 @@ class FigureHandler:
                 ]
             )
         self.datas_analyzed = np.array(datas_analyzed)
-        self.data_height = np.amax(self.datas_analyzed[:, 0])
-        self.data_width = np.amax(self.datas_analyzed[:, 1])
-        self.data_size = np.amax(self.datas_analyzed[:, 2])
-        self.data_max = np.amax(self.datas_analyzed[:, 3])
-        self.data_min = np.amin(self.datas_analyzed[:, 4])
-        self.data_mean = np.mean(self.datas_analyzed[:, 5])
-        self.data_median = np.median(self.datas_analyzed[:, 6])
-        # self.data_std = np.std(self.datas_analyzed[:, 7], ddof=1)
-
-        # self.data_height, self.data_width = self.datas.shape
-        # self.data_size = self.datas.size
-        # self.data_mean = np.mean(self.datas)
-        # self.data_max = np.amax(self.datas)
-        # self.data_min = np.amin(self.datas)
-        # self.data_median = np.median(self.datas)
-        # self.data_std = np.std(self.datas, ddof=1)
+        match (len(self.datas_analyzed)):
+            case 0:
+                self.datas_height = None
+                self.datas_width = None
+                self.datas_size = 0
+                self.datas_max = None
+                self.datas_min = None
+                self.datas_mean = None
+                self.datas_median = None
+            case 1:
+                self.datas_height = np.amax(self.datas_analyzed[0, 0])
+                self.datas_width = np.amax(self.datas_analyzed[0, 1])
+                self.datas_size = np.amax(self.datas_analyzed[0, 2])
+                self.datas_max = np.amax(self.datas_analyzed[0, 3])
+                self.datas_min = np.amin(self.datas_analyzed[0, 4])
+                self.datas_mean = np.mean(self.datas_analyzed[0, 5])
+                self.datas_median = np.median(self.datas_analyzed[0, 6])
+            case _:
+                self.datas_height = np.amax(self.datas_analyzed[:, 0])
+                self.datas_width = np.amax(self.datas_analyzed[:, 1])
+                self.datas_size = np.amax(self.datas_analyzed[:, 2])
+                self.datas_max = np.amax(self.datas_analyzed[:, 3])
+                self.datas_min = np.amin(self.datas_analyzed[:, 4])
+                self.datas_mean = np.mean(self.datas_analyzed[:, 5])
+                self.datas_median = np.median(self.datas_analyzed[:, 6])
 
     def plot(
         self,
@@ -125,14 +140,14 @@ class FigureHandler:
                     list_x = np.array(
                         [
                             x + (-1) ** n * 0.5
-                            for x in range(1, self.data_width + 1)
+                            for x in range(1, self.datas_width + 1)
                             for n in range(1, 3)
                         ]
                     )
                     list_y = np.array(
                         [
                             x + (-1) ** n * 0.5
-                            for x in range(1, self.data_height + 1)
+                            for x in range(1, self.datas_height + 1)
                             for n in range(1, 3)
                         ]
                     )
@@ -162,8 +177,8 @@ class FigureHandler:
                     # )
                 elif type3d == "scatter":
                     alpha = 0.3
-                    list_x = np.arange(1, self.data_width + 1)
-                    list_y = np.arange(1, self.data_height + 1)
+                    list_x = np.arange(1, self.datas_width + 1)
+                    list_y = np.arange(1, self.datas_height + 1)
                     X, Y = np.meshgrid(list_x, list_y)
                     ax.scatter(
                         X,
@@ -182,16 +197,16 @@ class FigureHandler:
                     alpha=alpha if alpha <= 1 else 1,
                 )
                 ax.tick_params(axis="z", labelsize=tickLabelSize, pad=10)
-                ax.set_xlim3d(0.5, self.data_width + 0.5)
-                ax.set_ylim3d(self.data_height + 0.5, 0.5)
+                ax.set_xlim3d(0.5, self.datas_width + 0.5)
+                ax.set_ylim3d(self.datas_height + 0.5, 0.5)
                 ax.set_zlim3d(
-                    math.floor(self.data_min), math.ceil(self.data_max)
+                    math.floor(self.datas_min), math.ceil(self.datas_max)
                 )
                 ax.set_box_aspect(
                     (
-                        self.data_width,
-                        self.data_height,
-                        max(self.data_width, self.data_height),
+                        self.datas_width,
+                        self.datas_height,
+                        max(self.datas_width, self.datas_height),
                     )
                 )
             else:
@@ -199,8 +214,8 @@ class FigureHandler:
                 # self.list_ax = self.figure.subplots(len(self.datas), 1)
                 extent = (
                     0.5,
-                    self.data_width + 0.5,
-                    self.data_height + 0.5,
+                    self.datas_width + 0.5,
+                    self.datas_height + 0.5,
                     0.5,
                 )
                 # for ax, data in zip(self.list_ax, self.datas):
@@ -209,19 +224,21 @@ class FigureHandler:
                 ax.yaxis.set_ticks_position("both")
 
                 ax.set_xticks(
-                    list(np.arange(Xinterval, self.data_width + 1, Xinterval))
+                    list(np.arange(Xinterval, self.datas_width + 1, Xinterval))
                     if Xinterval == 1
                     else [1]
                     + list(
-                        np.arange(Xinterval, self.data_width + 1, Xinterval)
+                        np.arange(Xinterval, self.datas_width + 1, Xinterval)
                     )
                 )
                 ax.set_yticks(
-                    list(np.arange(Yinterval, self.data_height + 1, Yinterval))
+                    list(
+                        np.arange(Yinterval, self.datas_height + 1, Yinterval)
+                    )
                     if Yinterval == 1
                     else [1]
                     + list(
-                        np.arange(Yinterval, self.data_height + 1, Yinterval)
+                        np.arange(Yinterval, self.datas_height + 1, Yinterval)
                     )
                 )
                 ax.tick_params(axis="x", labelsize=tickLabelSize)
