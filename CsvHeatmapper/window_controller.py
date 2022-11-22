@@ -92,7 +92,7 @@ class WindowController(QObject):
         self.figure_handler = FigureHandler()
         self.figure = self.figure_handler.figure
         # self.__loadedFiles = []
-        self.loadedFilesModel = LoadedFilesModel()
+        self.loadedFilesModel = LoadedFilesModel(parent=self)
         self.selectionModel = QItemSelectionModel(self.loadedFilesModel, self)
         self.selected_file_indexes = set()
         # self.__loadedFiles.append = self.my_append
@@ -125,11 +125,14 @@ class WindowController(QObject):
 
     def unload_files(self, indexes: set):
         indexes = sorted(list(indexes), reverse=True)
-        print(indexes)
+        # print(indexes)
         for index in indexes:
-            self.figure_handler.remove_data(index.row())
+            self.figure_handler.remove_data(index)
             # Remove the item and refresh.
-            del self.loadedFilesModel.files[index.row()]
+            del self.loadedFilesModel.files[index]
+            # self.figure_handler.remove_data(index.row())
+            # # Remove the item and refresh.
+            # del self.loadedFilesModel.files[index.row()]
         self.loadedFilesModel.layoutChanged.emit()
         # self.save()
         self._update_analyzedvalues()

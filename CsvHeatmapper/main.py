@@ -1,9 +1,11 @@
 import sys
 from time import sleep
 import os
+from datetime import datetime
 import logging
 from logging.handlers import RotatingFileHandler
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import (
     FigureCanvasQTAgg as FigureCanvas,
@@ -270,25 +272,6 @@ class MainWindow(QMainWindow):
         ui.pushButton_plot.clicked.connect(self._on_button_plot_clicked)
         ui.pushButton_save.clicked.connect(self._on_button_save_clicked)
 
-    def _on_file_selection_changed(self, selected, deselected):
-        print(selected.indexes(), deselected.indexes())
-        # print(self.controller.selectionModel.selectedIndexes())
-        # self.controller.selected_file_indexes = (
-        #     self.controller.selectionModel.selectedIndexes()
-        # )
-        # for i in self.controller.selectionModel.selectedIndexes():
-        #     if i not in self.controller.selected_file_indexes:
-        #         self.controller.selected_file_indexes.append(i)
-        [
-            self.controller.selected_file_indexes.add(i)
-            for i in selected.indexes()
-        ]
-        [
-            self.controller.selected_file_indexes.remove(i)
-            for i in deselected.indexes()
-        ]
-        print(self.controller.selected_file_indexes)
-
     def _on_valueRangeChanged(self, width, height, min, max):
         self.ui.doubleSpinBox_Xinterval.setMaximum(width)
         self.ui.doubleSpinBox_Yinterval.setMaximum(height)
@@ -313,10 +296,12 @@ class MainWindow(QMainWindow):
         self.listView = listView = QListView(loadedFilesWidget)
         listView.setModel(controller.loadedFilesModel)
         listView.setSelectionModel(controller.selectionModel)
-        listView.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        listView.setSelectionBehavior(
-            QAbstractItemView.SelectionBehavior.SelectRows
-        )
+        # listView.setDragEnabled(True)
+        listView.setSelectionMode(QAbstractItemView.MultiSelection)
+        # listView.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        # listView.setSelectionBehavior(
+        #     QAbstractItemView.SelectionBehavior.SelectRows
+        # )
         lay.addWidget(listView)
         loadedFilesWidget.setContentLayout(lay)
         loadedFilesWidget.show()
@@ -348,6 +333,25 @@ class MainWindow(QMainWindow):
         # canvas.setFixedSize(canvas.size())
         # canvas.setMinimumSize(canvas.size())
 
+    def _on_file_selection_changed(self, selected, deselected):
+        # print(selected.indexes(), deselected.indexes())
+        # print(self.controller.selectionModel.selectedIndexes())
+        # self.controller.selected_file_indexes = (
+        #     self.controller.selectionModel.selectedIndexes()
+        # )
+        # for i in self.controller.selectionModel.selectedIndexes():
+        #     if i not in self.controller.selected_file_indexes:
+        #         self.controller.selected_file_indexes.append(i)
+        [
+            self.controller.selected_file_indexes.add(i.row())
+            for i in selected.indexes()
+        ]
+        [
+            self.controller.selected_file_indexes.remove(i.row())
+            for i in deselected.indexes()
+        ]
+        print(self.controller.selected_file_indexes)
+
     def _button_addFile_clicked(self):
         loading_csvs = self._browse_inputfile()
         if loading_csvs:
@@ -364,9 +368,13 @@ class MainWindow(QMainWindow):
         # print(indexes)
         # if indexes:
         if self.controller.selected_file_indexes:
-            self.controller.unload_files(self.controller.selected_file_indexes)
+            # ind = {i.row() for i in self.controller.selected_file_indexes}
+            ind = self.controller.selected_file_indexes
             # Clear the selection (as it is no longer valid).
+            self.controller.selected_file_indexes = set()
             self.listView.clearSelection()
+            print("aaa", ind)
+            self.controller.unload_files(ind)
             width, height = (
                 self.controller.figure.get_size_inches()
                 * self.controller.figure.dpi
@@ -404,19 +412,39 @@ class MainWindow(QMainWindow):
         self.canvas.draw()
 
     def _on_button_save_clicked(self):
-        savepath, filetype = QFileDialog.getSaveFileName(
-            self,
-            "Save as",
-            filter="Info (*.csv);;PNG (*.png);;eps (*.eps);;JPEG (*.jpeg);;JPEG (*.jpg);;PDF (*.pdf);;PGF (*.pgf);;PS (*.ps);;RAW (*.raw);;RGBA (*.rgba);;SVG (*.svg);;SVGZ (*.svgz);;Tiff (*.tif);;Tiff (*.tiff)",
-            dir=setting.value("last_dir"),
-            selectedFilter="PNG",
-        )
-        if savepath:
-            if filetype == "Info (*.csv)":
-                self._save_analyzed_data(savepath)
-            else:
-                plt.savefig(savepath, bbox_inches="tight", transparent=True)
-            setting.setValue("last_dir", os.path.dirname(savepath))
+        if (count := len(self.controller.figure_handler.datas)) == 1:
+            savepath, filetype = QFileDialog.getSaveFileName(
+                self,
+                "Save as",
+                filter="Info (*.csv);;PNG (*.png);;eps (*.eps);;JPEG (*.jpeg);;JPEG (*.jpg);;PDF (*.pdf);;PGF (*.pgf);;PS (*.ps);;RAW (*.raw);;RGBA (*.rgba);;SVG (*.svg);;SVGZ (*.svgz);;Tiff (*.tif);;Tiff (*.tiff)",
+                dir=setting.value("last_dir"),
+                selectedFilter="PNG",
+            )
+            if savepath:
+                if filetype == "Info (*.csv)":
+                    self._save_analyzed_data(savepath)
+                else:
+                    # plt.savefig(savepath, bbox_inches="tight", transparent=True)
+                    self.controller.figure
+                setting.setValue("last_dir", os.path.dirname(savepath))
+        else:
+            now = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+            dir = f"{os.path.expanduser('~/Downloads')}/Heatmap ({now})"
+            os.mkdir(dir)
+            width, height = self.controller.figure.get_size_inches()
+            # print(width, height)
+            height = height // count
+            for i in range(count - 1, -1, -1):
+                self.controller.figure.savefig(
+                    f"{dir}/{count-i}.png",
+                    transparent=True,
+                    bbox_inches=mpl.transforms.Bbox(
+                        # This is in "figure fraction" for the bottom half
+                        # input in [[xmin, ymin], [xmax, ymax]]
+                        [[0, height * i], [width, height * (i + 1)]]
+                    ),
+                )
+            self._save_analyzed_data(f"{dir}/info.csv")
 
     def _save_analyzed_data(self, savepath):
         header = ",".join(
