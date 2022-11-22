@@ -408,11 +408,14 @@ class MainWindow(QMainWindow):
             self.ui.checkBox_3d.setEnabled(True)
 
     def _on_button_plot_clicked(self):
-        self.controller.plot()
-        self.canvas.draw()
+        if len(self.controller.figure_handler.datas):
+            self.controller.plot()
+            self.canvas.draw()
 
     def _on_button_save_clicked(self):
-        if (count := len(self.controller.figure_handler.datas)) == 1:
+        if (count := len(self.controller.figure_handler.datas)) == 0:
+            return
+        elif (count := len(self.controller.figure_handler.datas)) == 1:
             savepath, filetype = QFileDialog.getSaveFileName(
                 self,
                 "Save as",

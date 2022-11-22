@@ -14,6 +14,7 @@ class FigureHandler:
         #     left=0.05, right=0.95, bottom=0.1, top=0.95
         # )
         self.figure = plt.figure(figsize=(9, 6), dpi=100, tight_layout=True)
+        self.datas = []
         # if files:
         #     self.datas = self._file_to_ndarr(files)
         #     self._analyze_data()
@@ -74,14 +75,16 @@ class FigureHandler:
                 self.datas_min = None
                 self.datas_mean = None
                 self.datas_median = None
+                self.datas_std = None
             case 1:
-                self.datas_height = np.amax(self.datas_analyzed[0, 0])
-                self.datas_width = np.amax(self.datas_analyzed[0, 1])
-                self.datas_size = np.amax(self.datas_analyzed[0, 2])
-                self.datas_max = np.amax(self.datas_analyzed[0, 3])
-                self.datas_min = np.amin(self.datas_analyzed[0, 4])
-                self.datas_mean = np.mean(self.datas_analyzed[0, 5])
-                self.datas_median = np.median(self.datas_analyzed[0, 6])
+                self.datas_height = self.datas_analyzed[0, 0]
+                self.datas_width = self.datas_analyzed[0, 1]
+                self.datas_size = self.datas_analyzed[0, 2]
+                self.datas_max = self.datas_analyzed[0, 3]
+                self.datas_min = self.datas_analyzed[0, 4]
+                self.datas_mean = self.datas_analyzed[0, 5]
+                self.datas_median = self.datas_analyzed[0, 6]
+                self.datas_std = self.datas_analyzed[0, 7]
             case _:
                 self.datas_height = np.amax(self.datas_analyzed[:, 0])
                 self.datas_width = np.amax(self.datas_analyzed[:, 1])
@@ -90,6 +93,7 @@ class FigureHandler:
                 self.datas_min = np.amin(self.datas_analyzed[:, 4])
                 self.datas_mean = np.mean(self.datas_analyzed[:, 5])
                 self.datas_median = np.median(self.datas_analyzed[:, 6])
+                self.datas_std = None
 
     def plot(
         self,

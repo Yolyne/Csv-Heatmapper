@@ -162,7 +162,7 @@ class WindowController(QObject):
             f"Min: {self.figure_handler.datas_min}, "
             f"Mean: {self.figure_handler.datas_mean}, "
             f"Median: {self.figure_handler.datas_median}, "
-            # f"Sample Std: {self.figure_handler.data_std}"
+            f"Sample Std: {self.figure_handler.datas_std}"
         )
         self.analyzedvalues_changed.emit(analyzedvalues)
 
