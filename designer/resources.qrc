@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="icon">
+    <file>../imgs/plus-solid.svg</file>
+    <file>../imgs/minus-solid.svg</file>
     <file>../imgs/icon.ico</file>
     <file>../imgs/mglass.png</file>
     <file>../imgs/save.png</file>

@@ -16,12 +16,48 @@
     <height>730</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <bold>false</bold>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Csv Heatmapper</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
     <normaloff>:/icon/imgs/icon.ico</normaloff>:/icon/imgs/icon.ico</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QLabel[class=&quot;bold&quot;] {
+	font-weight: 900;
+}
+QGroupBox
+{
+	font-size: 14px;
+    font-weight: bold;
+}
+QGroupBox::title {
+    subcontrol-origin: content;
+    subcontrol-position: top center; /* position at the top center */
+	left: -2px;
+}
+QPushButton {
+	font: 900 12px;
+	max-height:50px;
+    border: 1px solid #8f8f91;
+    border-radius: 3px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #f6f7fa, stop: 1 #dadbde);
+}
+QPushButton:hover {
+    border-color: #a5f6ff;
+    background-color: #e5fcff;
+}
+QPushButton:pressed {
+	border-color: #aaa;
+	background-color: #ccc;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -79,6 +115,9 @@
           <enum>QFrame::Raised</enum>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <property name="topMargin">
            <number>0</number>
           </property>
@@ -160,11 +199,19 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>-1</pointsize>
+                    <italic>false</italic>
+                    <bold>false</bold>
+                   </font>
+                  </property>
                   <property name="locale">
                    <locale language="English" country="UnitedStates"/>
                   </property>
-                  <property name="text">
-                   <string>➕</string>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/icon/imgs/plus-solid.svg</normaloff>:/icon/imgs/plus-solid.svg</iconset>
                   </property>
                  </widget>
                 </item>
@@ -179,8 +226,9 @@
                   <property name="locale">
                    <locale language="English" country="UnitedStates"/>
                   </property>
-                  <property name="text">
-                   <string>➖</string>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/icon/imgs/minus-solid.svg</normaloff>:/icon/imgs/minus-solid.svg</iconset>
                   </property>
                  </widget>
                 </item>
@@ -203,7 +251,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QGroupBox" name="groupBox_3">
+              <widget class="QFrame" name="frame_3">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -219,50 +267,97 @@
                <property name="locale">
                 <locale language="English" country="UnitedStates"/>
                </property>
-               <property name="title">
-                <string>Axis Scale</string>
-               </property>
                <layout class="QGridLayout" name="gridLayout">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
                 <property name="topMargin">
                  <number>0</number>
                 </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
                 <property name="bottomMargin">
-                 <number>4</number>
+                 <number>0</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>14</number>
                 </property>
                 <property name="verticalSpacing">
                  <number>0</number>
                 </property>
                 <item row="1" column="0">
-                 <widget class="QLabel" name="label_2">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>Y Interval</string>
-                  </property>
+                 <widget class="QWidget" name="widget_2" native="true">
+                  <layout class="QGridLayout" name="gridLayout_5">
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>X Interval</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_Xinterval">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_2">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>Y Interval</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_Yinterval">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0" colspan="2">
+                    <widget class="QCheckBox" name="checkBox_origin">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>Turn the origin into (0, 0)</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <widget class="QLabel" name="label">
+                 <widget class="QLabel" name="label_11">
                   <property name="locale">
                    <locale language="English" country="UnitedStates"/>
                   </property>
                   <property name="text">
-                   <string>X Interval</string>
+                   <string>Axis Scale</string>
                   </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox_Yinterval">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox_Xinterval">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
+                  <property name="class" stdset="0">
+                   <string>bold</string>
                   </property>
                  </widget>
                 </item>
@@ -270,7 +365,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="groupBox_4">
+              <widget class="QFrame" name="frame_4">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -279,257 +374,264 @@
                </property>
                <property name="locale">
                 <locale language="English" country="UnitedStates"/>
-               </property>
-               <property name="title">
-                <string>Color Scale</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_2">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
                 <property name="topMargin">
                  <number>0</number>
                 </property>
-                <property name="bottomMargin">
-                 <number>4</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>0</number>
-                </property>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="label_6">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>Interval</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_5">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>Min</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_4">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>Max</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox_colorinterval">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox_colorMin">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox_colorMax">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QGroupBox" name="groupBox_5">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="locale">
-                <locale language="English" country="UnitedStates"/>
-               </property>
-               <property name="title">
-                <string>Label</string>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_3">
-                <property name="topMargin">
+                <property name="rightMargin">
                  <number>0</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>4</number>
+                 <number>0</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>14</number>
                 </property>
                 <property name="verticalSpacing">
                  <number>0</number>
                 </property>
                 <item row="0" column="0">
-                 <widget class="QLabel" name="label_8">
+                 <widget class="QLabel" name="label_12">
                   <property name="locale">
                    <locale language="English" country="UnitedStates"/>
                   </property>
                   <property name="text">
-                   <string>X Label</string>
+                   <string>Color Scale</string>
                   </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="label_9">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>Y Label</string>
+                  <property name="class" stdset="0">
+                   <string>bold</string>
                   </property>
                  </widget>
                 </item>
                 <item row="3" column="0">
-                 <widget class="QLabel" name="label_7">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>ColorBar Label</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="lineEdit_xLabel">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>x</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="lineEdit_yLabel">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>y</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="lineEdit_colorLabel">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>z ()</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
+                 <widget class="QWidget" name="widget_3" native="true">
+                  <layout class="QGridLayout" name="gridLayout_6">
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="label_6">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>Interval</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="label_5">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>Min</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_4">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>Max</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="2">
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_colorMin">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="2">
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_colorinterval">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_colorMax">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
                 </item>
                </layout>
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="groupBox_11">
+              <widget class="QFrame" name="frame_5">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>80</height>
-                </size>
-               </property>
                <property name="locale">
                 <locale language="English" country="UnitedStates"/>
                </property>
-               <property name="title">
-                <string>Font Size</string>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_7">
+               <layout class="QGridLayout" name="gridLayout_3">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
                 <property name="topMargin">
                  <number>0</number>
                 </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
                 <property name="bottomMargin">
-                 <number>4</number>
+                 <number>0</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>14</number>
                 </property>
                 <property name="verticalSpacing">
                  <number>0</number>
                 </property>
-                <item row="0" column="1">
-                 <widget class="QSpinBox" name="spinBox_axisLabelSize">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_13">
                   <property name="locale">
                    <locale language="English" country="UnitedStates"/>
                   </property>
-                  <property name="minimum">
-                   <number>1</number>
+                  <property name="text">
+                   <string>Label</string>
                   </property>
-                  <property name="maximum">
-                   <number>30</number>
-                  </property>
-                  <property name="value">
-                   <number>20</number>
+                  <property name="class" stdset="0">
+                   <string>bold</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="0">
-                 <widget class="QLabel" name="label_17">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>Tick Label</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_18">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="text">
-                   <string>Axis Label</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QSpinBox" name="spinBox_tickLabelSize">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
-                  <property name="minimum">
-                   <number>1</number>
-                  </property>
-                  <property name="maximum">
-                   <number>30</number>
-                  </property>
-                  <property name="value">
-                   <number>12</number>
-                  </property>
+                 <widget class="QWidget" name="widget_4" native="true">
+                  <layout class="QGridLayout" name="gridLayout_10">
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_8">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>X Label</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_9">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>Y Label</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="label_7">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>ColorBar Label</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QLineEdit" name="lineEdit_colorLabel">
+                     <property name="maximumSize">
+                      <size>
+                       <width>95</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>z ()</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="lineEdit_yLabel">
+                     <property name="maximumSize">
+                      <size>
+                       <width>95</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>y</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="lineEdit_xLabel">
+                     <property name="maximumSize">
+                      <size>
+                       <width>95</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>x</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
                 </item>
                </layout>
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="groupBox_12">
+              <widget class="QFrame" name="frame_11">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -545,11 +647,148 @@
                <property name="locale">
                 <locale language="English" country="UnitedStates"/>
                </property>
-               <property name="title">
-                <string>Color Map</string>
+               <layout class="QGridLayout" name="gridLayout_7">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>14</number>
+                </property>
+                <property name="verticalSpacing">
+                 <number>0</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_19">
+                  <property name="locale">
+                   <locale language="English" country="UnitedStates"/>
+                  </property>
+                  <property name="text">
+                   <string>Font Size</string>
+                  </property>
+                  <property name="class" stdset="0">
+                   <string>bold</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QWidget" name="widget_5" native="true">
+                  <layout class="QGridLayout" name="gridLayout_11">
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="label_17">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>Tick Label</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_18">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="text">
+                      <string>Axis Label</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QSpinBox" name="spinBox_axisLabelSize">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="minimum">
+                      <number>1</number>
+                     </property>
+                     <property name="maximum">
+                      <number>30</number>
+                     </property>
+                     <property name="value">
+                      <number>20</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QSpinBox" name="spinBox_tickLabelSize">
+                     <property name="locale">
+                      <locale language="English" country="UnitedStates"/>
+                     </property>
+                     <property name="minimum">
+                      <number>1</number>
+                     </property>
+                     <property name="maximum">
+                      <number>30</number>
+                     </property>
+                     <property name="value">
+                      <number>12</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QFrame" name="frame_12">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>80</height>
+                </size>
+               </property>
+               <property name="locale">
+                <locale language="English" country="UnitedStates"/>
                </property>
                <layout class="QGridLayout" name="gridLayout_8">
-                <item row="0" column="0">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>14</number>
+                </property>
+                <property name="verticalSpacing">
+                 <number>0</number>
+                </property>
+                <item row="1" column="0">
                  <widget class="QPushButton" name="pushButton_selectColormap">
                   <property name="locale">
                    <locale language="English" country="UnitedStates"/>
@@ -559,13 +798,26 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
+                <item row="1" column="1">
                  <widget class="QCheckBox" name="checkBox_colormapIsReversed">
                   <property name="locale">
                    <locale language="English" country="UnitedStates"/>
                   </property>
                   <property name="text">
                    <string>Reversed</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_20">
+                  <property name="locale">
+                   <locale language="English" country="UnitedStates"/>
+                  </property>
+                  <property name="text">
+                   <string>Color Map</string>
+                  </property>
+                  <property name="class" stdset="0">
+                   <string>bold</string>
                   </property>
                  </widget>
                 </item>
@@ -655,6 +907,12 @@
              </property>
              <item>
               <widget class="QPushButton" name="pushButton_plot">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>23</height>
+                </size>
+               </property>
                <property name="locale">
                 <locale language="English" country="UnitedStates"/>
                </property>
@@ -680,6 +938,9 @@
                <property name="icon">
                 <iconset resource="resources.qrc">
                  <normaloff>:/icon/imgs/save.png</normaloff>:/icon/imgs/save.png</iconset>
+               </property>
+               <property name="default">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
