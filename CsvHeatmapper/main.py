@@ -416,11 +416,13 @@ class MainWindow(QMainWindow):
         if (count := len(self.controller.figure_handler.datas)) == 0:
             return
         elif (count := len(self.controller.figure_handler.datas)) == 1:
+            file = self.controller.loadedFilesModel.files[0]
+            name = os.path.splitext(os.path.basename(file))[0]
             savepath, filetype = QFileDialog.getSaveFileName(
                 self,
                 "Save as",
                 filter="Info (*.csv);;PNG (*.png);;eps (*.eps);;JPEG (*.jpeg);;JPEG (*.jpg);;PDF (*.pdf);;PGF (*.pgf);;PS (*.ps);;RAW (*.raw);;RGBA (*.rgba);;SVG (*.svg);;SVGZ (*.svgz);;Tiff (*.tif);;Tiff (*.tiff)",
-                dir=setting.value("last_dir"),
+                dir=setting.value("last_dir") + f"/heatmap-{name}.png",
                 selectedFilter="PNG",
             )
             if savepath:
@@ -457,27 +459,49 @@ class MainWindow(QMainWindow):
             self._save_analyzed_data(f"{dir}/info.csv")
 
     def _save_analyzed_data(self, savepath):
-        header = ",".join(
-            [
-                "height",
-                "width",
-                "size",
-                "max",
-                "min",
-                "mean",
-                "median",
-                "std",
-            ]
-        )
+        # header = ",".join(
+        header = [
+            "name",
+            "height",
+            "width",
+            "size",
+            "max",
+            "min",
+            "mean",
+            "median",
+            "std",
+        ]
         import numpy
+        import pandas as pd
 
-        numpy.savetxt(
-            savepath,
-            self.controller.figure_handler.datas_analyzed,
-            fmt="%.5f",
-            delimiter=",",
-            header=header,
+        # arr = pd.DataFrame(
+        #     (
+
+        #             [
+        #                 [file]
+        #                 for file in self.controller.loadedFilesModel.files
+        #             ],
+        #             dtype=str,
+        #         ),
+        #         self.controller.figure_handler.datas_analyzed,
+        #     ),
+        # )
+        # arr = pd.concat()
+        df = pd.DataFrame(self.controller.figure_handler.datas_analyzed)
+        df = pd.concat(
+            (pd.Series(self.controller.loadedFilesModel.files), df), axis=1
         )
+        df.columns = header
+        # df.set_index(pd.Series(self.controller.loadedFilesModel.files))
+        # print(df)
+        # numpy.savetxt(
+        #     savepath,
+        #     arr,
+        #     fmt=["%s"] + ["%d"] * 3 + ["%f"] * 5,
+        #     delimiter=",",
+        #     header=header,
+        # )
+        df.to_csv(savepath, index=False)
 
 
 def main():
