@@ -427,8 +427,10 @@ class MainWindow(QMainWindow):
                 if filetype == "Info (*.csv)":
                     self._save_analyzed_data(savepath)
                 else:
-                    # plt.savefig(savepath, bbox_inches="tight", transparent=True)
-                    self.controller.figure
+                    self.controller.figure.savefig(
+                        savepath, bbox_inches="tight", transparent=True
+                    )
+                    # self.controller.figure
                 setting.setValue("last_dir", os.path.dirname(savepath))
         else:
             now = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
@@ -437,14 +439,19 @@ class MainWindow(QMainWindow):
             width, height = self.controller.figure.get_size_inches()
             # print(width, height)
             height = height // count
-            for i in range(count - 1, -1, -1):
+            # for i in range(count):
+            for i, file in enumerate(self.controller.loadedFilesModel.files):
+                name = os.path.splitext(os.path.basename(file))[0]
                 self.controller.figure.savefig(
-                    f"{dir}/{count-i}.png",
+                    f"{dir}/heatmap-{name}.png",
                     transparent=True,
                     bbox_inches=mpl.transforms.Bbox(
                         # This is in "figure fraction" for the bottom half
                         # input in [[xmin, ymin], [xmax, ymax]]
-                        [[0, height * i], [width, height * (i + 1)]]
+                        [
+                            [0, height * (count - i - 1)],
+                            [width, height * (count - i)],
+                        ]
                     ),
                 )
             self._save_analyzed_data(f"{dir}/info.csv")
