@@ -321,6 +321,9 @@ class MainWindow(QMainWindow):
         scrollArea.setMinimumWidth(900)
         vlayout.addWidget(scrollArea)
 
+        ui.spinBox_axisLabelSize.lineEdit().setEnabled(False)
+        ui.spinBox_tickLabelSize.lineEdit().setEnabled(False)
+
         def scrolling(event):
             current = scrollArea.verticalScrollBar().value()
             if event.button == "down":
