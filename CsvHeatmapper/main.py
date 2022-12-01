@@ -325,10 +325,12 @@ class MainWindow(QMainWindow):
         listView.setSelectionModel(controller.selectionModel)
         # listView.setDragEnabled(True)
         listView.setSelectionMode(QAbstractItemView.MultiSelection)
-        # listView.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        # listView.setSelectionBehavior(
-        #     QAbstractItemView.SelectionBehavior.SelectRows
-        # )
+
+        def _listView_keyPressEvent(event):
+            if event.key() == Qt.Key_Delete:
+                self._button_sabstractFile_clicked()
+
+        listView.keyPressEvent = _listView_keyPressEvent
         lay.addWidget(listView)
         loadedFilesWidget.setContentLayout(lay)
         loadedFilesWidget.show()
