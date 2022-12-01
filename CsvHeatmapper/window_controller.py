@@ -86,6 +86,7 @@ class WindowController(QObject):
     # data_changed = Signal(tuple)
     propertyChanged = Signal(str, object)
     valueRangeChanged = Signal(float, float, float, float)
+    is_first_plot = True
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -150,9 +151,11 @@ class WindowController(QObject):
         self.colorMin = int_min
         self.Xinterval = determine_interval(self.figure_handler.datas_width)
         self.Yinterval = determine_interval(self.figure_handler.datas_height)
-        self.colorinterval = determine_interval(
-            self.colorMax - self.colorMin, True
-        )
+        if self.is_first_plot:
+            self.colorinterval = determine_interval(
+                self.colorMax - self.colorMin, True
+            )
+            self.is_first_plot = False
 
     def _update_analyzedvalues(self):
         # print(self.figure_handler.datas)
