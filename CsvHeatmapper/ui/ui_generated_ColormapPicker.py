@@ -31,6 +31,9 @@ class Ui_Dialog(object):
         Dialog.setSizePolicy(sizePolicy)
         Dialog.setStyleSheet(u"QFrame#frame_colormaps {\n"
 "	background: url(:/background/imgs/cm.png) no-repeat;\n"
+"}\n"
+"QPushButton {\n"
+"	min-width:40px;\n"
 "}")
         Dialog.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.verticalLayout = QVBoxLayout(Dialog)

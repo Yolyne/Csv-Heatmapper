@@ -77,11 +77,7 @@ class LoadedFilesWidget(QWidget):
     def __init__(
         self, parent=None, title="", window_controller: WindowController = None
     ):
-        # def __init__(self, parent, window_controller: WindowController):
         super().__init__(parent)
-        # super().__init__(parent)
-        # self.ui = Ui_Form()
-        # self.ui.setupUi(self)
         self.controller = window_controller
         self.setWindowFlags(Qt.FramelessWindowHint)
         # self.setGeometry(
@@ -90,12 +86,22 @@ class LoadedFilesWidget(QWidget):
         #     window_controller.preview_width,
         #     window_controller.preview_height,
         # )
-        self.move(18, 46)
+        self.move(22, 46)
 
         self.toggle_button = QToolButton(
             text=title, checkable=True, checked=False
         )
-        # self.toggle_button.setStyleSheet("QToolButton { border: none; }")
+        self.toggle_button.setStyleSheet(
+            """QToolButton {border:1px solid #8f8f91;}
+QToolButton:hover {
+    border-color: #a5f6ff;
+    background-color: #e5fcff;
+}
+QToolButton:pressed {
+    border-color: #aaa;
+    background-color: #ccc;
+}"""
+        )
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         self.toggle_button.setArrowType(Qt.RightArrow)
         self.toggle_button.pressed.connect(self.on_pressed)

@@ -44,8 +44,8 @@ QGroupBox::title {
 }
 QPushButton {
 	font: 900 12px;
-	max-height:50px;
     border: 1px solid #8f8f91;
+	min-height:20px;
     border-radius: 3px;
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                       stop: 0 #f6f7fa, stop: 1 #dadbde);
@@ -796,7 +796,7 @@ QPushButton:pressed {
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>23</height>
+                 <height>22</height>
                 </size>
                </property>
                <property name="text">

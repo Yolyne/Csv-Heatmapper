@@ -51,8 +51,8 @@ class Ui_MainWindow(object):
 "}\n"
 "QPushButton {\n"
 "	font: 900 12px;\n"
-"	max-height:50px;\n"
 "    border: 1px solid #8f8f91;\n"
+"	min-height:20px;\n"
 "    border-radius: 3px;\n"
 "    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
 "                                      stop: 0 #f6f7fa, stop: 1 #dadbde);\n"
@@ -451,7 +451,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.pushButton_plot = QPushButton(self.frame_41)
         self.pushButton_plot.setObjectName(u"pushButton_plot")
-        self.pushButton_plot.setMinimumSize(QSize(0, 23))
+        self.pushButton_plot.setMinimumSize(QSize(0, 22))
 
         self.horizontalLayout_4.addWidget(self.pushButton_plot)
 
