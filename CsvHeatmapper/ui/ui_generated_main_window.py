@@ -74,7 +74,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.widget = QWidget(self.centralwidget)
         self.widget.setObjectName(u"widget")
-        self.widget.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.horizontalLayout_2 = QHBoxLayout(self.widget)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -86,7 +85,6 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
         self.frame.setSizePolicy(sizePolicy)
         self.frame.setMaximumSize(QSize(240, 16777215))
-        self.frame.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.verticalLayout = QVBoxLayout(self.frame)
@@ -101,7 +99,6 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.groupBox_file.sizePolicy().hasHeightForWidth())
         self.groupBox_file.setSizePolicy(sizePolicy1)
         self.groupBox_file.setMinimumSize(QSize(0, 60))
-        self.groupBox_file.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.horizontalLayout_3 = QHBoxLayout(self.groupBox_file)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.horizontalLayout_3.setContentsMargins(-1, 0, -1, 2)
@@ -130,7 +127,6 @@ class Ui_MainWindow(object):
         font1.setBold(False)
         font1.setItalic(False)
         self.toolButton_addFile.setFont(font1)
-        self.toolButton_addFile.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         icon1 = QIcon()
         icon1.addFile(u":/icon/imgs/plus-solid.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.toolButton_addFile.setIcon(icon1)
@@ -141,7 +137,6 @@ class Ui_MainWindow(object):
         self.toolButton_substractFile.setObjectName(u"toolButton_substractFile")
         sizePolicy2.setHeightForWidth(self.toolButton_substractFile.sizePolicy().hasHeightForWidth())
         self.toolButton_substractFile.setSizePolicy(sizePolicy2)
-        self.toolButton_substractFile.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         icon2 = QIcon()
         icon2.addFile(u":/icon/imgs/minus-solid.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.toolButton_substractFile.setIcon(icon2)
@@ -156,7 +151,6 @@ class Ui_MainWindow(object):
 
         self.groupBox_2 = QGroupBox(self.frame)
         self.groupBox_2.setObjectName(u"groupBox_2")
-        self.groupBox_2.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.verticalLayout_2 = QVBoxLayout(self.groupBox_2)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(-1, 0, -1, -1)
@@ -165,7 +159,6 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.frame_3.sizePolicy().hasHeightForWidth())
         self.frame_3.setSizePolicy(sizePolicy1)
         self.frame_3.setMaximumSize(QSize(16777215, 80))
-        self.frame_3.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.gridLayout = QGridLayout(self.frame_3)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setHorizontalSpacing(14)
@@ -179,31 +172,26 @@ class Ui_MainWindow(object):
         self.gridLayout_5.setContentsMargins(-1, 0, 0, 0)
         self.label = QLabel(self.widget_2)
         self.label.setObjectName(u"label")
-        self.label.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_5.addWidget(self.label, 0, 0, 1, 1)
 
         self.doubleSpinBox_Xinterval = QDoubleSpinBox(self.widget_2)
         self.doubleSpinBox_Xinterval.setObjectName(u"doubleSpinBox_Xinterval")
-        self.doubleSpinBox_Xinterval.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_5.addWidget(self.doubleSpinBox_Xinterval, 0, 1, 1, 1)
 
         self.label_2 = QLabel(self.widget_2)
         self.label_2.setObjectName(u"label_2")
-        self.label_2.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_5.addWidget(self.label_2, 1, 0, 1, 1)
 
         self.doubleSpinBox_Yinterval = QDoubleSpinBox(self.widget_2)
         self.doubleSpinBox_Yinterval.setObjectName(u"doubleSpinBox_Yinterval")
-        self.doubleSpinBox_Yinterval.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_5.addWidget(self.doubleSpinBox_Yinterval, 1, 1, 1, 1)
 
         self.checkBox_origin = QCheckBox(self.widget_2)
         self.checkBox_origin.setObjectName(u"checkBox_origin")
-        self.checkBox_origin.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_5.addWidget(self.checkBox_origin, 2, 0, 1, 2)
 
@@ -212,7 +200,6 @@ class Ui_MainWindow(object):
 
         self.label_11 = QLabel(self.frame_3)
         self.label_11.setObjectName(u"label_11")
-        self.label_11.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout.addWidget(self.label_11, 0, 0, 1, 1)
 
@@ -223,7 +210,6 @@ class Ui_MainWindow(object):
         self.frame_4.setObjectName(u"frame_4")
         sizePolicy1.setHeightForWidth(self.frame_4.sizePolicy().hasHeightForWidth())
         self.frame_4.setSizePolicy(sizePolicy1)
-        self.frame_4.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.gridLayout_2 = QGridLayout(self.frame_4)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setHorizontalSpacing(14)
@@ -231,7 +217,6 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.label_12 = QLabel(self.frame_4)
         self.label_12.setObjectName(u"label_12")
-        self.label_12.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_2.addWidget(self.label_12, 0, 0, 1, 1)
 
@@ -243,37 +228,31 @@ class Ui_MainWindow(object):
         self.gridLayout_6.setContentsMargins(-1, 0, 0, 0)
         self.label_6 = QLabel(self.widget_3)
         self.label_6.setObjectName(u"label_6")
-        self.label_6.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_6.addWidget(self.label_6, 4, 0, 1, 1)
 
         self.label_5 = QLabel(self.widget_3)
         self.label_5.setObjectName(u"label_5")
-        self.label_5.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_6.addWidget(self.label_5, 3, 0, 1, 1)
 
         self.label_4 = QLabel(self.widget_3)
         self.label_4.setObjectName(u"label_4")
-        self.label_4.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_6.addWidget(self.label_4, 0, 0, 1, 1)
 
         self.doubleSpinBox_colorMin = QDoubleSpinBox(self.widget_3)
         self.doubleSpinBox_colorMin.setObjectName(u"doubleSpinBox_colorMin")
-        self.doubleSpinBox_colorMin.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_6.addWidget(self.doubleSpinBox_colorMin, 3, 2, 1, 1)
 
         self.doubleSpinBox_colorinterval = QDoubleSpinBox(self.widget_3)
         self.doubleSpinBox_colorinterval.setObjectName(u"doubleSpinBox_colorinterval")
-        self.doubleSpinBox_colorinterval.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_6.addWidget(self.doubleSpinBox_colorinterval, 4, 2, 1, 1)
 
         self.doubleSpinBox_colorMax = QDoubleSpinBox(self.widget_3)
         self.doubleSpinBox_colorMax.setObjectName(u"doubleSpinBox_colorMax")
-        self.doubleSpinBox_colorMax.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_6.addWidget(self.doubleSpinBox_colorMax, 0, 2, 1, 1)
 
@@ -287,7 +266,6 @@ class Ui_MainWindow(object):
         self.frame_5.setObjectName(u"frame_5")
         sizePolicy1.setHeightForWidth(self.frame_5.sizePolicy().hasHeightForWidth())
         self.frame_5.setSizePolicy(sizePolicy1)
-        self.frame_5.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.gridLayout_3 = QGridLayout(self.frame_5)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.gridLayout_3.setHorizontalSpacing(14)
@@ -295,7 +273,6 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.label_13 = QLabel(self.frame_5)
         self.label_13.setObjectName(u"label_13")
-        self.label_13.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_3.addWidget(self.label_13, 0, 0, 1, 1)
 
@@ -307,43 +284,43 @@ class Ui_MainWindow(object):
         self.gridLayout_10.setContentsMargins(-1, 0, 0, 0)
         self.label_8 = QLabel(self.widget_4)
         self.label_8.setObjectName(u"label_8")
-        self.label_8.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_10.addWidget(self.label_8, 0, 0, 1, 1)
 
         self.label_9 = QLabel(self.widget_4)
         self.label_9.setObjectName(u"label_9")
-        self.label_9.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_10.addWidget(self.label_9, 1, 0, 1, 1)
 
         self.label_7 = QLabel(self.widget_4)
         self.label_7.setObjectName(u"label_7")
-        self.label_7.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_10.addWidget(self.label_7, 4, 0, 1, 1)
 
         self.lineEdit_colorLabel = QLineEdit(self.widget_4)
         self.lineEdit_colorLabel.setObjectName(u"lineEdit_colorLabel")
         self.lineEdit_colorLabel.setMaximumSize(QSize(95, 16777215))
-        self.lineEdit_colorLabel.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
-        self.lineEdit_colorLabel.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.lineEdit_colorLabel.setFrame(True)
+        self.lineEdit_colorLabel.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.lineEdit_colorLabel.setCursorMoveStyle(Qt.LogicalMoveStyle)
 
         self.gridLayout_10.addWidget(self.lineEdit_colorLabel, 4, 1, 1, 1)
 
         self.lineEdit_yLabel = QLineEdit(self.widget_4)
         self.lineEdit_yLabel.setObjectName(u"lineEdit_yLabel")
         self.lineEdit_yLabel.setMaximumSize(QSize(95, 16777215))
-        self.lineEdit_yLabel.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
-        self.lineEdit_yLabel.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.lineEdit_yLabel.setFrame(True)
+        self.lineEdit_yLabel.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.lineEdit_yLabel.setCursorMoveStyle(Qt.LogicalMoveStyle)
 
         self.gridLayout_10.addWidget(self.lineEdit_yLabel, 1, 1, 1, 1)
 
         self.lineEdit_xLabel = QLineEdit(self.widget_4)
         self.lineEdit_xLabel.setObjectName(u"lineEdit_xLabel")
         self.lineEdit_xLabel.setMaximumSize(QSize(95, 16777215))
-        self.lineEdit_xLabel.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
-        self.lineEdit_xLabel.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.lineEdit_xLabel.setFrame(True)
+        self.lineEdit_xLabel.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.lineEdit_xLabel.setCursorMoveStyle(Qt.LogicalMoveStyle)
 
         self.gridLayout_10.addWidget(self.lineEdit_xLabel, 0, 1, 1, 1)
 
@@ -358,7 +335,6 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.frame_11.sizePolicy().hasHeightForWidth())
         self.frame_11.setSizePolicy(sizePolicy1)
         self.frame_11.setMaximumSize(QSize(16777215, 80))
-        self.frame_11.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.gridLayout_7 = QGridLayout(self.frame_11)
         self.gridLayout_7.setObjectName(u"gridLayout_7")
         self.gridLayout_7.setHorizontalSpacing(14)
@@ -366,7 +342,6 @@ class Ui_MainWindow(object):
         self.gridLayout_7.setContentsMargins(0, 0, 0, 0)
         self.label_19 = QLabel(self.frame_11)
         self.label_19.setObjectName(u"label_19")
-        self.label_19.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_7.addWidget(self.label_19, 0, 0, 1, 1)
 
@@ -378,19 +353,16 @@ class Ui_MainWindow(object):
         self.gridLayout_11.setContentsMargins(-1, 0, 0, 0)
         self.label_17 = QLabel(self.widget_5)
         self.label_17.setObjectName(u"label_17")
-        self.label_17.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_11.addWidget(self.label_17, 3, 0, 1, 1)
 
         self.label_18 = QLabel(self.widget_5)
         self.label_18.setObjectName(u"label_18")
-        self.label_18.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_11.addWidget(self.label_18, 0, 0, 1, 1)
 
         self.spinBox_axisLabelSize = QSpinBox(self.widget_5)
         self.spinBox_axisLabelSize.setObjectName(u"spinBox_axisLabelSize")
-        self.spinBox_axisLabelSize.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.spinBox_axisLabelSize.setMinimum(1)
         self.spinBox_axisLabelSize.setMaximum(30)
         self.spinBox_axisLabelSize.setValue(20)
@@ -399,7 +371,6 @@ class Ui_MainWindow(object):
 
         self.spinBox_tickLabelSize = QSpinBox(self.widget_5)
         self.spinBox_tickLabelSize.setObjectName(u"spinBox_tickLabelSize")
-        self.spinBox_tickLabelSize.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.spinBox_tickLabelSize.setMinimum(1)
         self.spinBox_tickLabelSize.setMaximum(30)
         self.spinBox_tickLabelSize.setValue(12)
@@ -417,7 +388,6 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.frame_12.sizePolicy().hasHeightForWidth())
         self.frame_12.setSizePolicy(sizePolicy1)
         self.frame_12.setMaximumSize(QSize(16777215, 80))
-        self.frame_12.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.gridLayout_8 = QGridLayout(self.frame_12)
         self.gridLayout_8.setObjectName(u"gridLayout_8")
         self.gridLayout_8.setHorizontalSpacing(14)
@@ -425,19 +395,16 @@ class Ui_MainWindow(object):
         self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
         self.pushButton_selectColormap = QPushButton(self.frame_12)
         self.pushButton_selectColormap.setObjectName(u"pushButton_selectColormap")
-        self.pushButton_selectColormap.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_8.addWidget(self.pushButton_selectColormap, 1, 0, 1, 1)
 
         self.checkBox_colormapIsReversed = QCheckBox(self.frame_12)
         self.checkBox_colormapIsReversed.setObjectName(u"checkBox_colormapIsReversed")
-        self.checkBox_colormapIsReversed.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_8.addWidget(self.checkBox_colormapIsReversed, 1, 1, 1, 1)
 
         self.label_20 = QLabel(self.frame_12)
         self.label_20.setObjectName(u"label_20")
-        self.label_20.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.gridLayout_8.addWidget(self.label_20, 0, 0, 1, 1)
 
@@ -446,7 +413,6 @@ class Ui_MainWindow(object):
 
         self.frame_31 = QFrame(self.groupBox_2)
         self.frame_31.setObjectName(u"frame_31")
-        self.frame_31.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.frame_31.setFrameShape(QFrame.StyledPanel)
         self.frame_31.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_31)
@@ -454,20 +420,17 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setContentsMargins(-1, 0, -1, 0)
         self.checkBox_3d = QCheckBox(self.frame_31)
         self.checkBox_3d.setObjectName(u"checkBox_3d")
-        self.checkBox_3d.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.horizontalLayout.addWidget(self.checkBox_3d)
 
         self.radioButton = QRadioButton(self.frame_31)
         self.radioButton.setObjectName(u"radioButton")
-        self.radioButton.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.radioButton.setChecked(True)
 
         self.horizontalLayout.addWidget(self.radioButton)
 
         self.radioButton_2 = QRadioButton(self.frame_31)
         self.radioButton_2.setObjectName(u"radioButton_2")
-        self.radioButton_2.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.horizontalLayout.addWidget(self.radioButton_2)
 
@@ -479,7 +442,6 @@ class Ui_MainWindow(object):
 
         self.frame_41 = QFrame(self.frame)
         self.frame_41.setObjectName(u"frame_41")
-        self.frame_41.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.frame_41.setFrameShape(QFrame.StyledPanel)
         self.frame_41.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_4 = QHBoxLayout(self.frame_41)
@@ -488,7 +450,6 @@ class Ui_MainWindow(object):
         self.pushButton_plot = QPushButton(self.frame_41)
         self.pushButton_plot.setObjectName(u"pushButton_plot")
         self.pushButton_plot.setMinimumSize(QSize(0, 23))
-        self.pushButton_plot.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.horizontalLayout_4.addWidget(self.pushButton_plot)
 
@@ -496,7 +457,6 @@ class Ui_MainWindow(object):
         self.pushButton_save.setObjectName(u"pushButton_save")
         sizePolicy2.setHeightForWidth(self.pushButton_save.sizePolicy().hasHeightForWidth())
         self.pushButton_save.setSizePolicy(sizePolicy2)
-        self.pushButton_save.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         icon3 = QIcon()
         icon3.addFile(u":/icon/imgs/save.png", QSize(), QIcon.Normal, QIcon.Off)
         self.pushButton_save.setIcon(icon3)
@@ -508,7 +468,6 @@ class Ui_MainWindow(object):
 
         self.listWidget = QListWidget(self.frame)
         self.listWidget.setObjectName(u"listWidget")
-        self.listWidget.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.verticalLayout.addWidget(self.listWidget)
 
@@ -517,7 +476,6 @@ class Ui_MainWindow(object):
 
         self.frame_figure = QFrame(self.widget)
         self.frame_figure.setObjectName(u"frame_figure")
-        self.frame_figure.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.frame_figure.setFrameShape(QFrame.StyledPanel)
         self.frame_figure.setFrameShadow(QFrame.Raised)
 
@@ -528,7 +486,6 @@ class Ui_MainWindow(object):
 
         self.line = QFrame(self.centralwidget)
         self.line.setObjectName(u"line")
-        self.line.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.line.setFrameShape(QFrame.HLine)
         self.line.setFrameShadow(QFrame.Sunken)
 

@@ -75,9 +75,6 @@ QPushButton:pressed {
     </property>
     <item>
      <widget class="QWidget" name="widget" native="true">
-      <property name="locale">
-       <locale language="English" country="UnitedStates"/>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="leftMargin">
         <number>0</number>
@@ -105,9 +102,6 @@ QPushButton:pressed {
            <height>16777215</height>
           </size>
          </property>
-         <property name="locale">
-          <locale language="English" country="UnitedStates"/>
-         </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -134,9 +128,6 @@ QPushButton:pressed {
               <width>0</width>
               <height>60</height>
              </size>
-            </property>
-            <property name="locale">
-             <locale language="English" country="UnitedStates"/>
             </property>
             <property name="title">
              <string>CSV File</string>
@@ -201,13 +192,9 @@ QPushButton:pressed {
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>-1</pointsize>
                     <italic>false</italic>
                     <bold>false</bold>
                    </font>
-                  </property>
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
                   </property>
                   <property name="icon">
                    <iconset resource="resources.qrc">
@@ -223,9 +210,6 @@ QPushButton:pressed {
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="icon">
                    <iconset resource="resources.qrc">
                     <normaloff>:/icon/imgs/minus-solid.svg</normaloff>:/icon/imgs/minus-solid.svg</iconset>
@@ -240,9 +224,6 @@ QPushButton:pressed {
           </item>
           <item>
            <widget class="QGroupBox" name="groupBox_2">
-            <property name="locale">
-             <locale language="English" country="UnitedStates"/>
-            </property>
             <property name="title">
              <string>Plot Setting</string>
             </property>
@@ -263,9 +244,6 @@ QPushButton:pressed {
                  <width>16777215</width>
                  <height>80</height>
                 </size>
-               </property>
-               <property name="locale">
-                <locale language="English" country="UnitedStates"/>
                </property>
                <layout class="QGridLayout" name="gridLayout">
                 <property name="leftMargin">
@@ -303,43 +281,26 @@ QPushButton:pressed {
                    </property>
                    <item row="0" column="0">
                     <widget class="QLabel" name="label">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>X Interval</string>
                      </property>
                     </widget>
                    </item>
                    <item row="0" column="1">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_Xinterval">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
-                    </widget>
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_Xinterval"/>
                    </item>
                    <item row="1" column="0">
                     <widget class="QLabel" name="label_2">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>Y Interval</string>
                      </property>
                     </widget>
                    </item>
                    <item row="1" column="1">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_Yinterval">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
-                    </widget>
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_Yinterval"/>
                    </item>
                    <item row="2" column="0" colspan="2">
                     <widget class="QCheckBox" name="checkBox_origin">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>Turn the origin into (0, 0)</string>
                      </property>
@@ -350,9 +311,6 @@ QPushButton:pressed {
                 </item>
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_11">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>Axis Scale</string>
                   </property>
@@ -371,9 +329,6 @@ QPushButton:pressed {
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="locale">
-                <locale language="English" country="UnitedStates"/>
                </property>
                <layout class="QGridLayout" name="gridLayout_2">
                 <property name="leftMargin">
@@ -396,9 +351,6 @@ QPushButton:pressed {
                 </property>
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_12">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>Color Scale</string>
                   </property>
@@ -424,9 +376,6 @@ QPushButton:pressed {
                    </property>
                    <item row="4" column="0">
                     <widget class="QLabel" name="label_6">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>Interval</string>
                      </property>
@@ -434,9 +383,6 @@ QPushButton:pressed {
                    </item>
                    <item row="3" column="0">
                     <widget class="QLabel" name="label_5">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>Min</string>
                      </property>
@@ -444,34 +390,19 @@ QPushButton:pressed {
                    </item>
                    <item row="0" column="0">
                     <widget class="QLabel" name="label_4">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>Max</string>
                      </property>
                     </widget>
                    </item>
                    <item row="3" column="2">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_colorMin">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
-                    </widget>
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_colorMin"/>
                    </item>
                    <item row="4" column="2">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_colorinterval">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
-                    </widget>
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_colorinterval"/>
                    </item>
                    <item row="0" column="2">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_colorMax">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
-                    </widget>
+                    <widget class="QDoubleSpinBox" name="doubleSpinBox_colorMax"/>
                    </item>
                   </layout>
                  </widget>
@@ -486,9 +417,6 @@ QPushButton:pressed {
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="locale">
-                <locale language="English" country="UnitedStates"/>
                </property>
                <layout class="QGridLayout" name="gridLayout_3">
                 <property name="leftMargin">
@@ -511,9 +439,6 @@ QPushButton:pressed {
                 </property>
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_13">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>Label</string>
                   </property>
@@ -539,9 +464,6 @@ QPushButton:pressed {
                    </property>
                    <item row="0" column="0">
                     <widget class="QLabel" name="label_8">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>X Label</string>
                      </property>
@@ -549,9 +471,6 @@ QPushButton:pressed {
                    </item>
                    <item row="1" column="0">
                     <widget class="QLabel" name="label_9">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>Y Label</string>
                      </property>
@@ -559,9 +478,6 @@ QPushButton:pressed {
                    </item>
                    <item row="4" column="0">
                     <widget class="QLabel" name="label_7">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>ColorBar Label</string>
                      </property>
@@ -575,14 +491,17 @@ QPushButton:pressed {
                        <height>16777215</height>
                       </size>
                      </property>
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>z ()</string>
                      </property>
+                     <property name="frame">
+                      <bool>true</bool>
+                     </property>
                      <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                     </property>
+                     <property name="cursorMoveStyle">
+                      <enum>Qt::LogicalMoveStyle</enum>
                      </property>
                     </widget>
                    </item>
@@ -594,14 +513,17 @@ QPushButton:pressed {
                        <height>16777215</height>
                       </size>
                      </property>
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>y</string>
                      </property>
+                     <property name="frame">
+                      <bool>true</bool>
+                     </property>
                      <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                     </property>
+                     <property name="cursorMoveStyle">
+                      <enum>Qt::LogicalMoveStyle</enum>
                      </property>
                     </widget>
                    </item>
@@ -613,14 +535,17 @@ QPushButton:pressed {
                        <height>16777215</height>
                       </size>
                      </property>
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>x</string>
                      </property>
+                     <property name="frame">
+                      <bool>true</bool>
+                     </property>
                      <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                     </property>
+                     <property name="cursorMoveStyle">
+                      <enum>Qt::LogicalMoveStyle</enum>
                      </property>
                     </widget>
                    </item>
@@ -644,9 +569,6 @@ QPushButton:pressed {
                  <height>80</height>
                 </size>
                </property>
-               <property name="locale">
-                <locale language="English" country="UnitedStates"/>
-               </property>
                <layout class="QGridLayout" name="gridLayout_7">
                 <property name="leftMargin">
                  <number>0</number>
@@ -668,9 +590,6 @@ QPushButton:pressed {
                 </property>
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_19">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>Font Size</string>
                   </property>
@@ -696,9 +615,6 @@ QPushButton:pressed {
                    </property>
                    <item row="3" column="0">
                     <widget class="QLabel" name="label_17">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>Tick Label</string>
                      </property>
@@ -706,9 +622,6 @@ QPushButton:pressed {
                    </item>
                    <item row="0" column="0">
                     <widget class="QLabel" name="label_18">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="text">
                       <string>Axis Label</string>
                      </property>
@@ -716,9 +629,6 @@ QPushButton:pressed {
                    </item>
                    <item row="0" column="1">
                     <widget class="QSpinBox" name="spinBox_axisLabelSize">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="minimum">
                       <number>1</number>
                      </property>
@@ -732,9 +642,6 @@ QPushButton:pressed {
                    </item>
                    <item row="3" column="1">
                     <widget class="QSpinBox" name="spinBox_tickLabelSize">
-                     <property name="locale">
-                      <locale language="English" country="UnitedStates"/>
-                     </property>
                      <property name="minimum">
                       <number>1</number>
                      </property>
@@ -766,9 +673,6 @@ QPushButton:pressed {
                  <height>80</height>
                 </size>
                </property>
-               <property name="locale">
-                <locale language="English" country="UnitedStates"/>
-               </property>
                <layout class="QGridLayout" name="gridLayout_8">
                 <property name="leftMargin">
                  <number>0</number>
@@ -790,9 +694,6 @@ QPushButton:pressed {
                 </property>
                 <item row="1" column="0">
                  <widget class="QPushButton" name="pushButton_selectColormap">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>Select</string>
                   </property>
@@ -800,9 +701,6 @@ QPushButton:pressed {
                 </item>
                 <item row="1" column="1">
                  <widget class="QCheckBox" name="checkBox_colormapIsReversed">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>Reversed</string>
                   </property>
@@ -810,9 +708,6 @@ QPushButton:pressed {
                 </item>
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_20">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>Color Map</string>
                   </property>
@@ -826,9 +721,6 @@ QPushButton:pressed {
              </item>
              <item>
               <widget class="QFrame" name="frame_3">
-               <property name="locale">
-                <locale language="English" country="UnitedStates"/>
-               </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
@@ -844,9 +736,6 @@ QPushButton:pressed {
                 </property>
                 <item>
                  <widget class="QCheckBox" name="checkBox_3d">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>3D</string>
                   </property>
@@ -854,9 +743,6 @@ QPushButton:pressed {
                 </item>
                 <item>
                  <widget class="QRadioButton" name="radioButton">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>Scatter</string>
                   </property>
@@ -867,9 +753,6 @@ QPushButton:pressed {
                 </item>
                 <item>
                  <widget class="QRadioButton" name="radioButton_2">
-                  <property name="locale">
-                   <locale language="English" country="UnitedStates"/>
-                  </property>
                   <property name="text">
                    <string>Surface</string>
                   </property>
@@ -883,9 +766,6 @@ QPushButton:pressed {
           </item>
           <item>
            <widget class="QFrame" name="frame_4">
-            <property name="locale">
-             <locale language="English" country="UnitedStates"/>
-            </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -913,9 +793,6 @@ QPushButton:pressed {
                  <height>23</height>
                 </size>
                </property>
-               <property name="locale">
-                <locale language="English" country="UnitedStates"/>
-               </property>
                <property name="text">
                 <string>Plot</string>
                </property>
@@ -928,9 +805,6 @@ QPushButton:pressed {
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="locale">
-                <locale language="English" country="UnitedStates"/>
                </property>
                <property name="text">
                 <string/>
@@ -948,20 +822,13 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="listWidget">
-            <property name="locale">
-             <locale language="English" country="UnitedStates"/>
-            </property>
-           </widget>
+           <widget class="QListWidget" name="listWidget"/>
           </item>
          </layout>
         </widget>
        </item>
        <item>
         <widget class="QFrame" name="frame_figure">
-         <property name="locale">
-          <locale language="English" country="UnitedStates"/>
-         </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -975,9 +842,6 @@ QPushButton:pressed {
     </item>
     <item>
      <widget class="Line" name="line">
-      <property name="locale">
-       <locale language="English" country="UnitedStates"/>
-      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>

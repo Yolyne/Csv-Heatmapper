@@ -226,30 +226,57 @@ class MainWindow(QMainWindow):
         #     print(name, value)
         #     setattr(obj, name, value)
 
+        def _on_textChanged(value, widget: QWidget, property_name):
+            if isinstance(widget, QLineEdit):
+                widget: QLineEdit
+                lineEdit = widget
+            elif isinstance(widget, QAbstractSpinBox):
+                widget: QAbstractSpinBox
+                lineEdit = widget.lineEdit()
+            _pos = lineEdit.cursorPosition()
+            setattr(controller, property_name, value)
+            lineEdit.setCursorPosition(_pos)
+            # print(getattr(controller, property_name))
+
         widget: QWidget
         for widget in self.findChildren(QWidget):
             if widget_name := widget.objectName():
-                controller_property = widget_name.split("_")[-1]
-                # print(controller_property)
+                controller_property_name = widget_name.split("_")[-1]
+                # print(controller_property_name)
                 if hasattr(widget, "valueChanged"):
                     widget.valueChanged.connect(
-                        lambda v, property=controller_property: setattr(
-                            controller, property, v
+                        lambda v, property_name=controller_property_name: setattr(
+                            controller, property_name, v
                         )
                     )
                     # widget.valueChanged.connect(
-                    #     lambda v: _set_attr(controller, controller_property, v)
+                    #     lambda v: _set_attr(controller, controller_property_name, v)
                     # )
                 elif hasattr(widget, "textChanged"):
+                    # widget.textChanged.connect(
+                    #     lambda v, property_name=controller_property_name: setattr(
+                    #         controller, property_name, v
+                    #     )
+                    # )
                     widget.textChanged.connect(
-                        lambda v, property=controller_property: setattr(
-                            controller, property, v
+                        lambda v, widget=widget, property_name=controller_property_name: _on_textChanged(
+                            v, widget, property_name
                         )
                     )
 
-        def _on_propertyChanged(property, value):
-            pattern = QRegularExpression(property)
-            # print(property, value)
+                    if isinstance(widget, QLineEdit):
+                        widget: QLineEdit
+                        lineEdit = widget
+                    elif isinstance(widget, QAbstractSpinBox):
+                        widget: QAbstractSpinBox
+                        lineEdit = widget.lineEdit()
+                    lineEdit.returnPressed.connect(
+                        self._on_button_plot_clicked
+                    )
+
+        def _on_propertyChanged(property_name, value):
+            pattern = QRegularExpression(property_name)
+            # print(property_name, value)
             widget = self.findChildren(QWidget, pattern)[0]
             if isinstance(widget, QAbstractSpinBox):
                 widget.setValue(value)
