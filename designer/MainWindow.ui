@@ -196,6 +196,9 @@ QPushButton:pressed {
                     <bold>false</bold>
                    </font>
                   </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
+                  </property>
                   <property name="icon">
                    <iconset resource="resources.qrc">
                     <normaloff>:/icon/imgs/plus-solid.svg</normaloff>:/icon/imgs/plus-solid.svg</iconset>
@@ -209,6 +212,9 @@ QPushButton:pressed {
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
                   </property>
                   <property name="icon">
                    <iconset resource="resources.qrc">
@@ -822,7 +828,11 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="listWidget"/>
+           <widget class="QListWidget" name="listWidget">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -873,6 +883,29 @@ QPushButton:pressed {
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>doubleSpinBox_Xinterval</tabstop>
+  <tabstop>doubleSpinBox_Yinterval</tabstop>
+  <tabstop>checkBox_origin</tabstop>
+  <tabstop>doubleSpinBox_colorMax</tabstop>
+  <tabstop>doubleSpinBox_colorMin</tabstop>
+  <tabstop>doubleSpinBox_colorinterval</tabstop>
+  <tabstop>lineEdit_xLabel</tabstop>
+  <tabstop>lineEdit_yLabel</tabstop>
+  <tabstop>lineEdit_colorLabel</tabstop>
+  <tabstop>spinBox_axisLabelSize</tabstop>
+  <tabstop>spinBox_tickLabelSize</tabstop>
+  <tabstop>pushButton_selectColormap</tabstop>
+  <tabstop>checkBox_colormapIsReversed</tabstop>
+  <tabstop>checkBox_3d</tabstop>
+  <tabstop>radioButton</tabstop>
+  <tabstop>radioButton_2</tabstop>
+  <tabstop>pushButton_plot</tabstop>
+  <tabstop>pushButton_save</tabstop>
+  <tabstop>listWidget</tabstop>
+  <tabstop>toolButton_substractFile</tabstop>
+  <tabstop>toolButton_addFile</tabstop>
+ </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>
