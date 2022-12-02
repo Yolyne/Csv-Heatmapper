@@ -218,6 +218,7 @@ class MainWindow(QMainWindow):
     def _connect_signal_slot(self):
         ui = self.ui
         controller = self.controller
+        ui.action_User_s_manual.triggered.connect(controller.show_manual)
 
         self.listView.selectionModel().selectionChanged.connect(
             self._on_file_selection_changed

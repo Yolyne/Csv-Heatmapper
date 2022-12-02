@@ -1,6 +1,7 @@
 # from dataclasses import dataclass
-from time import sleep, perf_counter
+from time import perf_counter
 import os
+import webbrowser
 import math
 import matplotlib as mpl
 
@@ -110,6 +111,9 @@ class WindowController(QObject):
         self.__colorMap = None
 
         self.colormaps = list(mpl.cm._colormaps._cmaps.keys())
+
+    def show_manual(self):
+        webbrowser.open("file://" + os.path.abspath("docs/index.html"))
 
     def load_files(self, files):
         for file in files:
