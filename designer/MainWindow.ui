@@ -29,18 +29,25 @@
     <normaloff>:/icon/imgs/icon.ico</normaloff>:/icon/imgs/icon.ico</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">QLabel[class=&quot;bold&quot;] {
+   <string notr="true">QWidget#centralwidget {
+	background: #f0f0f0;
+}
+QLabel[class=&quot;bold&quot;] {
 	font-weight: 900;
 }
 QGroupBox
 {
 	font-size: 14px;
     font-weight: bold;
+	padding-top: 15px;
 }
 QGroupBox::title {
-    subcontrol-origin: content;
+    subcontrol-origin: padding;
     subcontrol-position: top center; /* position at the top center */
 	left: -2px;
+}
+QGroupBox#groupBox_file {
+	background: #f0f0f0;
 }
 QPushButton {
 	font: 900 12px;
@@ -110,9 +117,6 @@ QPushButton:pressed {
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
            <number>0</number>
           </property>
           <item>

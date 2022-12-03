@@ -36,18 +36,25 @@ class Ui_MainWindow(object):
         icon = QIcon()
         icon.addFile(u":/icon/imgs/icon.ico", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setStyleSheet(u"QLabel[class=\"bold\"] {\n"
+        MainWindow.setStyleSheet(u"QWidget#centralwidget {\n"
+"	background: #f0f0f0;\n"
+"}\n"
+"QLabel[class=\"bold\"] {\n"
 "	font-weight: 900;\n"
 "}\n"
 "QGroupBox\n"
 "{\n"
 "	font-size: 14px;\n"
 "    font-weight: bold;\n"
+"	padding-top: 15px;\n"
 "}\n"
 "QGroupBox::title {\n"
-"    subcontrol-origin: content;\n"
+"    subcontrol-origin: padding;\n"
 "    subcontrol-position: top center; /* position at the top center */\n"
 "	left: -2px;\n"
+"}\n"
+"QGroupBox#groupBox_file {\n"
+"	background: #f0f0f0;\n"
 "}\n"
 "QPushButton {\n"
 "	font: 900 12px;\n"
@@ -90,7 +97,6 @@ class Ui_MainWindow(object):
         self.verticalLayout = QVBoxLayout(self.frame)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(-1, 0, -1, -1)
         self.groupBox_file = QGroupBox(self.frame)
         self.groupBox_file.setObjectName(u"groupBox_file")
         sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)

@@ -38,8 +38,9 @@ from PySide6.QtWidgets import (
     QStyledItemDelegate,
     QListView,
     QAbstractItemView,
+    QPushButton,
 )
-from PySide6 import QtGui, QtMultimedia
+from PySide6 import QtCore, QtGui
 from PySide6.QtCore import (
     QRegularExpression,
     QSettings,
@@ -47,8 +48,6 @@ from PySide6.QtCore import (
     QAbstractAnimation,
     QParallelAnimationGroup,
     QPropertyAnimation,
-    QStringListModel,
-    QEvent,
 )
 
 # from ui.my_widgets import DoubleDragSpinBox, StatusWidget
@@ -75,10 +74,14 @@ if setting.value("last_dir") == "":
 
 class LoadedFilesWidget(QWidget):
     def __init__(
-        self, parent=None, title="", window_controller: WindowController = None
+        self,
+        parent: QWidget = None,
+        title="",
+        window_controller: WindowController = None,
     ):
         super().__init__(parent)
         self.controller = window_controller
+        self.setMinimumSize(164, 0)
         self.setWindowFlags(Qt.FramelessWindowHint)
         # self.setGeometry(
         #     self.screen().availableGeometry().right(),
@@ -86,11 +89,12 @@ class LoadedFilesWidget(QWidget):
         #     window_controller.preview_width,
         #     window_controller.preview_height,
         # )
-        self.move(22, 46)
+        self.move(22, 55)
 
         self.toggle_button = QToolButton(
             text=title, checkable=True, checked=False
         )
+        self.toggle_button.setObjectName("toggle_button")
         self.toggle_button.setStyleSheet(
             """QToolButton {border:1px solid #8f8f91;}
 QToolButton:hover {
@@ -107,6 +111,12 @@ QToolButton:pressed {
         self.toggle_button.pressed.connect(self.on_pressed)
         self.toggle_button.setFixedSize(164, 24)
         self.toggle_animation = QParallelAnimationGroup(self)
+
+        self.back = back = QPushButton(parent)
+        back.setGeometry(0, 0, 0, 0)
+        back.setStyleSheet("background:rgba(0, 0, 0, 128)")
+        back.stackUnder(self)
+        back.clicked.connect(self.toggle_button.click)
 
         self.content_area = QScrollArea(maximumHeight=0, minimumHeight=0)
         self.content_area.setSizePolicy(
@@ -133,7 +143,12 @@ QToolButton:pressed {
 
     # @QtCore.pyqtSlot()
     def on_pressed(self):
+        # checked = self.toggle_button.setChecked()
         checked = self.toggle_button.isChecked()
+        if checked:
+            self.back.setGeometry(0, 0, 0, 0)
+        else:
+            self.back.setGeometry(0, 22, 2000, 1500)
         self.toggle_button.setArrowType(
             Qt.DownArrow if not checked else Qt.RightArrow
         )
@@ -323,14 +338,19 @@ class MainWindow(QMainWindow):
         ui = self.ui
         controller = self.controller
 
+        groupBox_file_dummy = QWidget(self.ui.frame)
+        groupBox_file_dummy.setMinimumSize(0, 60)
+        self.ui.verticalLayout.insertWidget(0, groupBox_file_dummy)
+        gb = ui.groupBox_file
+        gb.setParent(self)
+        gb.setGeometry(10, 32, 220, 60)
         loadedFilesWidget = LoadedFilesWidget(self, "Loaded Files", controller)
-        loadedFilesWidget.setMinimumSize(164, 0)
+        ui.groupBox_file.stackUnder(loadedFilesWidget)
         lay = QVBoxLayout()
         lay.setContentsMargins(0, 0, 0, 0)
         self.listView = listView = QListView(loadedFilesWidget)
         listView.setModel(controller.loadedFilesModel)
         listView.setSelectionModel(controller.selectionModel)
-        # listView.setDragEnabled(True)
         listView.setSelectionMode(QAbstractItemView.MultiSelection)
 
         def _listView_keyPressEvent(event):
