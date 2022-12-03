@@ -34,11 +34,10 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QFrame,
-    QComboBox,
-    QStyledItemDelegate,
     QListView,
     QAbstractItemView,
     QPushButton,
+    QListWidgetItem,
 )
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import (
@@ -244,17 +243,14 @@ class MainWindow(QMainWindow):
             self._button_sabstractFile_clicked
         )
 
+        ui.checkBox_origin.stateChanged.connect(self._on_checkBox_origin_checked)
+
         # def _set_attr(obj, name, value):
         #     print(name, value)
         #     setattr(obj, name, value)
 
-        def _on_textChanged(value, widget: QWidget, property_name):
-            if isinstance(widget, QLineEdit):
-                widget: QLineEdit
-                lineEdit = widget
-            elif isinstance(widget, QAbstractSpinBox):
-                widget: QAbstractSpinBox
-                lineEdit = widget.lineEdit()
+        def _on_textChanged(value, lineEdit: QWidget, property_name):
+            # print(value)
             _pos = lineEdit.cursorPosition()
             setattr(controller, property_name, value)
             lineEdit.setCursorPosition(_pos)
@@ -272,26 +268,23 @@ class MainWindow(QMainWindow):
                         )
                     )
                     # widget.valueChanged.connect(
-                    #     lambda v: _set_attr(controller, controller_property_name, v)
-                    # )
-                elif hasattr(widget, "textChanged"):
-                    # widget.textChanged.connect(
-                    #     lambda v, property_name=controller_property_name: setattr(
+                    #     lambda v, property_name=controller_property_name: _set_attr(
                     #         controller, property_name, v
                     #     )
                     # )
-                    widget.textChanged.connect(
-                        lambda v, widget=widget, property_name=controller_property_name: _on_textChanged(
-                            v, widget, property_name
-                        )
-                    )
-
+                elif hasattr(widget, "textChanged"):
                     if isinstance(widget, QLineEdit):
                         widget: QLineEdit
                         lineEdit = widget
                     elif isinstance(widget, QAbstractSpinBox):
                         widget: QAbstractSpinBox
                         lineEdit = widget.lineEdit()
+                    widget.textChanged.connect(
+                        lambda v, widget=lineEdit, property_name=controller_property_name: _on_textChanged(
+                            v, widget, property_name
+                        )
+                    )
+
                     lineEdit.returnPressed.connect(
                         self._on_button_plot_clicked
                     )
@@ -309,6 +302,8 @@ class MainWindow(QMainWindow):
 
         controller.propertyChanged.connect(_on_propertyChanged)
         controller.valueRangeChanged.connect(self._on_valueRangeChanged)
+
+        controller.max_larger_min.connect(self._on_max_larger_min)
 
         ui.pushButton_selectColormap.clicked.connect(self._open_colorpicker)
 
@@ -376,9 +371,6 @@ class MainWindow(QMainWindow):
         scrollArea.setWidget(canvas)
         scrollArea.setMinimumWidth(900)
         vlayout.addWidget(scrollArea)
-
-        ui.spinBox_axisLabelSize.lineEdit().setEnabled(False)
-        ui.spinBox_tickLabelSize.lineEdit().setEnabled(False)
 
         def scrolling(event):
             current = scrollArea.verticalScrollBar().value()
@@ -451,6 +443,31 @@ class MainWindow(QMainWindow):
         if files:
             setting.setValue("last_dir", os.path.dirname(files[-1]))
         return files
+
+    def _on_checkBox_origin_checked(self, checked:int):
+        if checked:
+            self.ui.frame_axisMax.setEnabled(True)
+            self.ui.
+        else:
+            self.ui.frame_axisMax.setEnabled(False)
+
+
+    def _on_max_larger_min(self, max_larger_min):
+        self.ui.pushButton_plot.setEnabled(max_larger_min)
+        if max_larger_min:
+            self.ui.listWidget.takeItem(0)
+        else:
+            if self.ui.listWidget.count() == 1:
+                return
+            item = QListWidgetItem()
+            self.ui.listWidget.addItem(
+                item
+            )
+            label = QLabel(
+                '<font color="red">Error</font>: Max must be larger than Min in Color Scale.'
+            )
+            item.setSizeHint(label.sizeHint())
+            self.ui.listWidget.setItemWidget(item, label)
 
     def _open_colorpicker(self):
         if self.colordialog is None:

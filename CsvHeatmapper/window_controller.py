@@ -87,6 +87,7 @@ class WindowController(QObject):
     # data_changed = Signal(tuple)
     propertyChanged = Signal(str, object)
     valueRangeChanged = Signal(float, float, float, float)
+    max_larger_min = Signal(bool)
     is_first_plot = True
 
     def __init__(self, parent=None):
@@ -98,11 +99,11 @@ class WindowController(QObject):
         self.selectionModel = QItemSelectionModel(self.loadedFilesModel, self)
         self.selected_file_indexes = set()
         # self.__loadedFiles.append = self.my_append
-        self.__Xinterval = None
-        self.__Yinterval = None
-        self.__colorMax = None
-        self.__colorMin = None
-        self.__colorinterval = None
+        self.__Xinterval = 0
+        self.__Yinterval = 0
+        self.__colorMax = 0
+        self.__colorMin = 0
+        self.__colorinterval = 0
         self.__xLabel = "x"
         self.__yLabel = "y"
         self.__colorLabel = "z ()"
@@ -253,6 +254,10 @@ class WindowController(QObject):
     def colorMax(self, value):
         self.__colorMax = value
         self.propertyChanged.emit("colorMax", value)
+        if self.__colorMax > self.__colorMin:
+            self.max_larger_min.emit(True)
+        else:
+            self.max_larger_min.emit(False)
 
     @property
     def colorMin(self):
@@ -262,6 +267,10 @@ class WindowController(QObject):
     def colorMin(self, value):
         self.__colorMin = value
         self.propertyChanged.emit("colorMin", value)
+        if self.__colorMax > self.__colorMin:
+            self.max_larger_min.emit(True)
+        else:
+            self.max_larger_min.emit(False)
 
     @property
     def colorinterval(self):
