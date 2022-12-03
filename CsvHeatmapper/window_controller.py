@@ -246,6 +246,24 @@ class WindowController(QObject):
         self.__Yinterval = value
         self.propertyChanged.emit("Yinterval", value)
 
+    # @property
+    # def xMax(self):
+    #     return self.__xMax
+
+    # @xMax.setter
+    # def xMax(self, value):
+    #     self.__xMax = value
+    #     self.propertyChanged.emit("xMax", value)
+
+    # @property
+    # def yMax(self):
+    #     return self.__yMax
+
+    # @yMax.setter
+    # def yMax(self, value):
+    #     self.__yMax = value
+    #     self.propertyChanged.emit("yMax", value)
+
     @property
     def colorMax(self):
         return self.__colorMax

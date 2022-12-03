@@ -206,6 +206,7 @@ class Ui_MainWindow(object):
         self.doubleSpinBox_Xinterval = QDoubleSpinBox(self.widget_2)
         self.doubleSpinBox_Xinterval.setObjectName(u"doubleSpinBox_Xinterval")
         self.doubleSpinBox_Xinterval.setMinimumSize(QSize(0, 12))
+        self.doubleSpinBox_Xinterval.setMinimum(0.010000000000000)
 
         self.gridLayout_4.addWidget(self.doubleSpinBox_Xinterval, 0, 1, 1, 1)
 
@@ -217,11 +218,13 @@ class Ui_MainWindow(object):
         self.doubleSpinBox_Yinterval = QDoubleSpinBox(self.widget_2)
         self.doubleSpinBox_Yinterval.setObjectName(u"doubleSpinBox_Yinterval")
         self.doubleSpinBox_Yinterval.setMinimumSize(QSize(0, 12))
+        self.doubleSpinBox_Yinterval.setMinimum(0.010000000000000)
 
         self.gridLayout_4.addWidget(self.doubleSpinBox_Yinterval, 1, 1, 1, 1)
 
         self.frame_axisMax = QFrame(self.widget_2)
         self.frame_axisMax.setObjectName(u"frame_axisMax")
+        self.frame_axisMax.setEnabled(False)
         sizePolicy3 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
@@ -240,8 +243,11 @@ class Ui_MainWindow(object):
 
         self.doubleSpinBox_xMax = QDoubleSpinBox(self.frame_axisMax)
         self.doubleSpinBox_xMax.setObjectName(u"doubleSpinBox_xMax")
+        self.doubleSpinBox_xMax.setEnabled(False)
         self.doubleSpinBox_xMax.setMinimumSize(QSize(0, 12))
         self.doubleSpinBox_xMax.setFocusPolicy(Qt.NoFocus)
+        self.doubleSpinBox_xMax.setMinimum(0.010000000000000)
+        self.doubleSpinBox_xMax.setValue(10.000000000000000)
 
         self.gridLayout.addWidget(self.doubleSpinBox_xMax, 0, 1, 1, 1)
 
@@ -252,8 +258,11 @@ class Ui_MainWindow(object):
 
         self.doubleSpinBox_yMax = QDoubleSpinBox(self.frame_axisMax)
         self.doubleSpinBox_yMax.setObjectName(u"doubleSpinBox_yMax")
+        self.doubleSpinBox_yMax.setEnabled(False)
         self.doubleSpinBox_yMax.setMinimumSize(QSize(0, 12))
         self.doubleSpinBox_yMax.setFocusPolicy(Qt.NoFocus)
+        self.doubleSpinBox_yMax.setMinimum(0.010000000000000)
+        self.doubleSpinBox_yMax.setValue(10.000000000000000)
 
         self.gridLayout.addWidget(self.doubleSpinBox_yMax, 1, 1, 1, 1)
 
@@ -294,6 +303,7 @@ class Ui_MainWindow(object):
         self.doubleSpinBox_colorMax = QDoubleSpinBox(self.widget_3)
         self.doubleSpinBox_colorMax.setObjectName(u"doubleSpinBox_colorMax")
         self.doubleSpinBox_colorMax.setMinimumSize(QSize(0, 12))
+        self.doubleSpinBox_colorMax.setMinimum(0.010000000000000)
 
         self.gridLayout_6.addWidget(self.doubleSpinBox_colorMax, 0, 2, 1, 1)
 
@@ -310,12 +320,14 @@ class Ui_MainWindow(object):
         self.doubleSpinBox_colorinterval = QDoubleSpinBox(self.widget_3)
         self.doubleSpinBox_colorinterval.setObjectName(u"doubleSpinBox_colorinterval")
         self.doubleSpinBox_colorinterval.setMinimumSize(QSize(0, 12))
+        self.doubleSpinBox_colorinterval.setMinimum(0.010000000000000)
 
         self.gridLayout_6.addWidget(self.doubleSpinBox_colorinterval, 4, 2, 1, 1)
 
         self.doubleSpinBox_colorMin = QDoubleSpinBox(self.widget_3)
         self.doubleSpinBox_colorMin.setObjectName(u"doubleSpinBox_colorMin")
         self.doubleSpinBox_colorMin.setMinimumSize(QSize(0, 12))
+        self.doubleSpinBox_colorMin.setMinimum(0.010000000000000)
 
         self.gridLayout_6.addWidget(self.doubleSpinBox_colorMin, 3, 2, 1, 1)
 
@@ -497,8 +509,53 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.frame_12)
 
-        self.frame_3 = QFrame(self.groupBox_2)
+        self.frame_4 = QFrame(self.groupBox_2)
+        self.frame_4.setObjectName(u"frame_4")
+        self.frame_4.setFrameShape(QFrame.StyledPanel)
+        self.frame_4.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_6 = QVBoxLayout(self.frame_4)
+        self.verticalLayout_6.setSpacing(0)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.label = QLabel(self.frame_4)
+        self.label.setObjectName(u"label")
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_6.addWidget(self.label)
+
+        self.widget_6 = QWidget(self.frame_4)
+        self.widget_6.setObjectName(u"widget_6")
+        self.verticalLayout_7 = QVBoxLayout(self.widget_6)
+        self.verticalLayout_7.setSpacing(0)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.verticalLayout_7.setContentsMargins(-1, 0, 0, 0)
+        self.frame_6 = QFrame(self.widget_6)
+        self.frame_6.setObjectName(u"frame_6")
+        self.frame_6.setFrameShape(QFrame.StyledPanel)
+        self.frame_6.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_5 = QHBoxLayout(self.frame_6)
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.label_2 = QLabel(self.frame_6)
+        self.label_2.setObjectName(u"label_2")
+
+        self.horizontalLayout_5.addWidget(self.label_2)
+
+        self.spinBox_decimalPlaces = QSpinBox(self.frame_6)
+        self.spinBox_decimalPlaces.setObjectName(u"spinBox_decimalPlaces")
+        self.spinBox_decimalPlaces.setMinimum(1)
+        self.spinBox_decimalPlaces.setMaximum(12)
+        self.spinBox_decimalPlaces.setValue(2)
+
+        self.horizontalLayout_5.addWidget(self.spinBox_decimalPlaces)
+
+
+        self.verticalLayout_7.addWidget(self.frame_6)
+
+        self.frame_3 = QFrame(self.widget_6)
         self.frame_3.setObjectName(u"frame_3")
+        self.frame_3.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.frame_3.sizePolicy().hasHeightForWidth())
         self.frame_3.setSizePolicy(sizePolicy1)
         self.frame_3.setMinimumSize(QSize(0, 16))
@@ -506,7 +563,7 @@ class Ui_MainWindow(object):
         self.frame_3.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_3)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(-1, 0, -1, 0)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.checkBox_3d = QCheckBox(self.frame_3)
         self.checkBox_3d.setObjectName(u"checkBox_3d")
 
@@ -524,7 +581,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.radioButton_2)
 
 
-        self.verticalLayout_2.addWidget(self.frame_3)
+        self.verticalLayout_7.addWidget(self.frame_3)
+
+
+        self.verticalLayout_6.addWidget(self.widget_6)
+
+
+        self.verticalLayout_2.addWidget(self.frame_4)
 
 
         self.verticalLayout.addWidget(self.groupBox_2)
@@ -559,6 +622,12 @@ class Ui_MainWindow(object):
 
         self.listWidget = QListWidget(self.frame)
         self.listWidget.setObjectName(u"listWidget")
+        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.listWidget.sizePolicy().hasHeightForWidth())
+        self.listWidget.setSizePolicy(sizePolicy4)
+        self.listWidget.setMaximumSize(QSize(16777215, 126))
         self.listWidget.setFocusPolicy(Qt.NoFocus)
 
         self.verticalLayout.addWidget(self.listWidget)
@@ -655,6 +724,9 @@ class Ui_MainWindow(object):
         self.checkBox_colormapIsReversed.setText(QCoreApplication.translate("MainWindow", u"Reversed", None))
         self.label_20.setText(QCoreApplication.translate("MainWindow", u"Color Map", None))
         self.label_20.setProperty("class", QCoreApplication.translate("MainWindow", u"bold", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"Other", None))
+        self.label.setProperty("class", QCoreApplication.translate("MainWindow", u"bold", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Decimal Places", None))
         self.checkBox_3d.setText(QCoreApplication.translate("MainWindow", u"3D", None))
         self.radioButton.setText(QCoreApplication.translate("MainWindow", u"Scatter", None))
         self.radioButton_2.setText(QCoreApplication.translate("MainWindow", u"Surface", None))
