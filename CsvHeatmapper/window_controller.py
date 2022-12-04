@@ -46,7 +46,7 @@ logger.addHandler(ch)
 
 
 def determine_interval(length, is_colorbar=False):
-    minimum = length / 8
+    minimum = length / 12
     magnitude = 10 ** math.floor(math.log(minimum, 10))
     residual = minimum / magnitude
     if magnitude < 1 and not is_colorbar:
@@ -99,19 +99,40 @@ class WindowController(QObject):
         self.selectionModel = QItemSelectionModel(self.loadedFilesModel, self)
         self.selected_file_indexes = set()
         # self.__loadedFiles.append = self.my_append
-        self.__Xinterval = 0
-        self.__Yinterval = 0
-        self.__colorMax = 0
-        self.__colorMin = 0
-        self.__colorinterval = 0
-        self.__xLabel = "x"
-        self.__yLabel = "y"
-        self.__colorLabel = "z ()"
-        self.__axisLabelSize = 20
-        self.__tickLabelSize = 12
+        self.__Xinterval = 0.0
+        self.__Yinterval = 0.0
+        self.__origin = 0
+        self.__xMax = 0.0
+        self.__yMax = 0.0
+        self.__colorMax = 0.0
+        self.__colorMin = 0.0
+        self.__colorinterval = 0.0
+        self.__xLabel = ""
+        self.__yLabel = ""
+        self.__colorLabel = ""
+        self.__axisLabelSize = 0
+        self.__tickLabelSize = 0
         self.__colorMap = None
 
         self.colormaps = list(mpl.cm._colormaps._cmaps.keys())
+
+        self._init_properties()
+
+    def _init_properties(self):
+        self.Xinterval = 0
+        self.Yinterval = 0
+        # self.origin
+        self.xMax = 10
+        self.yMax = 10
+        self.colorMax = 0
+        self.colorMin = 0
+        self.colorinterval = 0
+        self.xLabel = "x"
+        self.yLabel = "y"
+        self.colorLabel = "z ()"
+        self.axisLabelSize = 20
+        self.tickLabelSize = 12
+        # self.colorMap = None
 
     def show_manual(self):
         webbrowser.open("file://" + os.path.abspath("docs/index.html"))
@@ -147,8 +168,8 @@ class WindowController(QObject):
         int_min = float(math.floor(self.figure_handler.datas_min))
         int_max = float(math.ceil(self.figure_handler.datas_max))
         self.valueRangeChanged.emit(
-            self.figure_handler.datas_width,
-            self.figure_handler.datas_height,
+            self.xMax if self.origin else self.figure_handler.datas_width,
+            self.yMax if self.origin else self.figure_handler.datas_height,
             int_min,
             int_max,
         )
@@ -156,7 +177,10 @@ class WindowController(QObject):
         self.colorMin = int_min
         self.Xinterval = determine_interval(self.figure_handler.datas_width)
         self.Yinterval = determine_interval(self.figure_handler.datas_height)
-        if self.is_first_plot:
+        if (
+            self.is_first_plot
+            or (self.colorMax - self.colorMin) / self.colorinterval > 30
+        ):
             self.colorinterval = determine_interval(
                 self.colorMax - self.colorMin, True
             )
@@ -185,6 +209,10 @@ class WindowController(QObject):
         t_before = perf_counter()
         # if (fig := self.plot()) is None:
         #     return
+        xMax = yMax = None
+        if self.origin:
+            xMax = self.xMax
+            yMax = self.yMax
         fig = self.figure_handler.plot(
             self.Xinterval,
             self.Yinterval,
@@ -197,6 +225,8 @@ class WindowController(QObject):
             self.axisLabelSize,
             self.tickLabelSize,
             self.colorMap,
+            xMax,
+            yMax,
         )
         # logger.info("ploting time: {} s".format(perf_counter() - t_before))
         # try:
@@ -246,23 +276,32 @@ class WindowController(QObject):
         self.__Yinterval = value
         self.propertyChanged.emit("Yinterval", value)
 
-    # @property
-    # def xMax(self):
-    #     return self.__xMax
+    @property
+    def origin(self):
+        return self.__origin
 
-    # @xMax.setter
-    # def xMax(self, value):
-    #     self.__xMax = value
-    #     self.propertyChanged.emit("xMax", value)
+    @origin.setter
+    def origin(self, value):
+        self.__origin = bool(value)
+        self.propertyChanged.emit("origin", value)
 
-    # @property
-    # def yMax(self):
-    #     return self.__yMax
+    @property
+    def xMax(self):
+        return self.__xMax
 
-    # @yMax.setter
-    # def yMax(self, value):
-    #     self.__yMax = value
-    #     self.propertyChanged.emit("yMax", value)
+    @xMax.setter
+    def xMax(self, value):
+        self.__xMax = value
+        self.propertyChanged.emit("xMax", value)
+
+    @property
+    def yMax(self):
+        return self.__yMax
+
+    @yMax.setter
+    def yMax(self, value):
+        self.__yMax = value
+        self.propertyChanged.emit("yMax", value)
 
     @property
     def colorMax(self):

@@ -430,9 +430,6 @@ QPushButton:pressed {
                       </item>
                       <item row="0" column="1">
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_xMax">
-                        <property name="enabled">
-                         <bool>false</bool>
-                        </property>
                         <property name="minimumSize">
                          <size>
                           <width>0</width>
@@ -440,10 +437,13 @@ QPushButton:pressed {
                          </size>
                         </property>
                         <property name="focusPolicy">
-                         <enum>Qt::NoFocus</enum>
+                         <enum>Qt::StrongFocus</enum>
                         </property>
                         <property name="minimum">
                          <double>0.010000000000000</double>
+                        </property>
+                        <property name="maximum">
+                         <double>99999.000000000000000</double>
                         </property>
                         <property name="value">
                          <double>10.000000000000000</double>
@@ -459,9 +459,6 @@ QPushButton:pressed {
                       </item>
                       <item row="1" column="1">
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_yMax">
-                        <property name="enabled">
-                         <bool>false</bool>
-                        </property>
                         <property name="minimumSize">
                          <size>
                           <width>0</width>
@@ -469,10 +466,13 @@ QPushButton:pressed {
                          </size>
                         </property>
                         <property name="focusPolicy">
-                         <enum>Qt::NoFocus</enum>
+                         <enum>Qt::StrongFocus</enum>
                         </property>
                         <property name="minimum">
                          <double>0.010000000000000</double>
+                        </property>
+                        <property name="maximum">
+                         <double>99999.000000000000000</double>
                         </property>
                         <property name="value">
                          <double>10.000000000000000</double>
@@ -1097,7 +1097,7 @@ QPushButton:pressed {
                       <item>
                        <widget class="QSpinBox" name="spinBox_decimalPlaces">
                         <property name="minimum">
-                         <number>1</number>
+                         <number>0</number>
                         </property>
                         <property name="maximum">
                          <number>12</number>

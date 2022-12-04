@@ -243,10 +243,10 @@ class Ui_MainWindow(object):
 
         self.doubleSpinBox_xMax = QDoubleSpinBox(self.frame_axisMax)
         self.doubleSpinBox_xMax.setObjectName(u"doubleSpinBox_xMax")
-        self.doubleSpinBox_xMax.setEnabled(False)
         self.doubleSpinBox_xMax.setMinimumSize(QSize(0, 12))
-        self.doubleSpinBox_xMax.setFocusPolicy(Qt.NoFocus)
+        self.doubleSpinBox_xMax.setFocusPolicy(Qt.StrongFocus)
         self.doubleSpinBox_xMax.setMinimum(0.010000000000000)
+        self.doubleSpinBox_xMax.setMaximum(99999.000000000000000)
         self.doubleSpinBox_xMax.setValue(10.000000000000000)
 
         self.gridLayout.addWidget(self.doubleSpinBox_xMax, 0, 1, 1, 1)
@@ -258,10 +258,10 @@ class Ui_MainWindow(object):
 
         self.doubleSpinBox_yMax = QDoubleSpinBox(self.frame_axisMax)
         self.doubleSpinBox_yMax.setObjectName(u"doubleSpinBox_yMax")
-        self.doubleSpinBox_yMax.setEnabled(False)
         self.doubleSpinBox_yMax.setMinimumSize(QSize(0, 12))
-        self.doubleSpinBox_yMax.setFocusPolicy(Qt.NoFocus)
+        self.doubleSpinBox_yMax.setFocusPolicy(Qt.StrongFocus)
         self.doubleSpinBox_yMax.setMinimum(0.010000000000000)
+        self.doubleSpinBox_yMax.setMaximum(99999.000000000000000)
         self.doubleSpinBox_yMax.setValue(10.000000000000000)
 
         self.gridLayout.addWidget(self.doubleSpinBox_yMax, 1, 1, 1, 1)
@@ -544,7 +544,7 @@ class Ui_MainWindow(object):
 
         self.spinBox_decimalPlaces = QSpinBox(self.frame_6)
         self.spinBox_decimalPlaces.setObjectName(u"spinBox_decimalPlaces")
-        self.spinBox_decimalPlaces.setMinimum(1)
+        self.spinBox_decimalPlaces.setMinimum(0)
         self.spinBox_decimalPlaces.setMaximum(12)
         self.spinBox_decimalPlaces.setValue(2)
 

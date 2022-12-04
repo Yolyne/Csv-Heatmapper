@@ -108,6 +108,8 @@ class FigureHandler:
         axisLabelSize,
         tickLabelSize,
         colorMap="jet",
+        xMax=None,
+        yMax=None,
         is3d=False,
         type3d="scatter",
     ):
@@ -216,35 +218,109 @@ class FigureHandler:
             else:
                 # self.ax = ax = self.figure.add_subplot(111)
                 # self.list_ax = self.figure.subplots(len(self.datas), 1)
-                extent = (
-                    0.5,
-                    self.datas_width + 0.5,
-                    self.datas_height + 0.5,
-                    0.5,
-                )
+                if xMax and yMax:
+                    extent = (
+                        0,
+                        self.datas_width,
+                        self.datas_height,
+                        0,
+                    )
+                else:
+                    extent = (
+                        0.5,
+                        self.datas_width + 0.5,
+                        self.datas_height + 0.5,
+                        0.5,
+                    )
                 # for ax, data in zip(self.list_ax, self.datas):
+                # ax.matshow(data, norm=cbar_norm, cmap=colorMap)
                 ax.matshow(data, norm=cbar_norm, cmap=colorMap, extent=extent)
                 ax.xaxis.set_label_position("top")
                 ax.yaxis.set_ticks_position("both")
 
-                ax.set_xticks(
-                    list(np.arange(Xinterval, self.datas_width + 1, Xinterval))
-                    if Xinterval == 1
-                    else [1]
-                    + list(
-                        np.arange(Xinterval, self.datas_width + 1, Xinterval)
+                if xMax and yMax:
+                    ax.set_xticks(
+                        list(
+                            np.arange(
+                                0,
+                                self.datas_width,
+                                Xinterval * (self.datas_width) / xMax,
+                            )
+                        )
+                        + [self.datas_width]
                     )
-                )
-                ax.set_yticks(
-                    list(
-                        np.arange(Yinterval, self.datas_height + 1, Yinterval)
+                    ax.set_yticks(
+                        list(
+                            np.arange(
+                                0,
+                                self.datas_height,
+                                Yinterval * (self.datas_height) / yMax,
+                            )
+                        )
+                        + [self.datas_height]
                     )
-                    if Yinterval == 1
-                    else [1]
-                    + list(
-                        np.arange(Yinterval, self.datas_height + 1, Yinterval)
+                    ax.set_xticklabels(
+                        [
+                            "%s" % v.rstrip("0").rstrip(".")
+                            if "." in (v := str(_))
+                            else v
+                            for _ in np.round(
+                                np.arange(0, xMax, Xinterval),
+                                len(str(Xinterval).split(".")[-1]),
+                            )
+                        ]
+                        + [
+                            "%s" % v.rstrip("0").rstrip(".")
+                            if "." in (v := str(xMax))
+                            else v
+                        ]
+                        # np.arange(0, xMax + Xinterval, Xinterval)
                     )
-                )
+                    ax.set_yticklabels(
+                        [
+                            "%s" % v.rstrip("0").rstrip(".")
+                            if "." in (v := str(_))
+                            else v
+                            for _ in np.round(
+                                np.arange(0, yMax, Yinterval),
+                                len(str(Yinterval).split(".")[-1]),
+                            )
+                        ]
+                        + [
+                            "%s" % v.rstrip("0").rstrip(".")
+                            if "." in (v := str(yMax))
+                            else v
+                        ]
+                    )
+                else:
+                    ax.set_xticks(
+                        list(
+                            np.arange(
+                                Xinterval, self.datas_width + 1, Xinterval
+                            )
+                        )
+                        if Xinterval == 1
+                        else [1]
+                        + list(
+                            np.arange(
+                                Xinterval, self.datas_width + 1, Xinterval
+                            )
+                        )
+                    )
+                    ax.set_yticks(
+                        list(
+                            np.arange(
+                                Yinterval, self.datas_height + 1, Yinterval
+                            )
+                        )
+                        if Yinterval == 1
+                        else [1]
+                        + list(
+                            np.arange(
+                                Yinterval, self.datas_height + 1, Yinterval
+                            )
+                        )
+                    )
                 ax.tick_params(axis="x", labelsize=tickLabelSize)
                 ax.tick_params(axis="y", labelsize=tickLabelSize)
                 ax.set_xlabel(rf"{xLabel}", fontsize=axisLabelSize)

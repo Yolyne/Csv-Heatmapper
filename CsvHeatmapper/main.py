@@ -38,6 +38,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QPushButton,
     QListWidgetItem,
+    QCheckBox,
 )
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import (
@@ -258,11 +259,12 @@ class MainWindow(QMainWindow):
             lineEdit.setCursorPosition(_pos)
             # print(getattr(controller, property_name))
 
-        def _axis_scale_max_changed(value, xory):
-            if xory == "doubleSpinBox_xMax":
+        def _axis_scale_max_changed(value, property_name):
+            if property_name == "xMax":
                 ui.doubleSpinBox_Xinterval.setMaximum(value)
-            else:
+            else:  # "yMax"
                 ui.doubleSpinBox_Yinterval.setMaximum(value)
+            setattr(controller, property_name, value)
 
         widget: QWidget
         for widget in self.findChildren(QWidget):
@@ -271,8 +273,8 @@ class MainWindow(QMainWindow):
                 # print(controller_property_name)
                 if widget_name in {"doubleSpinBox_xMax", "doubleSpinBox_yMax"}:
                     widget.valueChanged.connect(
-                        lambda v, xory=controller_property_name: _axis_scale_max_changed(
-                            v, xory
+                        lambda v, property_name=controller_property_name: _axis_scale_max_changed(
+                            v, property_name
                         )
                     )
                 elif hasattr(widget, "valueChanged"):
@@ -301,6 +303,12 @@ class MainWindow(QMainWindow):
 
                     lineEdit.returnPressed.connect(
                         self._on_button_plot_clicked
+                    )
+                elif hasattr(widget, "stateChanged"):
+                    widget.stateChanged.connect(
+                        lambda v, property_name=controller_property_name: setattr(
+                            controller, property_name, v
+                        )
                     )
 
         def _on_propertyChanged(property_name, value):
@@ -335,11 +343,16 @@ class MainWindow(QMainWindow):
         ui.pushButton_save.clicked.connect(self._on_button_save_clicked)
 
     def _on_valueRangeChanged(self, width, height, min, max):
-        self.ui.doubleSpinBox_Xinterval.setMaximum(width)
-        self.ui.doubleSpinBox_Yinterval.setMaximum(height)
+        # self.ui.doubleSpinBox_Xinterval.setMaximum(width)
+        # self.ui.doubleSpinBox_Yinterval.setMaximum(height)
+        self.ui.doubleSpinBox_Xinterval.setRange(width / 40, width)
+        self.ui.doubleSpinBox_Yinterval.setRange(height / 40, height)
         self.ui.doubleSpinBox_colorMax.setRange(min, max)
         self.ui.doubleSpinBox_colorMin.setRange(min, max)
-        self.ui.doubleSpinBox_colorinterval.setMaximum(max - min)
+        # self.ui.doubleSpinBox_colorinterval.setMaximum(max - min)
+        self.ui.doubleSpinBox_colorinterval.setRange(
+            (max - min) / 40, max - min
+        )
 
     def _get_ui_properties(self):
         # self.controller.exposure_time_decimals = (
@@ -472,26 +485,43 @@ class MainWindow(QMainWindow):
         return files
 
     def _on_checkBox_origin_checked(self, checked: int):
+        setattr(
+            self.controller,
+            self.ui.checkBox_origin.objectName().split()[-1],
+            bool(checked),
+        )
         if checked:
             self.ui.frame_axisMax.setEnabled(True)
-            self.ui.doubleSpinBox_xMax.setEnabled(True)
-            self.ui.doubleSpinBox_yMax.setEnabled(True)
-            self.ui.doubleSpinBox_Xinterval.setMaximum(
-                self.ui.doubleSpinBox_xMax.value()
+            self.ui.doubleSpinBox_Xinterval.setRange(
+                self.ui.doubleSpinBox_xMax.value() / 40,
+                self.ui.doubleSpinBox_xMax.value(),
             )
-            self.ui.doubleSpinBox_Yinterval.setMaximum(
-                self.ui.doubleSpinBox_yMax.value()
+            self.ui.doubleSpinBox_Yinterval.setRange(
+                self.ui.doubleSpinBox_yMax.value() / 40,
+                self.ui.doubleSpinBox_yMax.value(),
             )
+            # self.ui.doubleSpinBox_Xinterval.setMaximum(
+            #     self.ui.doubleSpinBox_xMax.value()
+            # )
+            # self.ui.doubleSpinBox_Yinterval.setMaximum(
+            #     self.ui.doubleSpinBox_yMax.value()
+            # )
         else:
             self.ui.frame_axisMax.setEnabled(False)
-            self.ui.doubleSpinBox_xMax.setEnabled(False)
-            self.ui.doubleSpinBox_yMax.setEnabled(False)
-            self.ui.doubleSpinBox_Xinterval.setMaximum(
-                self.controller.figure_handler.datas_width
+            self.ui.doubleSpinBox_Xinterval.setRange(
+                self.controller.figure_handler.datas_width / 40,
+                self.controller.figure_handler.datas_width,
             )
-            self.ui.doubleSpinBox_Yinterval.setMaximum(
-                self.controller.figure_handler.datas_height
+            self.ui.doubleSpinBox_Yinterval.setRange(
+                self.controller.figure_handler.datas_height / 40,
+                self.controller.figure_handler.datas_height,
             )
+            # self.ui.doubleSpinBox_Xinterval.setMaximum(
+            #     self.controller.figure_handler.datas_width
+            # )
+            # self.ui.doubleSpinBox_Yinterval.setMaximum(
+            #     self.controller.figure_handler.datas_height
+            # )
 
     def _on_max_larger_min(self, max_larger_min):
         self.ui.pushButton_plot.setEnabled(max_larger_min)
@@ -520,7 +550,7 @@ class MainWindow(QMainWindow):
         for sb in self.findChildren(QWidget):
             if isinstance(sb, QDoubleSpinBox):
                 sb.setDecimals(value)
-                sb.setMinimum(float("0." + "0" * (value - 1) + "1"))
+                # sb.setMinimum(float("0." + "0" * (value - 1) + "1"))
 
     def _change_checkBox_3d_state(self, data_is_big):
         if data_is_big:
