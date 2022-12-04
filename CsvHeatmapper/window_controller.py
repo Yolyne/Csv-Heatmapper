@@ -45,12 +45,11 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 
 
-def determine_interval(length, is_colorbar=False):
+def determine_interval(length, isInteger=False):
     minimum = length / 12
     magnitude = 10 ** math.floor(math.log(minimum, 10))
     residual = minimum / magnitude
-    if magnitude < 1 and not is_colorbar:
-        # Don't allow x(y)-interval less than 1.
+    if magnitude < 1 and isInteger:
         return 1
     if residual > 5:
         interval = 10 * magnitude
@@ -167,22 +166,30 @@ class WindowController(QObject):
     def _update_properties(self):
         int_min = float(math.floor(self.figure_handler.datas_min))
         int_max = float(math.ceil(self.figure_handler.datas_max))
+        if self.origin:
+            xMax = self.xMax
+            yMax = self.yMax
+            isInteger = False
+        else:
+            xMax = self.figure_handler.datas_width
+            yMax = self.figure_handler.datas_height
+            isInteger = True
         self.valueRangeChanged.emit(
-            self.xMax if self.origin else self.figure_handler.datas_width,
-            self.yMax if self.origin else self.figure_handler.datas_height,
+            xMax,
+            yMax,
             int_min,
             int_max,
         )
         self.colorMax = int_max
         self.colorMin = int_min
-        self.Xinterval = determine_interval(self.figure_handler.datas_width)
-        self.Yinterval = determine_interval(self.figure_handler.datas_height)
+        self.Xinterval = determine_interval(xMax, isInteger)
+        self.Yinterval = determine_interval(yMax, isInteger)
         if (
             self.is_first_plot
             or (self.colorMax - self.colorMin) / self.colorinterval > 30
         ):
             self.colorinterval = determine_interval(
-                self.colorMax - self.colorMin, True
+                self.colorMax - self.colorMin
             )
             self.is_first_plot = False
 
