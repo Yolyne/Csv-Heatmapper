@@ -10,10 +10,9 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 class FigureHandler:
     def __init__(self, files=None) -> None:
         # self.figure = plt.figure(figsize=(9, 6), dpi=100)
-        # self.figure.subplots_adjust(
-        #     left=0.05, right=0.95, bottom=0.1, top=0.95
-        # )
-        self.figure = plt.figure(figsize=(9, 6), dpi=100, tight_layout=True)
+        # self.figure.subplots_adjust(left=0, right=1, bottom=0, top=1, hspace=0)
+        self.figure = plt.figure(figsize=(6, 4), dpi=100, tight_layout=True)
+        # self.figure.subplots_adjust(hspace=0)
         self.datas = []
         # if files:
         #     self.datas = self._file_to_ndarr(files)
@@ -23,12 +22,12 @@ class FigureHandler:
         self.datas = [self._file_to_ndarr(file) for file in files]
         # print(self.data)
         # self.figure.set_dpi(100 * len(files))
-        self.figure.set_size_inches(9, 6 * len(self.datas))
+        self.figure.set_size_inches(6, 4 * len(self.datas))
         self._analyze_data()
 
     def remove_data(self, index):
         del self.datas[index]
-        self.figure.set_size_inches(9, 6 * len(self.datas))
+        self.figure.set_size_inches(6, 4 * len(self.datas))
         self._analyze_data()
 
     def _file_to_ndarr(self, file):

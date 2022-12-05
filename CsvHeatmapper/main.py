@@ -11,6 +11,7 @@ from matplotlib.backends.backend_qtagg import (
     FigureCanvasQTAgg as FigureCanvas,
     NavigationToolbar2QT as NavigationToolbar,
 )
+from matplotlib.transforms import Bbox
 
 
 # from stage_controller import StageController
@@ -364,6 +365,19 @@ class MainWindow(QMainWindow):
         ui = self.ui
         controller = self.controller
 
+        ui.doubleSpinBox_Xinterval.setValue(controller.Xinterval)
+        ui.doubleSpinBox_Yinterval.setValue(controller.Yinterval)
+        ui.doubleSpinBox_xMax.setValue(controller.xMax)
+        ui.doubleSpinBox_yMax.setValue(controller.yMax)
+        ui.doubleSpinBox_colorMax.setValue(controller.colorMax)
+        ui.doubleSpinBox_colorMin.setValue(controller.colorMin)
+        ui.doubleSpinBox_colorinterval.setValue(controller.colorinterval)
+        ui.lineEdit_xLabel.setText(controller.xLabel)
+        ui.lineEdit_yLabel.setText(controller.yLabel)
+        ui.lineEdit_colorLabel.setText(controller.colorLabel)
+        ui.spinBox_axisLabelSize.setValue(controller.axisLabelSize)
+        ui.spinBox_tickLabelSize.setValue(controller.tickLabelSize)
+
         def _textFromValue(value, self):
             return str(round(value, self.decimals())).rstrip("0").rstrip(".")
             # return str(value).rstrip()
@@ -591,24 +605,71 @@ class MainWindow(QMainWindow):
             dir = f"{os.path.expanduser('~/Downloads')}/Heatmap ({now})"
             os.mkdir(dir)
             width, height = self.controller.figure.get_size_inches()
+            # print(
+            #     [
+            #         axis.get_window_extent().transformed(
+            #             self.controller.figure.dpi_scale_trans.inverted()
+            #         )
+            #         for axis in self.controller.figure.axes
+            #     ]
+            # )
+            # bboxes = [
+            #     axis.get_window_extent().transformed(
+            #         self.controller.figure.dpi_scale_trans.inverted()
+            #     )
+            #     for axis in self.controller.figure.axes
+            # ]
+            # [ for plot, cbar in zip(bboxes[:count], bboxes[count:])]
+            def full_extent(ax, cbar, pad=0.0) -> Bbox:
+                """Get the full extent of an axes, including axes labels, tick labels, and
+                titles."""
+                # For text objects, we need to draw the figure first, otherwise the extents
+                # are undefined.
+                # ax.figure.canvas.draw()
+                # items = ax.get_xticklabels() + ax.get_yticklabels()
+                items = [
+                    ax,
+                    ax.title,
+                    ax.xaxis.label,
+                    ax.yaxis.label,
+                    cbar.yaxis.label,
+                ]
+                # items += [ax, ax.title]
+                bbox = Bbox.union([item.get_window_extent() for item in items])
+
+                return bbox.expanded(1.0 + pad, 1.0 + 0.05)
+
             # print(width, height)
             height = height // count
-            # for i in range(count):
-            for i, file in enumerate(self.controller.loadedFilesModel.files):
+            # for i, file in enumerate(self.controller.loadedFilesModel.files):
+            #     name = os.path.splitext(os.path.basename(file))[0]
+            #     self.controller.figure.savefig(
+            #         f"{dir}/heatmap-{name}.png",
+            #         transparent=True,
+            #         bbox_inches=mpl.transforms.Bbox(
+            #             # This is in "figure fraction" for the bottom half
+            #             # input in [[xmin, ymin], [xmax, ymax]]
+            #             [
+            #                 [0, height * (count - i - 1)],
+            #                 [width, height * (count - i)],
+            #             ]
+            #         ),
+            #     )
+            for plot, cbar, file in zip(
+                self.controller.figure.axes[:count],
+                self.controller.figure.axes[count:],
+                self.controller.loadedFilesModel.files,
+            ):
                 name = os.path.splitext(os.path.basename(file))[0]
+                extent = full_extent(plot, cbar).transformed(
+                    self.controller.figure.dpi_scale_trans.inverted()
+                )
                 self.controller.figure.savefig(
                     f"{dir}/heatmap-{name}.png",
                     transparent=True,
-                    bbox_inches=mpl.transforms.Bbox(
-                        # This is in "figure fraction" for the bottom half
-                        # input in [[xmin, ymin], [xmax, ymax]]
-                        [
-                            [0, height * (count - i - 1)],
-                            [width, height * (count - i)],
-                        ]
-                    ),
+                    bbox_inches=extent,
                 )
-            self._save_analyzed_data(f"{dir}/info.csv")
+            # self._save_analyzed_data(f"{dir}/info.csv")
 
     def _save_analyzed_data(self, savepath):
         # header = ",".join(

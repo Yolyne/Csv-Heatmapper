@@ -101,37 +101,19 @@ class WindowController(QObject):
         self.__Xinterval = 0.0
         self.__Yinterval = 0.0
         self.__origin = 0
-        self.__xMax = 0.0
-        self.__yMax = 0.0
+        self.__xMax = 10.0
+        self.__yMax = 10.0
         self.__colorMax = 0.0
         self.__colorMin = 0.0
         self.__colorinterval = 0.0
-        self.__xLabel = ""
-        self.__yLabel = ""
-        self.__colorLabel = ""
-        self.__axisLabelSize = 0
-        self.__tickLabelSize = 0
+        self.__xLabel = "x"
+        self.__yLabel = "y"
+        self.__colorLabel = "z ()"
+        self.__axisLabelSize = 18
+        self.__tickLabelSize = 10
         self.__colorMap = None
 
         self.colormaps = list(mpl.cm._colormaps._cmaps.keys())
-
-        self._init_properties()
-
-    def _init_properties(self):
-        self.Xinterval = 0
-        self.Yinterval = 0
-        # self.origin
-        self.xMax = 10
-        self.yMax = 10
-        self.colorMax = 0
-        self.colorMin = 0
-        self.colorinterval = 0
-        self.xLabel = "x"
-        self.yLabel = "y"
-        self.colorLabel = "z ()"
-        self.axisLabelSize = 20
-        self.tickLabelSize = 12
-        # self.colorMap = None
 
     def show_manual(self):
         webbrowser.open("file://" + os.path.abspath("docs/index.html"))
