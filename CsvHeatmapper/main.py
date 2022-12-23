@@ -69,7 +69,7 @@ from window_controller import WindowController
 APP_NAME = "CsvHeatmapper"
 COMPANY = "Yolyne"
 setting = QSettings(COMPANY, APP_NAME)
-if setting.value("last_dir") == "":
+if not setting.value("last_dir"):
     setting.setValue("last_dir", os.path.expanduser("~/Documents"))
 
 
@@ -487,11 +487,16 @@ class MainWindow(QMainWindow):
             self.canvas.setFixedSize(width, height)
 
     def _browse_inputfile(self):
+        dir_open = (
+            setting.value("last_dir")
+            if os.path.exists(setting.value("last_dir"))
+            else os.path.expanduser("~/Documents")
+        )
         files = QFileDialog.getOpenFileNames(
             self,
             "Select",
             filter="CSV-like files (*.csv *.xlsx)",
-            dir=setting.value("last_dir"),
+            dir=dir_open,
         )[0]
 
         if files:
