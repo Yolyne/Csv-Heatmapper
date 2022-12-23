@@ -606,7 +606,7 @@ class MainWindow(QMainWindow):
                     # self.controller.figure
                 setting.setValue("last_dir", os.path.dirname(savepath))
         else:
-            now = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+            now = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
             dir = f"{os.path.expanduser('~/Downloads')}/Heatmap ({now})"
             os.mkdir(dir)
             width, height = self.controller.figure.get_size_inches()
@@ -660,20 +660,27 @@ class MainWindow(QMainWindow):
             #             ]
             #         ),
             #     )
+            print(
+                self.controller.figure.axes[:count],
+                self.controller.figure.axes[count:],
+            )
+            i = 1
             for plot, cbar, file in zip(
                 self.controller.figure.axes[:count],
                 self.controller.figure.axes[count:],
                 self.controller.loadedFilesModel.files,
             ):
+                # now = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
                 name = os.path.splitext(os.path.basename(file))[0]
                 extent = full_extent(plot, cbar).transformed(
                     self.controller.figure.dpi_scale_trans.inverted()
                 )
                 self.controller.figure.savefig(
-                    f"{dir}/heatmap-{name}.png",
+                    f"{dir}/heatmap-{name}-{i}.png",
                     transparent=True,
                     bbox_inches=extent,
                 )
+                i += 1
             # self._save_analyzed_data(f"{dir}/info.csv")
 
     def _save_analyzed_data(self, savepath):
